@@ -1,0 +1,15 @@
+<!-- This script is meant for redirecting based on the browser language -->
+
+<script>
+
+var language = navigator.language;
+
+if (language.indexOf('fr') > -1) {
+    document.location.href = 'fr/';
+} else if (language.indexOf('en') > -1) {
+    document.location.href = 'en/';
+} else {
+    document.location.href = 'en/';
+}
+</script>
+

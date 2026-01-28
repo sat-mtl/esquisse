@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+	<title>Stretched Chord to show Flows</title>
+
+	<!-- D3.js -->	
+    <script src="http://d3js.org/d3.v3.js"></script>
+	<script src="d3.stretched.chord.js"></script>
+	<script src="d3.layout.chord.sort.js"></script>
+	
+	<!-- jQuery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	
+	<!-- Open Sans & CSS -->
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:700,400,300' rel='stylesheet' type='text/css'>
+	  <style>
+		body {
+		  font-family: 'Open Sans', sans-serif;
+		  font-size: 12px;
+		  font-weight: 400;
+		  color: #525252;
+		  text-align: center;
+		}	
+		
+		line {
+		  stroke: #000;
+		  stroke-width: 1.px;
+		}
+
+		text {
+		  font-size: 8px;
+		}
+
+		.titles{
+		  font-size: 10px;
+		}
+
+		path.chord {
+		  fill-opacity: .80;
+		}
+	  </style>
+  </head>
+  <body>
+
+    <div id="chart"></div>	
+    <script src="script.js"></script>
+	
+  </body>
+</html>

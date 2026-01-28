@@ -1,0 +1,39 @@
+{
+  "name": "gitlab-sat-mtl-sat-mtl-io",
+  "version": "1.0.0",
+  "description": "Open-source tools created at the Society for Art and Technology",
+  "main": "./src/tools/script.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack serve --mode=development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/sat-mtl/sat-mtl.gitlab.io.git"
+  },
+  "author": "Christian Frisson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/sat-mtl/sat-mtl.gitlab.io/issues"
+  },
+  "homepage": "https://gitlab.com/sat-mtl/sat-mtl.gitlab.io#readme",
+  "devDependencies": {
+    "@babel/core": "^7.26.7",
+    "@babel/preset-env": "^7.26.7",
+    "@babel/preset-react": "^7.26.3",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^6.7.3",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "dependencies": {
+    "d3": "^7.8.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "reactflow": "^11.11.4"
+  }
+}

@@ -1,0 +1,78 @@
+% https://tex.stackexchange.com/a/8935
+
+\documentclass[]{standalone}
+\usepackage{standalone}
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning, fit,}
+\usepackage{lscape}
+\usepackage{ifpdf}
+\usepackage[\ifpdf\else
+hypertex
+\fi]{hyperref}
+
+\begin{document}
+\begin{tikzpicture}[font=\ttfamily,
+  mymatrix/.style={matrix of nodes, nodes=typetag, row sep=1em, text width=10em},
+  mycontainer/.style={draw=gray, shape=rectangle, rounded corners},
+  typetag/.style={draw=gray, shape=rectangle, rounded corners, inner sep=1ex, anchor=west},
+  title/.style={draw=none, color=gray, inner sep=0pt},
+  subtitle/.style={draw=none, color=red}
+  ]
+  
+  \matrix[mymatrix, matrix anchor=north] (mx1a) {
+    |[title]|Rendu immersif \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/EditionInSitu}{Édition in Situ}\\
+    \textit{Créer dans un environnement immersif des prototypes de scénographie 3D} \\
+    |[title]|Systèmes autonomes \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/mirador}{Mirador}\\
+    \textit{Faciliter le déploiement d'espaces immersifs temporaires} \\
+    |[subtitle]|\href{https://sat-mtl.gitlab.io/documentation/puara/fr}{Puara}\\
+    \textit{Framework pour outils autonomes et contrôle gestuel} \\
+  };
+  
+  \matrix[mymatrix, left=of mx1a.north west, anchor=south east] (mx1e) {
+    |[title]|Interaction \\
+    |[subtitle]|\href{https://sat-mtl.gitlab.io/documentation/livepose/}{LivePose}\\
+    \textit{Capturer les poses humaines et les mouvements en temps réel} \\
+  };
+  
+  \matrix[mymatrix, right=of mx1a.base east, anchor=north west] (mx1) {
+    |[title]|Téléprésence \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/scenic}{Scenic}\\
+    \textit{Interagir avec Switcher grâce à une interface graphique} \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/switcher}{Switcher}\\
+    \textit{Créer des expériences collaboratives par Internet} \\
+  };
+  
+  \matrix[mymatrix, left=of mx1a.west, anchor=north east] (mx1d) {
+    |[title]|Spatialisation sonore \\
+    |[subtitle]|\href{https://sat-mtl.gitlab.io/documentation/satie}{SATIE}\\
+    \textit{Réaliser des scènes audio denses, en direct} \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/audiodice}{Audiodice}\\
+    \textit{Peupler l'espace physique de sources sonores} \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/vaRays}{vaRays}\\
+    \textit{Calculer en temps réel des réponses impulsionnelles pour un environnement virtuel} \\
+  };
+  
+  \matrix[mymatrix, right=of mx1a.10, anchor=south west] (mx1b) {
+    |[title]|Projection mapping \\
+    |[subtitle]|\href{https://sat-mtl.gitlab.io/documentation/splash}{Splash}\\
+    \textit{Réaliser du vidéomapping en temps réel} \\
+    |[subtitle]|\href{https://gitlab.com/sat-mtl/tools/splash/calimiro}{Calimiro}\\
+    \textit{Calibrer des environnements immersifs par lumière structurée} \\
+  };
+  
+  \node[mycontainer, fit=(mx1)] {};
+  \node[mycontainer, fit=(mx1a)] {};
+  \node[mycontainer, fit=(mx1b)] {};
+  \node[mycontainer, fit=(mx1d)] {};
+  \node[mycontainer, fit=(mx1e)] {};
+
+  \draw[thick, shorten >=5pt, shorten <=5pt] (mx1e) -- (mx1a);
+  \draw[thick, shorten >=5pt, shorten <=5pt] (mx1) to (mx1a);
+  \draw[thick, shorten >=5pt, shorten <=5pt] (mx1d) to (mx1a);
+  \draw[thick, shorten >=4pt, shorten <=4pt] (mx1b) to (mx1a);
+       
+\end{tikzpicture}
+\end{document}
+
