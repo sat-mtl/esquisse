@@ -79,7 +79,7 @@ header, main, footer{
       justify-content: center;
       align-items: center;
       cursor: grab;
-     
+      overflow: hidden;
     }
      
     .dndflow .dndnode.input {

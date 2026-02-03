@@ -5,7 +5,9 @@ import { NodeTemplate } from "./components/NodeTemplate.jsx";
 export default () => {
     return (
         <aside>
-            <NodeTemplate name="bob" />
+            <NodeTemplate logoFileName="jack.png" />
+            <NodeTemplate logoFileName="Switcher.png" />
+            
         </aside>
     );
 };
