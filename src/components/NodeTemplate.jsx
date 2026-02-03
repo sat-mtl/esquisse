@@ -13,7 +13,7 @@ export function NodeTemplate({ name, logo }){
     return (
         /*TODO Find code for where the node behaves in the play area*/
         <div className="dndnode input" onDragStart={(event) => onDragStart(event, "image")} draggable>
-                <img className="image" src="/logos/Calimiro.png" alt="/logosat.png" />              
+                <img className="image" src="/images/audiodice.png" alt="/logosat.png" />              
         </div>
     )
 }
