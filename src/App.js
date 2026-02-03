@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useState } from 'react';
-import ReactFlow, { ReactFlowProvider, useReactFlow, addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls } from 'reactflow';
+import ReactFlow, { ReactFlowProvider, MarkerType, useReactFlow, addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import { initialNodes } from "./nodes.jsx";
@@ -16,6 +16,13 @@ const getId = () => `${id++}`;
 const nodeTypes = {
   image: ImageNode,
 };
+
+const addEndMarker = (edge) => ({
+    ...edge,
+    markerEnd: {
+        type: MarkerType.Arrow,
+    },
+});
 
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
@@ -63,7 +70,7 @@ const Flow = () => {
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges],
   );
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges],
+    (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)), [setEdges],
   );
 
   const onNodeContextMenu = useCallback((event, node) => {
