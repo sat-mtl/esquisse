@@ -1,7 +1,8 @@
 import React from "react";
 import { useDnD } from "../DnDContext.jsx";
 
-export function NodeTemplate(){
+export function NodeTemplate({ name, logo }){
+    //Makes it so that the node is draggable
     const [_, setType] = useDnD();
     
         const onDragStart = (event, nodeType) => {
@@ -10,8 +11,9 @@ export function NodeTemplate(){
         };
 
     return (
-        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "input")} draggable>
-                Input Node
+        /*TODO Find code for where the node behaves in the play area*/
+        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "image")} draggable>
+                <img className="image" src="/logos/Calimiro.png" alt="/logosat.png" />              
         </div>
     )
 }

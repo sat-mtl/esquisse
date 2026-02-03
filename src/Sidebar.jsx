@@ -5,7 +5,7 @@ import { NodeTemplate } from "./components/NodeTemplate.jsx";
 export default () => {
     return (
         <aside>
-            <NodeTemplate />
+            <NodeTemplate name="bob" />
         </aside>
     );
 };
