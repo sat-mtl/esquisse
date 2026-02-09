@@ -13,7 +13,8 @@ export function SidebarNode({logoFileName}){
     return (
         /*TODO Find code for where the node behaves in the play area*/
         <div className="dndnode input" onDragStart={(event) => onDragStart(event, "image")} draggable>
-                <img className="image" src={`/images/${logoFileName}`} alt="/logosat.png" />              
+            <img className="image" src={`/images/${logoFileName}`} alt="/logosat.png" />
+            <div className="popup">YOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYOYO</div>          
         </div>
     )
 }
