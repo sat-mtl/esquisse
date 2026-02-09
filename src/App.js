@@ -53,10 +53,10 @@ const Flow = () => {
       },
     };
 
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => nds.concat(newNode)); //add a node to nodeslist
   }, [screenToFlowPosition, type]);
 
-  const onNodesChange = useCallback(
+  const onNodesChange = useCallback( //applies nodes changes and updates setNodes
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes],
   );
   const onEdgesChange = useCallback(
