@@ -1,7 +1,7 @@
 import React from "react";
 import { useDnD } from "../DnDContext.jsx";
 
-export function NodeTemplate({logoFileName}){
+export function SidebarNode({logoFileName}){
     //Makes it so that the node is draggable
     const [_, setType] = useDnD();
     
