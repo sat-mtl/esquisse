@@ -5,7 +5,7 @@ import { SidebarNode } from "./components/SidebarNode.jsx";
 export default () => {
     return (
         <aside>
-            <SidebarNode logoFileName="jack.png" />
+            <SidebarNode name="Jack" logoFileName="jack.png" />
             <SidebarNode logoFileName="Switcher.png" />           
         </aside>
     );
