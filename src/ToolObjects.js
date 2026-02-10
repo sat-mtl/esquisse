@@ -1,8 +1,8 @@
 //Data Objects on the Tools
 
-const OssiaObj = {
+export const OssiaObj = {
     name: "Ossia", 
-    logoImage: "logos/HapticFloor.png",
+    logoImage: "images/HapticFloor.png",
     description: "Temp Description",
     input: ["Audio", "Video"]
 };
