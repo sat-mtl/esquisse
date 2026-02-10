@@ -8,7 +8,7 @@ import * as tools from "./ToolObjects.js";
 export default () => {
     return (
         <aside>
-            <SidebarNode name={tools.OssiaObj.name} logoFileName={tools.OssiaObj.logoImage} />
+            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
             <SidebarNode logoFileName="Switcher.png" />           
         </aside>
     );
