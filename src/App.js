@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   ReactFlowProvider,
   MarkerType,
@@ -89,26 +89,36 @@ const Flow = () => {
     [setEdges],
   );
 
+  /* Saves the state of the flow diagram to localStorage for future use */
   const onSave = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
       localStorage.setItem(flowKey, JSON.stringify(flow));
     }
   }, [rfInstance]);
-
+  
+  /* Restores the state of the flow diagram to whatever is saved in localStorage if it exists */
+  const restoreFlow = useCallback(() => {
+    const flow = JSON.parse(localStorage.getItem(flowKey));
+    
+    if (flow) {
+      const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+      setNodes(flow.nodes || []);
+      setEdges(flow.edges || []);
+      setViewport({ x, y, zoom });
+    }
+  }, [setNodes, setEdges, setViewport]);
+  
   const onRestore = useCallback(() => {
-    const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(flowKey));
-
-      if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
-      }
-    };
     restoreFlow();
-  }, [setNodes, setViewport]);
+  }, [restoreFlow]);
+  
+  /* Restores the state of the node diagram each time the page is reloaded */
+  useEffect(() => {
+    if (rfInstance) {
+      restoreFlow();
+    }
+  }, [rfInstance, restoreFlow]); 
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
@@ -148,6 +158,8 @@ const Flow = () => {
     },
     [nodes],
   );
+  
+  
 
   return (
     <div className="dndflow">
@@ -169,6 +181,7 @@ const Flow = () => {
           onNodeContextMenu={onNodeContextMenu}
           onPaneClick={onPaneclick}
           nodeTypes={nodeTypes}
+          
           fitView
         >
           <Background />
