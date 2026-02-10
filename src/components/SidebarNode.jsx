@@ -24,6 +24,7 @@ export function SidebarNode({tool}){
         const onDragStart = (event, nodeType) => {
             setType(nodeType);
             event.dataTransfer.effectAllowed = "move";
+            setDescr(null);
         };
 
     return (
@@ -36,7 +37,11 @@ export function SidebarNode({tool}){
                 <div className="popup" style={{
                     left: descr.x - 50,
                     top: descr.y,
-                }}>{tool.name} <br /></div>
+                }}>
+                    <b>{tool.name} </b>
+                     <br />
+                    {tool.description}
+                </div>
             )}
         </>
     )

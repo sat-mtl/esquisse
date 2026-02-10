@@ -10,13 +10,12 @@ export const OssiaObj = {
 export const AudioDiceObj = {
     name: "Audio Dice", 
     logoImage: "images/audiodice.png",
-    description: "Temp Description",
+    description: "A set of 5 speakers comprised of 12 independent drivers each",
     input: ["Temp", "Temp"]
 };
 
 export const LivePoseObj = {
     name: "LivePose", 
     logoImage: "images/LivePose.png",
-    description: "Temp Description",
-    input: ["Temp", "Temp"]
+    description: "A command line tool which tracks people skeletons and applies filters"
 };
