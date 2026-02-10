@@ -80,20 +80,9 @@ const Flow = () => {
         },
       };
 
-<<<<<<< HEAD
-    setNodes((nds) => nds.concat(newNode)); //add a node to nodeslist
-  }, [screenToFlowPosition, type]);
-
-  const onNodesChange = useCallback( //applies nodes changes and updates setNodes
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes],
-  );
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges],
-=======
       setNodes((nds) => nds.concat(newNode));
     },
     [screenToFlowPosition, type],
->>>>>>> feature/saving
   );
   const onConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)),
