@@ -20,7 +20,7 @@ export default function ContextMenu({
     return (
         <div
             className="context-menu"
-            style={{ top, left, right, bottom,}}
+            style={{ top, left, right, bottom }}
             {...props}
         >
             <div onClick={() => duplicateNode(id)}>Duplicate Node</div>
