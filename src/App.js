@@ -4,8 +4,6 @@ import ReactFlow, {
   MarkerType,
   useReactFlow,
   addEdge,
-  applyEdgeChanges,
-  applyNodeChanges,
   Background,
   Controls,
   useNodesState,
