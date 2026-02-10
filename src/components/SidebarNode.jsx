@@ -26,9 +26,13 @@ export function SidebarNode({tool}){
         setDescr(null);
     };
 
+    const handleClick = () => {
+        window.open(`${tool.docLink}`, "_blank");
+    }
+
     return (
         <>
-            <div className="dndnode input" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "image")} draggable>
+            <div className="dndnode input" onClick={handleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "image")} draggable>
                 <img className="image" src={`/${tool.logoImage}`} alt="/logosat.png" />  
             </div>
 
