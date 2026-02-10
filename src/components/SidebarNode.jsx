@@ -8,7 +8,6 @@ export function SidebarNode({tool}){
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         setDescr({
-            text: name,
             x: rect.left,
             y: rect.top + rect.height / 2,
         });
@@ -21,11 +20,11 @@ export function SidebarNode({tool}){
     //Makes it so that the node is draggable
     const [_, setType] = useDnD();
     
-        const onDragStart = (event, nodeType) => {
-            setType(nodeType);
-            event.dataTransfer.effectAllowed = "move";
-            setDescr(null);
-        };
+    const onDragStart = (event, nodeType) => {
+        setType(nodeType);
+        event.dataTransfer.effectAllowed = "move";
+        setDescr(null);
+    };
 
     return (
         <>
