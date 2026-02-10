@@ -4,12 +4,14 @@ import { SidebarNode } from "./components/SidebarNode.jsx";
 import * as tools from "./ToolObjects.js";
 
 
-
 export default () => {
     return (
         <aside>
             <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
-            <SidebarNode logoFileName="Switcher.png" />           
+            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
+            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
+            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
+
         </aside>
     );
 };

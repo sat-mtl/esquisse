@@ -61,6 +61,7 @@ header, main, footer{
       padding: 15px 10px;
       font-size: 12px;
       background: #fcfcfc;
+      overflow: visible;
     }
      
     .dndflow aside .description {
@@ -76,7 +77,7 @@ header, main, footer{
       border-radius: 50%;
       margin-bottom: 10px;
       display: flex;
-      justify-content: center;
+      
       align-items: center;
       cursor: grab;
       position: relative;
@@ -88,16 +89,15 @@ header, main, footer{
     }
 
     .popup{
-      position: absolute;
-     
-      
+      position: fixed;
+      transform: translate(-100%, -50%);
       width: 100px;
       height: 100px;
       background-color: white;
       margin: auto;
       border: 3px solid black;
       border-radius: 5px;
-      display: none;
+      
       justify-content: center;
       align-items: center;
     }
