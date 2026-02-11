@@ -20,7 +20,7 @@ import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import SandboxNode from './components/SandboxNode.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ImageNode from './ImageNode.jsx';
-
+import * as tools from "./ToolObjects.js";
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -78,6 +78,11 @@ const Flow = () => {
     console.log(obj);
     console.log(type);
     
+    //If creating a sandbox node, check that there is a valid toolObj to pass to it.
+    if(type == 'sandbox' && !tools.checkValid(obj)){ 
+      throw "Invalid toolObj: " + obj.name;
+    }
+
     const newNode = {
       id: "dndNode_" + getId(),
       type,
