@@ -30,7 +30,7 @@ export default memo(({ data, isConnectable }) => {
             
             <p>sandboxNode</p>
             <p> {obj.name} </p>
-            <img className="image" src={`/images/${data.toolObj.logoFile}`} alt="/logosat.png" /> 
+            <img className="image" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" /> 
 
             <Handle
                 type="source"
