@@ -15,6 +15,14 @@ export const AudioDiceObj = {
     docLink: "https://gitlab.com/sat-mtl/tools/audiodice"
 };
 
+export const PoireObj = {
+    name: "Poire", 
+    logoImage: "images/poire.png",
+    description: "A prototype web controller for SATIE",
+    input: ["Temp", "Temp"],
+    docLink: "https://gitlab.com/sat-mtl/metalab/poire"
+};
+
 export const LivePoseObj = {
     name: "LivePose", 
     logoImage: "images/LivePose.png",

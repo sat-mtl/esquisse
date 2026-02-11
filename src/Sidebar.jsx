@@ -7,8 +7,8 @@ import * as tools from "./ToolObjects.js";
 export default () => {
     return (
         <aside>
-            <SidebarNode tool={tools.OssiaObj} />
             <SidebarNode tool={tools.AudioDiceObj} />
+            <SidebarNode tool={tools.PoireObj} />
             <SidebarNode tool={tools.LivePoseObj} />
         </aside>
     );
