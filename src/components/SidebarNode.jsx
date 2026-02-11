@@ -5,6 +5,7 @@ import { useDnD } from "../DnDContext.jsx";
 export function SidebarNode({tool}){
     const[descr, setDescr] = useState(null);
 
+    //Description box appears when mouse is inside node
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         setDescr({
@@ -13,6 +14,7 @@ export function SidebarNode({tool}){
         });
     };
 
+    //Description box disappears when mouse is outside node
     const handleMouseLeave = () => {
         setDescr(null);
     }
@@ -20,12 +22,14 @@ export function SidebarNode({tool}){
     //Makes it so that the node is draggable
     const [_, setType] = useDnD();
     
+    //Moves when dragged
     const onDragStart = (event, nodeType) => {
         setType(nodeType);
         event.dataTransfer.effectAllowed = "move";
         setDescr(null);
     };
 
+    //Links to external documentation when clicked
     const handleClick = () => {
         window.open(`${tool.docLink}`, "_blank");
     }
