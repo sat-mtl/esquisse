@@ -7,11 +7,9 @@ import * as tools from "./ToolObjects.js";
 export default () => {
     return (
         <aside>
-            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
-            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
-            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
-            <SidebarNode name={tools.OssiaObj.name} descr={tools.OssiaObj.description} logoFileName={tools.OssiaObj.logoImage} />
-
+            <SidebarNode toolObj={tools.AudioDiceObj} />
+            <SidebarNode toolObj={tools.PoireObj} />
+            <SidebarNode toolObj={tools.LivePoseObj} />
         </aside>
     );
 };
