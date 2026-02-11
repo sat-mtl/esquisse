@@ -2,6 +2,34 @@ import React, { useState } from "react";
 import { useDnD } from "../DnDContext.jsx";
 
 
+<<<<<<< src/components/SidebarNode.jsx
+export function SidebarNode({toolObj}){
+    
+    
+    
+    //Makes it so that the node is draggable
+    const [type, setType, obj, setObj] = useDnD();
+
+        const onDragStart = (event, nodeType) => {
+            setType(nodeType);
+            event.dataTransfer.effectAllowed = "move";
+            setObj(toolObj);
+
+            //console.log("Object in SidebarNode")
+            //console.log(obj);
+            
+        };
+
+    return (
+        
+        /* onDragStart(event, "XXX") is where you define the type created when dragged of of the side bar! 
+        For us node type will be sandbox which takes in a object defined in ToolObjects.js to work
+        App.js transfers the data from this node to the new one on the On*/
+        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "sandbox")} draggable> 
+            <img className="image" src={`/${toolObj.logoFile}`} alt="/logosat.png" />
+            <div className="popup">{toolObj.name} <br /> {toolObj.descr} </div>   
+        </div>
+=======
 export function SidebarNode({tool}){
     const[descr, setDescr] = useState(null);
 
@@ -36,7 +64,7 @@ export function SidebarNode({tool}){
 
     return (
         <>
-            <div className="dndnode input" onClick={handleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "image")} draggable>
+            <div className="dndnode input" onClick={handleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
                 <img className="image" src={`/${tool.logoImage}`} alt="/logosat.png" />  
             </div>
 
@@ -51,5 +79,6 @@ export function SidebarNode({tool}){
                 </div>
             )}
         </>
+>>>>>>> src/components/SidebarNode.jsx
     )
 }
