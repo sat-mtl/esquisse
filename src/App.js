@@ -17,14 +17,17 @@ import { initialEdges } from "./edges.jsx";
 import Sidebar from "./Sidebar.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 
-import ImageNode from "./ImageNode.jsx";
-import ContextMenu from "./ContextMenu.jsx";
+import SandboxNode from './components/SandboxNode.jsx';
+import ContextMenu from './ContextMenu.jsx';
+import ImageNode from './ImageNode.jsx';
+
 
 let id = 0;
 const getId = () => `${id++}`;
 
 const nodeTypes = {
   image: ImageNode,
+  sandbox: SandboxNode,
 };
 
 const addEndMarker = (edge) => ({
@@ -41,7 +44,7 @@ const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
-  const [type] = useDnD();
+  const [type,setType, toolObj, setObj] = useDnD(); //type of currently dragged item
   const [menu, setMenu] = useState(null);
   const ref = useRef(null);
   const [rfInstance, setRfInstance] = useState(null);
@@ -61,24 +64,22 @@ const Flow = () => {
         return;
       }
 
-      // project was renamed to screenToFlowPosition
-      // and you don't need to subtract the reactFlowBounds.left/top anymore
-      // details: https://reactflow.dev/whats-new/2023-11-10
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-      const newNode = {
-        id: "dndNode_" + getId(),
-        type,
-        position,
-        data: {
-          label: `${type} node`,
-          ...(type === "image" && {
-            image: { src: "images/Satellite.png", height: 300, width: 400 },
-          }), // Add image to data if type is image
-        },
-      };
+    // project was renamed to screenToFlowPosition
+    // and you don't need to subtract the reactFlowBounds.left/top anymore
+    // details: https://reactflow.dev/whats-new/2023-11-10
+    const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+
+
+    const newNode = {
+      id: "dndNode_" + getId(),
+      type,
+      position,
+      data: { 
+        label: `${type} node`,
+        ...(type === 'image' && { image: {src: 'images/Satellite.png', height: 300, width: 400} }), // Add image to data if type is image
+        ...(type === 'sandbox' && {toolObj: toolObj}),
+      },
+    };
 
       setNodes((nds) => nds.concat(newNode));
     },

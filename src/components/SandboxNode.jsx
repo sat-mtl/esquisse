@@ -1,22 +1,43 @@
-import React from "react";
+
 import { useDnD } from "../DnDContext.jsx";
-//import "../ToolObject.js";
+import "../ToolObjects.js";
 
-export function SandboxNode(toolObj){
-    //Makes it so that the node is draggable
-    const [_, setType] = useDnD();
-    
-        const onDragStart = (event, nodeType) => {
-            setType(nodeType);
-            event.dataTransfer.effectAllowed = "move";
-        };
+import React, { memo } from "react";
+import { Handle, Position } from "reactflow";
 
+
+
+
+
+export default memo(({ data, isConnectable }) => {
+
+    //debug mode
+    //console.log("Object in SandboxNode")
+    //console.log(data.toolObj);
+
+    let obj = data.toolObj;
+
+            
+   
     return (
-        /*TODO Find code for where the node behaves in the play area*/
-        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "image")} draggable>
-                <img className="image" src={`/images/${toolObj.logoImage}`} alt="/logosat.png" />              
-        </div>
-    )
+        <>
+            <Handle
+                type="target"
+                position={Position.Top}
+                isConnectable={isConnectable}
+                onConnect={(params) => console.log("handle onConnect", params)}
+            />
+            
+            <p>sandboxNode</p>
+            <p> {obj.name} </p>
+            <img className="image" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" /> 
 
+            <Handle
+                type="source"
+                position={Position.Bottom}
+                isConnectable={isConnectable}
+            />
+        </>
+    );
 
-}
+});
