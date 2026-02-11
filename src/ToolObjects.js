@@ -2,7 +2,7 @@
 
 export const OssiaObj = {
     name: "Ossia", 
-    logoImage: "images/HapticFloor.png",
+    logoFile: "../images/HapticFloor.png",
     description: "Temp Description",
     input: ["Audio", "Video"],
     docLink: "temp"};
