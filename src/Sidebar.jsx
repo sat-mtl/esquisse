@@ -7,9 +7,9 @@ import * as tools from "./ToolObjects.js";
 export default () => {
     return (
         <aside>
-            <SidebarNode tool={tools.AudioDiceObj} />
-            <SidebarNode tool={tools.PoireObj} />
-            <SidebarNode tool={tools.LivePoseObj} />
+            <SidebarNode toolObj={tools.AudioDiceObj} />
+            <SidebarNode toolObj={tools.PoireObj} />
+            <SidebarNode toolObj={tools.LivePoseObj} />
         </aside>
     );
 };
