@@ -44,11 +44,13 @@ const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
-  const [type,setType, toolObj, setObj] = useDnD(); //type of currently dragged item
+  
   const [menu, setMenu] = useState(null);
   const ref = useRef(null);
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
+
+  const [type, setType, obj, setObj] = useDnD(); //type of currently dragged item
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -58,6 +60,7 @@ const Flow = () => {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
+
 
       // check if the dropped element is valid
       if (!type) {
@@ -69,7 +72,12 @@ const Flow = () => {
     // details: https://reactflow.dev/whats-new/2023-11-10
     const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-
+    
+    
+    console.log("In App.js");
+    console.log(obj);
+    console.log(type);
+    
     const newNode = {
       id: "dndNode_" + getId(),
       type,
@@ -77,13 +85,13 @@ const Flow = () => {
       data: { 
         label: `${type} node`,
         ...(type === 'image' && { image: {src: 'images/Satellite.png', height: 300, width: 400} }), // Add image to data if type is image
-        ...(type === 'sandbox' && {toolObj: toolObj}),
+        ...(type === 'sandbox' && {toolObj: obj}),
       },
     };
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [screenToFlowPosition, type],
+    [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
   const onConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)),

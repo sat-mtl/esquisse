@@ -24,10 +24,15 @@ export function SidebarNode({toolObj}){
     //Moves when dragged
     const onDragStart = (event, nodeType) => {
         setType(nodeType);
+        setObj(toolObj);
         event.dataTransfer.effectAllowed = "move";
         setDescr(null);
-        setObj(toolObj)
+        
+
+        console.log("On Drag Start");
+        console.log(obj);
     };
+
 
     //Links to external documentation when clicked
     const handleClick = () => {
