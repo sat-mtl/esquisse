@@ -1,5 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   ReactFlowProvider,
   MarkerType,
   useReactFlow,
@@ -9,8 +10,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Panel,
-} from "reactflow";
-import "reactflow/dist/style.css";
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 
 import { initialNodes } from "./nodes.jsx";
 import { initialEdges } from "./edges.jsx";
@@ -21,6 +22,7 @@ import SandboxNode from './components/SandboxNode.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ImageNode from './ImageNode.jsx';
 import * as tools from "./ToolObjects.js";
+import ConnectionLine from './components/ConnectionLine.jsx'; 
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -99,31 +101,8 @@ const Flow = () => {
     [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
   const onConnect = useCallback(
-    (connection) => {
-      const sourceNode = nodes.find(
-        (node) => node.id === connection.source
-      );
-  
-      const targetNode = nodes.find(
-        (node) => node.id === connection.target
-      );
-  
-      if (!sourceNode || !targetNode) {
-        return; // Safety guard
-      }
-  
-      // Check compatibility
-      if (!tools.canConnect(sourceNode.data.toolObj, targetNode.data.toolObj)) {
-        console.log("These nodes cannot connect.");
-        return; // Stop here — do NOT add edge
-      }
-  
-      // If compatible, add edge
-      setEdges((eds) =>
-        addEdge(addEndMarker(connection), eds)
-      );
-    },
-    [nodes, setEdges]
+    (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)),
+    [setEdges],
   );
 
   /* Saves the state of the flow diagram to localStorage for future use */
@@ -215,9 +194,24 @@ const Flow = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onInit={setRfInstance}
+          connectionLineComponent={ConnectionLine}
           onNodeContextMenu={onNodeContextMenu}
           onPaneClick={onPaneclick}
           nodeTypes={nodeTypes}
+          isValidConnection={
+            (connection) => {
+              const sourceNode = nodes.find(n => n.id === connection.source);
+              const targetNode = nodes.find(n => n.id === connection.target);
+              
+              if (!sourceNode || !targetNode)
+                return false;
+              
+              return tools.canConnect(
+                sourceNode.data.toolObj, 
+                targetNode.data.toolObj
+              )
+            }
+          }
           
           fitView
         >

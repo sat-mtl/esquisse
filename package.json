@@ -31,9 +31,9 @@
     "webpack-dev-server": "^4.15.2"
   },
   "dependencies": {
+    "@xyflow/react": "^12.10.0",
     "d3": "^7.8.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "reactflow": "^11.11.4"
+    "react-dom": "^19.0.0"
   }
 }
