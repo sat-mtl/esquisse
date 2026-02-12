@@ -1,4 +1,30 @@
-//Data Objects on the Tools
+/*Data Objects on the Tools
+
+While javascript is not a typed language we are treating toolObj as a type of structure
+*/
+
+
+export function checkValid(toolObj){
+    let fields = ["name", "logoFile", "description", "input", "docLink"];
+
+    if (toolObj == null){ // if given empty object, false
+        return false;
+    }
+
+    let isValid = true;
+
+    //Lambda to check whether each field in list exist in the object
+    //if no, sets isValid to false
+    const fieldExists = (fieldName) => { 
+        if (toolObj[fieldName] == null){
+          isValid = false;
+        } 
+    }
+
+    fields.forEach(fieldExists);
+    return isValid;
+}
+
 
 export const OssiaObj = {
     name: "Ossia", 
