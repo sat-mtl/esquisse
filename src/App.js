@@ -99,8 +99,31 @@ const Flow = () => {
     [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)),
-    [setEdges],
+    (connection) => {
+      const sourceNode = nodes.find(
+        (node) => node.id === connection.source
+      );
+  
+      const targetNode = nodes.find(
+        (node) => node.id === connection.target
+      );
+  
+      if (!sourceNode || !targetNode) {
+        return; // Safety guard
+      }
+  
+      // Check compatibility
+      if (!tools.canConnect(sourceNode.data.toolObj, targetNode.data.toolObj)) {
+        console.log("These nodes cannot connect.");
+        return; // Stop here — do NOT add edge
+      }
+  
+      // If compatible, add edge
+      setEdges((eds) =>
+        addEdge(addEndMarker(connection), eds)
+      );
+    },
+    [nodes, setEdges]
   );
 
   /* Saves the state of the flow diagram to localStorage for future use */
