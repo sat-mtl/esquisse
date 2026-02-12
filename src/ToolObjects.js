@@ -25,6 +25,15 @@ export function checkValid(toolObj){
     return isValid;
 }
 
+export function canConnect(obj1, obj2) {
+  for (const input of obj1.input) {
+    if (obj2.input.includes(input)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 export const OssiaObj = {
     name: "Ossia", 
