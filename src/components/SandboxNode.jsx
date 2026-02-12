@@ -4,6 +4,7 @@ import { useDnD } from "../DnDContext.jsx";
 import React, { memo } from "react";
 import { Handle, Position } from "reactflow";
 
+
 /*
 Sandbox nodes are nodes that take in a toolObj feild that contains information on 
 the details of an object. It is assumed that created nodes have a valid toolObj passed to them.
@@ -33,24 +34,28 @@ export default memo(({ data, isConnectable }) => {
 
             
     return (
-        <>
+        <div className = "sandbox-node">
             <Handle
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable}
                 onConnect={(params) => console.log("handle onConnect", params)}
             />
-            
-            <p>sandboxNode</p>
-            <p> {obj.name} </p>
-            <img className="image" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" /> 
+
+        
+            <img id= "logo-img" src={`/${data.toolObj.logoFile}`} alt="/logosat.png"/> 
+    
+            <h5> {obj.name} </h5>
+        
+            <p>{obj.description}</p>
 
             <Handle
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
             />
-        </>
+
+        </div>
     );
 
 });
