@@ -54,7 +54,7 @@ export const PoireObj = {
     name: "Poire", 
     logoFile: "images/poire.png",
     description: "A prototype web controller for SATIE",
-    input: ["Temp", "Temp"],
+    input: ["Temp1", "Temp2"],
     docLink: "https://gitlab.com/sat-mtl/metalab/poire"
 };
 
