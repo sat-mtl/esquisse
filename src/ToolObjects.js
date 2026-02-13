@@ -34,6 +34,14 @@ export function canConnect(obj1, obj2) {
   return false;
 }
 
+export function getSharedInput(toolA, toolB) {
+  const inputsA = toolA.input; 
+  const inputsB = toolB.input; 
+  
+  const shared = inputsA.find(input => inputsB.includes(input));
+  return shared || null; 
+}
+
 
 export const OssiaObj = {
     name: "Ossia", 

@@ -38,8 +38,7 @@ export default memo(({ data, isConnectable }) => {
         isConnectable={isConnectable}
         onConnect={(params) => console.log("handle onConnect", params)}
       />
-
-z      
+      
       <img
         id="logo-img"
         src={`/${data.toolObj.logoFile}`}

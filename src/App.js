@@ -23,6 +23,7 @@ import ContextMenu from './ContextMenu.jsx';
 import ImageNode from './ImageNode.jsx';
 import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
+import CustomEdge from "./components/CustomEdge.jsx";
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -31,6 +32,10 @@ const nodeTypes = {
   image: ImageNode,
   sandbox: SandboxNode,
 };
+
+const edgeTypes = {
+  custom: CustomEdge
+}
 
 const addEndMarker = (edge) => ({
   ...edge,
@@ -101,8 +106,31 @@ const Flow = () => {
     [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(addEndMarker(connection), eds)),
-    [setEdges],
+    (connection) => {
+      const sourceNode = nodes.find(n => n.id === connection.source);
+      const targetNode = nodes.find(n => n.id === connection.target);
+      
+      if (!sourceNode || !targetNode) return;
+      
+      const sharedInput = tools.getSharedInput(
+        sourceNode.data.toolObj,
+        targetNode.data.toolObj
+      );
+      
+      if (!sharedInput) return;
+      
+      setEdges((eds) =>
+        addEdge(
+          addEndMarker({
+            ...connection,
+            type: "custom",
+            data: { sharedInput },
+          }),
+          eds
+        )
+      );
+    },
+    [nodes, setEdges],
   );
 
   /* Saves the state of the flow diagram to localStorage for future use */
@@ -187,6 +215,7 @@ const Flow = () => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          edgeTypes={edgeTypes}
           ref={ref}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
