@@ -1,12 +1,5 @@
 import { MarkerType } from '@xyflow/react'
 
 export const initialEdges = [
-    {
-        id: "e1-2",
-        source: "1",
-        target: "2",
-        markerEnd: {
-            type: MarkerType.Arrow,
-        },
-    },
+  // Empty for now, getting replaced with initial edges of our custom nodes.
 ];
