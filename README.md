@@ -4,7 +4,9 @@
 ## Description
 A visulization of the toolbox of the Société des Arts Technologiques (SAT)'s software and hardware. THe visualization is a node based editor where users can build a flowchart of the tools they are conisdering useing for their projects. The goal is to allow users to understand where SAT's software fits into their workflow. In doing so the visulization indicates whether software can communicate with each other and suggest the protocols that could be used to do so. The visulization includes both SAT's software as well as many common external tools.
 
-This project was initially built by a set of interns from Worcester Polytechnic Institute (Mass, USA) in early 2026. (Jan-Feb).
+### Credit
+Project by Matthew Ford, Sarah Hatch, Lucien La Rock, Cristian Pineda Delgado, and Taylor Meier.
+Built during an internship by students from Worcester Polytechnic Institute (Mass, USA) in early 2026. (Jan-Feb).
 
 
 ### Portail pour dévs informatique
