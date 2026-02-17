@@ -3,7 +3,7 @@
 html{
     
     color:black;
-    font-family:sans;
+    font-family: soin sans;
     justify-content: center;
     scroll-behavior: smooth;
     display: flex;
@@ -13,7 +13,7 @@ html{
 }
 
 h1, h2, h3{
-	font-family: Irma Regular;
+	font-family: soin sans;
 }
 
 a{
@@ -22,9 +22,10 @@ color: black;}
 .context-menu {
   background: white;
   border-style: solid;
-  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 0.1);
   position: absolute;
   z-index: 10;
+  font-family: soin sans;
 }
  
 .context-menu button {
@@ -53,50 +54,80 @@ header, main, footer{
   display: flex;
   flex-grow: 1;
   height: 100%;
+  background-color: white;
 }
   
 .dndflow aside {
   border-right: 1px solid #eee;
   padding: 15px 10px;
   font-size: 12px;
-  background: #fcfcfc;
+  background: #4b46ff;
   overflow: visible;
+  border-radius: 10px;
 }
   
 .dndflow aside .description {
   margin-bottom: 10px;
 }
+
+
+
+
   
 /* TODO play with radius to turn div into circle */
 .dndflow .dndnode {
-  height: 150px;
-  width: 150px;
-  padding: 4px;
-  border: 1px solid #1a192b;
+  height: 50px;
+  width: 50px;
+  padding: 10px;
+  border: 2px solid #4b46ff;
   border-radius: 50%;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
+  justify-content: center;
+
   cursor: grab;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  font-family: soin sans;
+}
+
+/* white circle behind the logo */
+.dndflow .dndnode::before {
+  content: "";
+  position: absolute;
+  inset: .001px;
+  background: white;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* make sure the logo is above the circle */
+.dndflow .dndnode img,
+.dndflow .dndnode svg {
+  position: relative;
+  z-index: 1;
 }
   
+
 .dndflow .dndnode.input {
-  border-color: #0041d0;
+  border-color: #4b46ff;
 }
 
 .popup{
   position: fixed;
+  padding: 10px;
   transform: translate(-100%, -50%);
   width: 150px;
   height: 150px;
   background-color: white;
   margin: auto;
-  border: 3px solid black;
-  border-radius: 5px;
+  border: 3px solid #4b46ff;
+  border-radius: 7px;
+  
   justify-content: center;
   align-items: center;
+  font-family: soin sans;
   font-size: 16px;
 }
 
@@ -184,5 +215,40 @@ header, main, footer{
   .dndflow aside {
     
     max-width: 250px;
+    color: #000;
   }
+}
+
+
+
+.sandbox-node {
+      padding: 4px;
+      width: 100px;
+
+      border: 1px solid #1a192b;
+      margin-bottom: 10px;
+
+      background: black;
+      
+
+    #logo-img{
+        padding: 5px;
+        background-color: white;
+        height: 30px;
+        display: inline;
+    
+    }
+
+    h5{
+        color: azure;
+        margin-top: 11px;
+        size: 16px;
+        display: inline;
+    }
+
+    p{
+      color: azure;
+      font-size: 7px;
+    }
+
 }
