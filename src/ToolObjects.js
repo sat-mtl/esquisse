@@ -73,3 +73,38 @@ export const LivePoseObj = {
     input: ["Temp", "Temp"],
     docLink: "https://gitlab.com/sat-mtl/tools/livepose"
 };
+
+export const PuaraObj = {
+    name: "Puara",
+    logoFile: "images/puara.jpg",
+    description: "A framework for building and deploying embedded systems",
+    input: ["Audio", "OSC", "Gestures"],
+    docLink: "https://github.com/Puara"
+}; 
+
+export const DomeportObj = {
+    name: "Domeport Web",
+    logoFile: "images/SATIE.png",
+    description: "A tool for visualizing any video file on a dome display",
+    input: ["Audio", "Video"],
+    docLink: "https://domeport.sat.qc.ca/"
+};
+
+export const SpatgrisObj = {
+    name: "SpatGRIS [external]",
+    logoFile: "images/spatgris.jpg",
+    description: "A software designed for multichannel spatialization in 2D and 3D",
+    input: ["Audio", "OSC"],
+    docLink: "https://gris.musique.umontreal.ca/"
+};
+
+// export const KoaiaObj = {
+//     name: "Koaia",
+//     logoFile: "images/LivePose.png",
+//     description: "",
+//     input: [],
+//     docLink: ""
+// };
+
+
+
