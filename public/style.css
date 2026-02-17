@@ -76,7 +76,6 @@ header, main, footer{
   border-radius: 50%;
   margin-bottom: 10px;
   display: flex;
-  
   align-items: center;
   cursor: grab;
   position: relative;
@@ -96,7 +95,6 @@ header, main, footer{
   margin: auto;
   border: 3px solid black;
   border-radius: 5px;
-  
   justify-content: center;
   align-items: center;
   font-size: 16px;
@@ -125,6 +123,58 @@ header, main, footer{
   object-fit: contain;
 }
 
+.sandbox-node {
+  padding: 4px;
+  width: 100px;
+  border: 1px solid #1a192b;
+  margin-bottom: 10px;
+  background: black;
+      
+  #logo-img{
+    padding: 5px;
+    background-color: white;
+    height: 30px;
+    display: inline;   
+  }
+
+  h5{
+    color: azure;
+    margin-top: 11px;
+    size: 16px;
+    display: inline;
+  }
+
+  p{
+    color: azure;
+    font-size: 7px;
+  }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wrapper {  
+  display: flex;
+}
+
+.wrapper .col {
+  flex-direction: column;
+}
+
+.wrapper .row {
+  flex-direction: row;
+}
+
+.tabcontent{
+  height: 95%;
+  width: 200px;
+  background-color: blue;
+  overflow: scroll;
+}
+
   
 @media screen and (min-width: 768px) {
   .dndflow {
@@ -132,42 +182,7 @@ header, main, footer{
   }
   
   .dndflow aside {
-    width: 20%;
+    
     max-width: 250px;
   }
-}
-
-  
-  
-
-.sandbox-node {
-      padding: 4px;
-      width: 100px;
-
-      border: 1px solid #1a192b;
-      margin-bottom: 10px;
-
-      background: black;
-      
-
-    #logo-img{
-        padding: 5px;
-        background-color: white;
-        height: 30px;
-        display: inline;
-    
-    }
-
-    h5{
-        color: azure;
-        margin-top: 11px;
-        size: 16px;
-        display: inline;
-    }
-
-    p{
-      color: azure;
-      font-size: 7px;
-    }
-
 }
