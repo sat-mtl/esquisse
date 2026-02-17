@@ -8,9 +8,9 @@ export function Toolbar(){
          <aside>
             <SidebarNode toolObj={tools.AudioDiceObj} />
             <SidebarNode toolObj={tools.PoireObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
-            <SidebarNode toolObj={tools.AudioDiceObj} />
-            <SidebarNode toolObj={tools.PoireObj} />
+            <SidebarNode toolObj={tools.PuaraObj} />
+            <SidebarNode toolObj={tools.DomeportObj} />
+            <SidebarNode toolObj={tools.SpatgrisObj} />
             <SidebarNode toolObj={tools.LivePoseObj} />
             <SidebarNode toolObj={tools.AudioDiceObj} />
             <SidebarNode toolObj={tools.PoireObj} />
