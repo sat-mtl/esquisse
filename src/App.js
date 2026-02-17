@@ -141,6 +141,44 @@ const Flow = () => {
     }
   }, [rfInstance]);
   
+  /* Enables downloading the state of the flow diagram */
+  const onDownload = useCallback(() => {
+    if (!rfInstance) return;
+  
+    const flow = rfInstance.toObject();
+    const json = JSON.stringify(flow, null, 2);
+  
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "reactflow-diagram.json";
+    a.click();  
+    
+    URL.revokeObjectURL(url);
+  }, [rfInstance]);
+  
+/* Dev feature for now: enables uploading JSON flows */
+  const onUpload = useCallback((event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const flow = JSON.parse(e.target.result);
+      
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        setViewport({ x, y, zoom });
+      }
+    };
+    
+    reader.readAsText(file);
+  }, [setNodes, setEdges, setViewport]); 
+  
   /* Restores the state of the flow diagram to whatever is saved in localStorage if it exists */
   const restoreFlow = useCallback(() => {
     const flow = JSON.parse(localStorage.getItem(flowKey));
@@ -246,6 +284,8 @@ const Flow = () => {
         >
           <Background />
           <Panel position="top-right">
+            <input type="file" accept="application/json" onChange={onUpload}/>
+            <button onClick={onDownload}>download</button>
             <button onClick={onSave}>save</button>
             <button onClick={onRestore}>restore</button>
           </Panel>
