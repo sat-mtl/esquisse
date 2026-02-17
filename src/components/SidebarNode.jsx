@@ -35,7 +35,6 @@ export function SidebarNode({toolObj}){
         //console.log(obj);
     };
 
-
     //Links to external documentation when clicked
     const handleClick = () => {
         window.open(`${toolObj.docLink}`, "_blank");
