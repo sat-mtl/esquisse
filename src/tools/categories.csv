@@ -1,8 +1,0 @@
-id,en,fr,color
-cap,"Group interaction","Interaction collective","d3.schemeTableau10[0]"
-spat,"Audio spatialization","Spatialisation sonore","d3.schemeTableau10[4]"
-proj,"Projection mapping","Projection mapping","d3.schemeTableau10[1]"
-telep,"Telepresence","Téléprésence","d3.schemeTableau10[3]"
-hapt,"Haptics","Stimulation haptique","d3.schemeTableau10[6]"
-interop,"Inter operability","Inter opérabilité","d3.schemeTableau10[9]"
-embed,"Self-contained systems","Systèmes autonomes","d3.schemeTableau10[5]"

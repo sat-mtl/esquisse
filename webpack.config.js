@@ -6,8 +6,7 @@ module.exports = (env, argv) => {
   var config = {
     mode: 'production',
     entry: {
-      main: './src/tools/script.js',   // loads d3 based script
-      toolbox: './src/toolbox.js',  // loads react + reactflow script
+      main: './src/toolbox.js',  // loads react + reactflow script
     },
     output: {
       path: path.resolve(__dirname, 'public'),

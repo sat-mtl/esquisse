@@ -1,15 +1,14 @@
-<!-- This script is meant for redirecting based on the browser language -->
-
-<script>
-
-var language = navigator.language;
-
-if (language.indexOf('fr') > -1) {
-    document.location.href = 'fr/';
-} else if (language.indexOf('en') > -1) {
-    document.location.href = 'en/';
-} else {
-    document.location.href = 'en/';
-}
-</script>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title> toooolbox </title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <div id="react-toolbox-root" style="width: 100vw; height: 100vh;">
+  </div>
+  <!-- load / point to toolbox bundle -->
+  <script src="../../main.bundle.js"></script>
+</body>
+</html>
