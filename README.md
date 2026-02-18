@@ -40,7 +40,7 @@ The React Flow toolbox is an interactive node-based interface for exploring tool
 ```bash
 npm run dev
 ```
-Then go to: **http://localhost:9000/toolbox.html**
+Then go to: **http://localhost:9000/**
 
 #### Production Build
 ```bash
@@ -55,7 +55,7 @@ The D3-based interactive diagram shows tool relationships.
 ```bash
 npm run dev
 ```
-Then go to: **http://localhost:9000/tools/index.html**
+Then go to: **http://localhost:9000/**
 
 #### Production Build
 ```bash
