@@ -25,6 +25,7 @@ import ImageNode from './ImageNode.jsx';
 import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
+import { validateTemplate } from "./Templates.js";
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -80,7 +81,51 @@ const Flow = () => {
     // details: https://reactflow.dev/whats-new/2023-11-10
     const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
+    if(type === "composite" && obj){
+
+      //Validate template
+      if(!validateTemplate(obj)){
+        alert("Template Invalid");
+        return;
+      }
+
+      const timestamp = Date.now();
+
+      const newNodes = obj.nodes.map(n => ({
+        ...n,
+        id:`${n.id}-${timestamp}`,
+        type: "sandbox",
+        data: {toolObj: n.toolObj},
+        position: {x: n.position.x + position.x, y: n.position.y + position.y},
+      }));
+
+      const newEdges = obj.edges.map(e => {
+        const sourceNode = newNodes.find(n => n.id.startsWith(e.source));
+        const targetNode = newNodes.find(n => n.id.startsWith(e.target));
+
+        const sharedInput = tools.getSharedInput(
+          sourceNode.data.toolObj,
+          targetNode.data.toolObj
+        );
+
+        return{
+          ...e,
+          id: `${e.id}-${timestamp}`,
+          source: `${e.source}-${timestamp}`,
+          target: `${e.target}-${timestamp}`,
+          type: "custom",
+          data: {sharedInput},
+        };
+      });
+
+      setNodes(nds => nds.concat(newNodes));
+      setEdges(eds => eds.concat(newEdges));
+      return;
+    }
     
+    console.log("In App.js");
+    console.log(obj);
+    console.log(type);
     
     //If creating a sandbox node, check that there is a valid toolObj to pass to it.
     if(type == 'sandbox' && !tools.checkValid(obj)){ 
@@ -102,6 +147,7 @@ const Flow = () => {
     },
     [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
+
   const onConnect = useCallback(
     (connection) => {
       const sourceNode = nodes.find(n => n.id === connection.source);

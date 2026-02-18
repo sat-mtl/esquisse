@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Toolbar } from "./Toolbar.jsx";
+import { Templatebar } from "../Templatebar.jsx";
 
 //Add here to create additional tabs
 const tabs = [
     {title: "Tools", content: <Toolbar />},
-    {title: "Test", content: "hello"}
+    {title: "Template Flows", content: <Templatebar />}
 ]
 
 export function SidebarTabs(){

@@ -59,3 +59,27 @@ export function SidebarNode({toolObj}){
         </>
     )
 }
+
+export function SidebarCompNode({ template }){
+    //Makes it so that the node is draggable
+    const [type, setType, obj, setObj] = useDnD();
+
+    //Moves when dragged
+    const onDragStart = (event) => {
+        setType("composite");
+
+        setObj(template); //to update toolObj for creating a sandbox node
+
+        event.dataTransfer.effectAllowed = "move";
+        
+        //debug
+        //console.log("On Drag Start");
+        //console.log(obj);
+    };
+
+    return(
+        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
+            { template.name } 
+        </div>  
+    )
+}
