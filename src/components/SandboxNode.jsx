@@ -34,7 +34,7 @@ export default memo(({ data, isConnectable }) => {
       <Handle
         type="target"
         id="#b1b1b7"
-        position={Position.Top}
+        position={Position.Left}
         isConnectable={isConnectable}
         onConnect={(params) => console.log("handle onConnect", params)}
       />
@@ -50,7 +50,7 @@ export default memo(({ data, isConnectable }) => {
       <Handle
         type="source"
         id="#b1b1b7"
-        position={Position.Bottom}
+        position={Position.Right}
         isConnectable={isConnectable}
       />
     </div>
