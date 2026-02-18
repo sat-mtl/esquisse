@@ -19,6 +19,7 @@ import Sidebar from "./Sidebar.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 
 import SandboxNode from './components/SandboxNode.jsx';
+import Landing from './components/Landing.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ImageNode from './ImageNode.jsx';
 import * as tools from "./ToolObjects.js";
@@ -80,10 +81,6 @@ const Flow = () => {
     const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
     
-    
-    console.log("In App.js");
-    console.log(obj);
-    console.log(type);
     
     //If creating a sandbox node, check that there is a valid toolObj to pass to it.
     if(type == 'sandbox' && !tools.checkValid(obj)){ 
@@ -195,6 +192,22 @@ const Flow = () => {
     restoreFlow();
   }, [restoreFlow]);
   
+  /* Controls toggling the landing page*/
+  const [isLandingModalOpen, setLandingModalOpen] = useState(true);
+  const onToggleLandingModal = useCallback(()=>{
+    if(isLandingModalOpen){
+      //console.log("landing is on, turn off");
+      setLandingModalOpen(false);
+     
+    }else{
+      //console.log("landing is off, turn on");
+      setLandingModalOpen(true);
+    }
+
+  }, [isLandingModalOpen])
+
+
+  
   /* Restores the state of the node diagram each time the page is reloaded */
   useEffect(() => {
     if (rfInstance) {
@@ -282,13 +295,22 @@ const Flow = () => {
           
           fitView
         >
+
+          <Panel>
+            {isLandingModalOpen && <Landing onButtonClick={onToggleLandingModal}/>}
+          </Panel>
+          
           <Background />
           <Panel position="top-right">
             <input type="file" accept="application/json" onChange={onUpload}/>
             <button onClick={onDownload}>download</button>
             <button onClick={onSave}>save</button>
             <button onClick={onRestore}>restore</button>
+            <button onClick= {onToggleLandingModal}> Instructions</button>
           </Panel>
+          
+          
+
           {menu && (
             <ContextMenu
               onClick={onPaneclick}
@@ -296,8 +318,12 @@ const Flow = () => {
               {...menu}
             />
           )}
+
+          
           <Controls />
+
         </ReactFlow>
+
       </div>
       <Sidebar />
     </div>
