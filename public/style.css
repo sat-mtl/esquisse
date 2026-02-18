@@ -86,7 +86,7 @@ header, main, footer{
   margin-bottom: 10px;
 }
   
-/* TODO play with radius to turn div into circle */
+
 .dndflow .dndnode {
   height: 50px;
   width: 50px;
@@ -101,6 +101,7 @@ header, main, footer{
   position: relative;
   overflow: visible;
   font-family: soin sans;
+  z-index: 0;
 }
 
 /* white circle behind the logo */
@@ -110,7 +111,7 @@ header, main, footer{
   inset: .001px;
   background: white;
   border-radius: 50%;
-  z-index: 0;
+  z-index: -1;
 }
 
 /* make sure the logo is above the circle */
@@ -243,9 +244,7 @@ header, main, footer{
   justify-content: center;
   display: flex;
 
-  background: rgba(0, 0, 0, 0.3);
-  background-o;
-  
+  background: rgba(0, 0, 0, 0.3);  
 }
 
 .modal-body{
