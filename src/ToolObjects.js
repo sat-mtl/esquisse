@@ -42,60 +42,13 @@ export function getSharedInput(toolA, toolB) {
   return shared || null; 
 }
 
-
-export const OssiaObj = {
-    name: "Ossia", 
-    logoFile: "/images/HapticFloor.png",
-    description: "Temp Description",
-    input: ["Audio", "Video"],
-    docLink: "temp"};
-
-export const AudioDiceObj = {
-    name: "Audio Dice", 
-    logoFile: "images/audiodice.png",
-    description: "A set of 5 speakers comprised of 12 independent drivers each",
-    input: ["Temp", "Temp"],
-    docLink: "https://gitlab.com/sat-mtl/tools/audiodice"
-};
-
-export const PoireObj = {
-    name: "Poire", 
-    logoFile: "images/poire.png",
-    description: "A prototype web controller for SATIE",
-    input: ["Temp1", "Temp2"],
-    docLink: "https://gitlab.com/sat-mtl/metalab/poire"
-};
-
-export const LivePoseObj = {
-    name: "LivePose", 
-    logoFile: "images/LivePose.png",
-    description: "A command line tool which tracks people skeletons and applies filters",
-    input: ["Temp", "Temp"],
-    docLink: "https://gitlab.com/sat-mtl/tools/livepose"
-};
-
-export const PuaraObj = {
-    name: "Puara",
-    logoFile: "images/puara.jpg",
-    description: "A framework for building and deploying embedded systems",
-    input: ["Audio", "OSC", "Gestures"],
-    docLink: "https://github.com/Puara"
-}; 
-
+//Tools
 export const DomeportObj = {
     name: "Domeport Web",
     logoFile: "images/SATIE.png",
     description: "A tool for visualizing any video file on a dome display",
     input: ["Audio", "Video"],
     docLink: "https://domeport.sat.qc.ca/"
-};
-
-export const SpatgrisObj = {
-    name: "SpatGRIS [external]",
-    logoFile: "images/spatgris.jpg",
-    description: "A software designed for multichannel spatialization in 2D and 3D",
-    input: ["Audio", "OSC"],
-    docLink: "https://gris.musique.umontreal.ca/"
 };
 
 // export const KoaiaObj = {
@@ -106,5 +59,50 @@ export const SpatgrisObj = {
 //     docLink: ""
 // };
 
+export const LivePoseObj = {
+    name: "LivePose", 
+    logoFile: "images/LivePose.png",
+    description: "A command line tool which tracks people skeletons and applies filters",
+    input: ["Temp", "Temp"],
+    docLink: "https://gitlab.com/sat-mtl/tools/livepose"
+};
 
+export const PointMapperObj = {
+    name: "PointMapper", 
+    logoFile: "logosat.png",
+    description: "A prototype web controller for SATIE",
+    input: ["Temp1", "Temp2"],
+    docLink: "temp"
+};
 
+export const PuaraObj = {
+    name: "Puara",
+    logoFile: "images/puara.jpg",
+    description: "A framework for building and deploying embedded systems",
+    input: ["Audio", "OSC", "Gestures"],
+    docLink: "https://github.com/Puara"
+}; 
+
+export const SatelliteObj = {
+    name: "Satellite", 
+    logoFile: "images/Satellite.png",
+    description: "An immersive and social digital 3D environment accessible on the web",
+    input: ["Temp", "Temp"],
+    docLink: "https://gitlab.com/sat-mtl/satellite"
+};
+
+export const ScoreObj = {
+    name: "Score", 
+    logoFile: "logosat.png",
+    description: "A sequencer for audio-visual artists, designed to create interactive shows",
+    input: ["Temp", "Temp"],
+    docLink: "https://github.com/ossia/score"
+};
+
+export const SpatgrisObj = {
+    name: "SpatGRIS [external]",
+    logoFile: "images/spatgris.jpg",
+    description: "A software designed for multichannel spatialization in 2D and 3D",
+    input: ["Audio", "OSC"],
+    docLink: "https://gris.musique.umontreal.ca/"
+};
