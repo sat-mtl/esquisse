@@ -5,19 +5,14 @@ import * as tools from "../ToolObjects.js";
 
 export function Toolbar(){
     return(
-         <aside>
-            <SidebarNode toolObj={tools.AudioDiceObj} />
-            <SidebarNode toolObj={tools.PoireObj} />
-            <SidebarNode toolObj={tools.PuaraObj} />
+         <aside>        
             <SidebarNode toolObj={tools.DomeportObj} />
+            <SidebarNode toolObj={tools.LivePoseObj} />
+            <SidebarNode toolObj={tools.PointMapperObj} />
+            <SidebarNode toolObj={tools.PuaraObj} />
+            <SidebarNode toolObj={tools.SatelliteObj} />
+            <SidebarNode toolObj={tools.ScoreObj} />
             <SidebarNode toolObj={tools.SpatgrisObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
-            <SidebarNode toolObj={tools.AudioDiceObj} />
-            <SidebarNode toolObj={tools.PoireObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
-            <SidebarNode toolObj={tools.AudioDiceObj} />
-            <SidebarNode toolObj={tools.PoireObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
         </aside>
     )
 };

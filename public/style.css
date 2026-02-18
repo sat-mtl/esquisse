@@ -58,6 +58,7 @@ header, main, footer{
 }
   
 .dndflow aside {
+  height: 100%;
   border-right: 1px solid #eee;
   padding: 15px 10px;
   font-size: 12px;
@@ -69,10 +70,6 @@ header, main, footer{
 .dndflow aside .description {
   margin-bottom: 10px;
 }
-
-
-
-
   
 /* TODO play with radius to turn div into circle */
 .dndflow .dndnode {
@@ -85,7 +82,6 @@ header, main, footer{
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: grab;
   position: relative;
   overflow: visible;
@@ -123,8 +119,7 @@ header, main, footer{
   background-color: white;
   margin: auto;
   border: 3px solid #4b46ff;
-  border-radius: 7px;
-  
+  border-radius: 7px; 
   justify-content: center;
   align-items: center;
   font-family: soin sans;
@@ -202,7 +197,7 @@ header, main, footer{
 .tabcontent{
   height: 95%;
   width: 200px;
-  background-color: blue;
+  background-color: white;
   overflow: scroll;
 }
 

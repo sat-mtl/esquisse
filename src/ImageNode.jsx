@@ -2,10 +2,7 @@ import React, { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 
 
-export function SidebarNode({data, isConnectable}){
-
-    
-    
+export function SidebarNode({data, isConnectable}){ 
     return (
         <>
             <Handle
