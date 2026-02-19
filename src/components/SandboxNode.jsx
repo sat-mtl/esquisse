@@ -27,10 +27,14 @@ export default memo(({ data, isConnectable }) => {
     );
   }
 
+  const handleClick = () => {
+    window.open(`${data.toolObj.docLink}`, "_blank");
+  }
+
   let obj = data.toolObj;
 
   return (
-    <div className = "sandbox-node">
+    <div className="sandbox-node" onClick={handleClick}> 
       <Handle
         type="target"
         id="#b1b1b7"
