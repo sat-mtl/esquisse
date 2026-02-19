@@ -21,7 +21,6 @@ import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import SandboxNode from './components/SandboxNode.jsx';
 import Landing from './components/Landing.jsx';
 import ContextMenu from './ContextMenu.jsx';
-import ImageNode from './ImageNode.jsx';
 import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
@@ -31,7 +30,6 @@ let id = 0;
 const getId = () => `${id++}`;
 
 const nodeTypes = {
-  image: ImageNode,
   sandbox: SandboxNode,
 };
 
@@ -138,7 +136,6 @@ const Flow = () => {
       position,
       data: { 
         label: `${type} node`,
-        ...(type === 'image' && { image: {src: 'images/Satellite.png', height: 300, width: 400} }), // Add image to data if type is image
         ...(type === 'sandbox' && {toolObj: obj}),
       },
     };
