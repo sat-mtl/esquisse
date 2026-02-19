@@ -15,7 +15,7 @@ export default function Landing({onButtonClick}){
                     <ul >
                         <li>To get started, drag a node from the sidebar on the right and drop it onto the canvas.</li>
                         <li>Then, click and drag from the left handle of one node to the right handle of another to connect them.</li>
-                        <li>Clicking a tool in the sidebar will bring you to its documentation or website.</li>
+                        <li>Clicking a tool in the sidebar or sandbox will bring you to its documentation or website.</li>
                         <li>The sidebar also contains a number of example templates to help you get started.</li>
                     </ul>
                     <p>You can return to this screen at any time by hitting the instructions button in the top right.</p>
