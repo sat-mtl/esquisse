@@ -9,9 +9,6 @@ export function Templatebar(){
     return(
          <aside>
             <SidebarCompNode template={templates.Temp1} />
-            <SidebarCompNode template={templates.Temp1} />
-            <SidebarCompNode template={templates.Temp1} />
-            <SidebarCompNode template={templates.Temp1} />
         </aside>
     )
 };

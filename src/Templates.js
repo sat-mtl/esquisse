@@ -39,18 +39,18 @@ export function validateTemplate (template) {
 }
 
 export const Temp1 = {
-    name: "Temp1", 
-    description: "Temp Description",
+    name: "LivePose + Score", 
+    description: "LivePose goes to Score",
     nodes: [
         {
             id:"node1",
             position: { x:0, y: 0},
-            toolObj: tools.PuaraObj
+            toolObj: tools.LivePoseObj
         },
         {
             id:"node2",
             position: { x:200, y: 0},
-            toolObj: tools.PuaraObj
+            toolObj: tools.ScoreObj
         }
     ],
     edges: [
