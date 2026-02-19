@@ -13,7 +13,7 @@ export default function Landing({onButtonClick}){
                         to understand how SAT's technologies interact with other tools.
                     </p>
                     <ul >
-                        <li>To get started, drag a node from the sidebar on the left and drop it onto the canvas.</li>
+                        <li>To get started, drag a node from the sidebar on the right and drop it onto the canvas.</li>
                         <li>Then, click and drag from the left handle of one node to the right handle of another to connect them.</li>
                         <li>Clicking a tool in the sidebar will bring you to its documentation or website.</li>
                         <li>The sidebar also contains a number of example templates to help you get started.</li>
