@@ -43,7 +43,7 @@ export function SidebarNode({toolObj}){
     return (
         <>
             <div className="dndnode input" onClick={handleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
-                <img className="image" src={`/${toolObj.logoFile}`} alt="/logosat.png" />  
+                <img className="image" src={`/${toolObj.logoFile}`} alt="/logosat.png" style={toolObj.logoScale ? { width: `${toolObj.logoScale * 90}%`, height: `${toolObj.logoScale * 90}%` } : undefined} />
             </div>
 
             {descr && (
