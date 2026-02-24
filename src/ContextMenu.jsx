@@ -2,29 +2,24 @@ import React, { use, useCallback } from "react";
 import { useReactFlow } from "@xyflow/react";
 
 export default function ContextMenu({
-    id,
     top,
     left,
     right,
     bottom,
-    duplicateNode,
-    ...props
+    actions = [],
 }) {
-    const { setNodes, setEdges } = useReactFlow();
-
-    const deleteNode = useCallback(() => {
-        setNodes((nodes) => nodes.filter((node) => node.id !== id));
-        setEdges((edges) => edges.filter((edge) => edge.source !== id));
-    }, [id, setNodes, setEdges]);
 
     return (
         <div
             className="context-menu"
             style={{ top, left, right, bottom }}
-            {...props}
+            onClick={(e) => e.stopPropagation()}
         >
-            <div onClick={() => duplicateNode(id)}>Duplicate Node</div>
-            <div onClick={deleteNode}>Delete Node</div>
+            {actions.map(({ label, onClick, component }, i) => (
+                <div key={ i } onClick={ onClick }>
+                    { component ? component : <div onClick={onClick}> { label } </div>}
+                </div>
+            ))}
         </div>
     );
 }

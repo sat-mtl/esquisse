@@ -3,7 +3,10 @@ import React from "react";
 import {
   getBezierPath,
   EdgeLabelRenderer,
+  useReactFlow,
 } from "@xyflow/react";
+
+import { Dropdown } from "./Dropdown.jsx";
 
 export default function CustomEdge({
   id,
@@ -17,6 +20,9 @@ export default function CustomEdge({
   style,
   data,
 }) {
+
+  const { setEdges } = useReactFlow();
+
   const [path, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -25,6 +31,16 @@ export default function CustomEdge({
     sourcePosition,
     targetPosition,
   });
+
+  const handleChange = (value) => {
+        setEdges((edges) => 
+          edges.map((edge) =>
+            edge.id === id 
+              ? {...edge, data: {...edge.data, protocol: value}}
+              : edge
+          )
+    )
+  }
 
   return (
     <>
@@ -36,23 +52,23 @@ export default function CustomEdge({
         style={style}
       />
 
-      {data?.sharedInput && (
+      
         <EdgeLabelRenderer>
           <div
             style={{
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-              background: "white",
-              padding: "2px 6px",
-              borderRadius: 6,
-              fontSize: 12,
-              pointerEvents: "none",
+              pointerEvents: "all",
             }}
           >
-            {data.sharedInput}
+            <Dropdown
+              options={data?.sharedInput || []}
+              value={data?.protocol}
+              onChange={handleChange}
+            />
           </div>
         </EdgeLabelRenderer>
-      )}
+      
     </>
   );
 }
