@@ -31,6 +31,14 @@ button:hover{
   color: white;
 }
 
+.textbox {
+  width: 200px;
+  height: 12px;
+  resize: none;
+  overflow: auto;
+  font-size: 8px;
+}
+
 .context-menu {
   background: white;
   border-style: solid;

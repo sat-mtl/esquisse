@@ -19,6 +19,7 @@ import Sidebar from "./Sidebar.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 
 import SandboxNode from './components/SandboxNode.jsx';
+import { TextboxNode } from "./components/TextboxNode.jsx";
 import Landing from './components/Landing.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import * as tools from "./ToolObjects.js";
@@ -32,6 +33,7 @@ const getId = () => `${id++}`;
 
 const nodeTypes = {
   sandbox: SandboxNode,
+  textbox: TextboxNode,
 };
 
 const edgeTypes = {
@@ -311,6 +313,29 @@ const Flow = () => {
     [setMenu],
   )
 
+  const onPaneContextMenu = useCallback((event) => {
+      // Prevent native context menu from showing
+      event.preventDefault();
+
+      // Calculate the position of the context menu. We want to make sure it
+      // doesn't get positioned off-screen
+      const pane = ref.current.getBoundingClientRect();
+      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      setMenu({
+        type: "pane",
+        data: {
+          top: event.clientY < pane.height - 200 && event.clientY,
+          left: event.clientX < pane.width - 200 && event.clientX,
+          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
+          bottom:
+          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          position,
+        }
+      });
+    },
+    [screenToFlowPosition],
+  )
+
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneclick = useCallback(() => setMenu({type: null, data: null}), []);
 
@@ -334,13 +359,13 @@ const Flow = () => {
         setNodes((nodes) => nodes.filter((node) => node.id !== id));
         setEdges((edges) => edges.filter((edge) => edge.source !== id));
         setMenu({ type: null, data: null }); //Close context menu
-    }, [id, setNodes, setEdges]
+    }, [setNodes, setEdges]
   );
 
   const deleteEdge = useCallback((id) =>{
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
     setMenu({ type: null, data: null }); //Close context menu
-  }, [setEdges]);  
+  }, [setEdges]);    
 
   return (
     <div className="dndflow">
@@ -363,6 +388,7 @@ const Flow = () => {
           connectionLineComponent={ConnectionLine}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
+          onPaneContextMenu={onPaneContextMenu}
           onPaneClick={onPaneclick}
           nodeTypes={nodeTypes}
           isValidConnection={
@@ -420,6 +446,34 @@ const Flow = () => {
               bottom={menu.data.bottom}
               actions={[
                 { label: "Delete Edge", onClick: () =>  deleteEdge(menu.data.id)}
+              ]}
+              onClose={onPaneclick}
+            />
+            )
+          }
+
+          {menu.type === "pane" && (
+            <ContextMenu
+              top={menu.data.top}
+              left={menu.data.left}
+              right={menu.data.right}
+              bottom={menu.data.bottom}
+              actions={[
+                { 
+                  label: "Add comment", 
+                  onClick: (e) =>  {
+                    e.stopPropagation();
+                    const position = menu.data.position;
+                    const newTextboxNode = {
+                      id: "textbox_" + getId(),
+                      type: "textbox",
+                      position,
+                      data: {label: ""},
+                    };
+                    setNodes(nds => nds.concat(newTextboxNode));
+                    setMenu({ type: null, data: null})
+                  },
+                },
               ]}
               onClose={onPaneclick}
             />
