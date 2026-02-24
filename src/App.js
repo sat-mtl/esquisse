@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, { useRef, useCallback, useState, useEffect, use } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -289,6 +289,28 @@ const Flow = () => {
     [setMenu],
   );
 
+  const onEdgeContextMenu = useCallback((event, edge) => {
+      // Prevent native context menu from showing
+      event.preventDefault();
+
+      // Calculate the position of the context menu. We want to make sure it
+      // doesn't get positioned off-screen
+      const pane = ref.current.getBoundingClientRect();
+      setMenu({
+        type: "edge",
+        data: {
+          id: edge.id,
+          top: event.clientY < pane.height - 200 && event.clientY,
+          left: event.clientX < pane.width - 200 && event.clientX,
+          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
+          bottom:
+          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+        }
+      });
+    },
+    [setMenu],
+  )
+
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneclick = useCallback(() => setMenu({type: null, data: null}), []);
 
@@ -314,8 +336,11 @@ const Flow = () => {
         setMenu({ type: null, data: null }); //Close context menu
     }, [id, setNodes, setEdges]
   );
-  
-  
+
+  const deleteEdge = useCallback((id) =>{
+    setEdges((edges) => edges.filter((edge) => edge.id !== id));
+    setMenu({ type: null, data: null }); //Close context menu
+  }, [setEdges]);  
 
   return (
     <div className="dndflow">
@@ -337,6 +362,7 @@ const Flow = () => {
           onInit={setRfInstance}
           connectionLineComponent={ConnectionLine}
           onNodeContextMenu={onNodeContextMenu}
+          onEdgeContextMenu={onEdgeContextMenu}
           onPaneClick={onPaneclick}
           nodeTypes={nodeTypes}
           isValidConnection={
@@ -383,7 +409,22 @@ const Flow = () => {
               ]}
               onClose={onPaneclick}
             />
-          )}
+            )
+          }
+
+          {menu.type === "edge" && (
+            <ContextMenu
+              top={menu.data.top}
+              left={menu.data.left}
+              right={menu.data.right}
+              bottom={menu.data.bottom}
+              actions={[
+                { label: "Delete Edge", onClick: () =>  deleteEdge(menu.data.id)}
+              ]}
+              onClose={onPaneclick}
+            />
+            )
+          }
           
           <Controls />
 
