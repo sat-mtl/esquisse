@@ -24,14 +24,11 @@ button{
     margin: 4px;
     font-weight: bold;
     background-color: #c8c8c8;
-   
 }
 
 button:hover{
   background-color: #0d0b48;
   color: white;
- 
-
 }
 
 .context-menu {
@@ -50,6 +47,18 @@ button:hover{
  
 .context-menu div:hover {
   background: lightgrey;
+}
+
+.react-flow__handle.source {
+  width: 9px;
+  height: 9px;
+  background-color: #0C7BDC;
+}
+
+.react-flow__handle.target {
+  width: 9px;
+  height: 9px;
+  background-color: #FFC20A;
 }
 
 header, main, footer{
@@ -224,8 +233,6 @@ header, main, footer{
   }
 }
 
-
-
 .modal-wrapper{
   position: fixed;
 
@@ -258,7 +265,6 @@ header, main, footer{
     
   }
 
-  
   li{
     padding-left: 20px;
     color:#4b46ff;
@@ -269,8 +275,6 @@ header, main, footer{
 
   
 }
-
-
 
 .sandbox-node {
       padding: 4px;

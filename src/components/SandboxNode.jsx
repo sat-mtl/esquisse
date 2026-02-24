@@ -36,6 +36,7 @@ export default memo(({ data, isConnectable }) => {
   return (
     <div className="sandbox-node" onDoubleClick={handleDoubleClick}> 
       <Handle
+        className="target"
         type="target"
         id="#b1b1b7"
         position={Position.Left}
@@ -52,6 +53,7 @@ export default memo(({ data, isConnectable }) => {
       <p>{ obj.description }</p>
 
       <Handle
+        className="source"
         type="source"
         id="#b1b1b7"
         position={Position.Right}
