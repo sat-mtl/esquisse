@@ -13,8 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { initialNodes } from "./nodes.jsx";
-import { initialEdges } from "./edges.jsx";
+
 import Sidebar from "./Sidebar.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 
@@ -26,7 +25,6 @@ import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
-import { Dropdown } from "./components/Dropdown.jsx";
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -51,8 +49,8 @@ const flowKey = 'saved-flow';
 
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { screenToFlowPosition } = useReactFlow();
   
   const [menu, setMenu] = useState({ type: null, data: {} });
@@ -263,10 +261,8 @@ const Flow = () => {
   
   /* Restores the state of the node diagram each time the page is reloaded */
   useEffect(() => {
-    if (rfInstance) {
-      restoreFlow();
-    }
-  }, [rfInstance, restoreFlow]); 
+    
+  }, [rfInstance]); 
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
