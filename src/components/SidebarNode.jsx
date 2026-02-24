@@ -36,13 +36,13 @@ export function SidebarNode({toolObj}){
     };
 
     //Links to external documentation when clicked
-    const handleClick = () => {
+    const handleDoubleClick = () => {
         window.open(`${toolObj.docLink}`, "_blank");
     }
 
     return (
         <>
-            <div className="dndnode input" onClick={handleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
+            <div className="dndnode input" onDoubleClick={handleDoubleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
                 <img className="image" src={`/${toolObj.logoFile}`} alt="/logosat.png" style={toolObj.logoScale ? { width: `${toolObj.logoScale * 90}%`, height: `${toolObj.logoScale * 90}%` } : undefined} />
             </div>
 
