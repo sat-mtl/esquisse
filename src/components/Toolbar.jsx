@@ -6,14 +6,6 @@ import * as tools from "../ToolObjects.js";
 export function Toolbar(){
     return(
          <aside>        
-            <SidebarNode toolObj={tools.DomeportObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
-            <SidebarNode toolObj={tools.PointMapperObj} />
-            <SidebarNode toolObj={tools.PuaraObj} />
-            <SidebarNode toolObj={tools.SatelliteObj} />
-            <SidebarNode toolObj={tools.ScoreObj} />
-            <SidebarNode toolObj={tools.SpatgrisObj} />
-            <SidebarNode toolObj={tools.KoaiaObj} />
             <SidebarNode toolObj={tools.AbletonLiveObj} />
             <SidebarNode toolObj={tools.ArdourObj} />
             <SidebarNode toolObj={tools.BitwigObj} />
@@ -22,17 +14,24 @@ export function Toolbar(){
             <SidebarNode toolObj={tools.CinderObj} />
             <SidebarNode toolObj={tools.CubaseObj} />
             <SidebarNode toolObj={tools.IsadoraObj} />
+            <SidebarNode toolObj={tools.KoaiaObj} />
             <SidebarNode toolObj={tools.LeapMotionObj} />
+            <SidebarNode toolObj={tools.LivePoseObj} />
             <SidebarNode toolObj={tools.MadMapperObj} />
             <SidebarNode toolObj={tools.MaxMSPObj} />
             <SidebarNode toolObj={tools.NotchObj} />
             <SidebarNode toolObj={tools.OBSStudioObj} />
             <SidebarNode toolObj={tools.P5jsObj} />
+            <SidebarNode toolObj={tools.PointMapperObj} />
             <SidebarNode toolObj={tools.ProcessingObj} />
+            <SidebarNode toolObj={tools.PuaraObj} />
             <SidebarNode toolObj={tools.PureDataObj} />
             <SidebarNode toolObj={tools.ReaperObj} />
             <SidebarNode toolObj={tools.ResolumeObj} />
+            <SidebarNode toolObj={tools.SatelliteObj} />
+            <SidebarNode toolObj={tools.ScoreObj} />
             <SidebarNode toolObj={tools.SmodeObj} />
+            <SidebarNode toolObj={tools.SpatgrisObj} />
             <SidebarNode toolObj={tools.SplashObj} />
             <SidebarNode toolObj={tools.SuperColliderObj} />
             <SidebarNode toolObj={tools.TouchDesignerObj} />

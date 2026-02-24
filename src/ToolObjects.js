@@ -43,80 +43,6 @@ export function getSharedInput(toolA, toolB) {
 }
 
 //Tools
-export const DomeportObj = {
-    name: "Domeport Web",
-    logoFile: "images/domeport_web.png",
-    logoScale: 1.5,
-    description: "A tool for visualizing any video file on a dome display",
-    input: ["Audio", "Video"],
-    output: [],
-    docLink: "https://domeport.sat.qc.ca/"
-};
-
-
-export const LivePoseObj = {
-    name: "LivePose",
-    logoFile: "images/LivePose.png",
-    description: "A command line tool which tracks people skeletons and applies filters",
-    input: ["Video", "OSC"],
-    output: [],
-    docLink: "https://github.com/sat-mtl/livepose"
-};
-
-export const PointMapperObj = {
-    name: "PointMapper",
-    logoFile: "logosat.png",
-    description: "A prototype web controller for SATIE",
-    input: ["Video", "OSC",],
-    output: [],
-    docLink: "temp"
-};
-
-export const PuaraObj = {
-    name: "Puara",
-    logoFile: "images/puara.jpg",
-    description: "A framework for building and deploying embedded systems",
-    input: ["Audio", "OSC", "Gestural Data", "Sensor Data"],
-    output: [],
-    docLink: "https://github.com/Puara"
-};
-
-export const SatelliteObj = {
-    name: "Satellite",
-    logoFile: "images/Satellite.png",
-    description: "An immersive and social digital 3D environment accessible on the web",
-    input: ["Video"],
-    output: [],
-    docLink: "https://gitlab.com/sat-mtl/satellite"
-};
-
-export const ScoreObj = {
-    name: "ossia score",
-    logoFile: "images/ossiascore_logo.png",
-    description: "Interactive, intermedia audio-visual sequencer.",
-    input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images"],
-    output: [],
-    docLink: "https://github.com/ossia/score"
-};
-
-export const SpatgrisObj = {
-    name: "SpatGRIS [external]",
-    logoFile: "images/SpatGRIS_logo.png",
-    description: "A software designed for multichannel spatialization in 2D and 3D",
-    input: ["Audio", "OSC"],
-    output: [],
-    docLink: "https://gris.musique.umontreal.ca/"
-};
-
-export const KoaiaObj = {
-    name: "Koaia",
-    logoFile: "images/koaia_logo.png",
-    description: "A tool for exploring generative AI.",
-    input: ["Video", "NDI"],
-    output: [],
-    docLink: "https://github.com/sat-mtl/Koaia"
-};
-
 export const AbletonLiveObj = {
     name: "Ableton Live [external]",
     logoFile: "images/AbletonLive_logo.png",
@@ -161,7 +87,7 @@ export const ChataigneObj = {
     description: "A creative control software for mapping and routing OSC, MIDI, and other protocols.",
     input: ["OSC", "Audio", "Video"],
     output: [],
-    docLink: "https://benjamin.music/chataigne"
+    docLink: "https://benjamin.kuperberg.fr/chataigne/en"
 };
 
 export const CinderObj = {
@@ -182,6 +108,16 @@ export const CubaseObj = {
     docLink: "https://www.steinberg.net/cubase/"
 };
 
+export const DomeportObj = {
+    name: "Domeport Web",
+    logoFile: "images/domeport_web.png",
+    logoScale: 1.5,
+    description: "A tool for visualizing any video file on a dome display",
+    input: ["Audio", "Video"],
+    output: [],
+    docLink: "https://domeport.sat.qc.ca/"
+};
+
 export const IsadoraObj = {
     name: "Isadora [external]",
     logoFile: "images/isadora_logo.jpeg",
@@ -192,6 +128,15 @@ export const IsadoraObj = {
     docLink: "https://troikatronix.com/"
 };
 
+export const KoaiaObj = {
+    name: "Koaia",
+    logoFile: "images/koaia_logo.png",
+    description: "A tool for exploring generative AI.",
+    input: ["Video", "NDI"],
+    output: [],
+    docLink: "https://github.com/sat-mtl/Koaia"
+};
+
 export const LeapMotionObj = {
     name: "Leap Motion [external]",
     logoFile: "images/leapmotion_logo.png",
@@ -200,6 +145,15 @@ export const LeapMotionObj = {
     input: ["Gestural Data", "OSC"],
     output: [],
     docLink: "https://www.ultraleap.com/"
+};
+
+export const LivePoseObj = {
+    name: "LivePose",
+    logoFile: "images/LivePose.png",
+    description: "A command line tool which tracks people skeletons and applies filters",
+    input: ["Video", "OSC"],
+    output: [],
+    docLink: "https://github.com/sat-mtl/livepose"
 };
 
 export const MadMapperObj = {
@@ -250,6 +204,15 @@ export const P5jsObj = {
     docLink: "https://p5js.org/"
 };
 
+export const PointMapperObj = {
+    name: "PointMapper",
+    logoFile: "logosat.png",
+    description: "A prototype web controller for SATIE",
+    input: ["Video", "OSC",],
+    output: [],
+    docLink: "https://toolbox.sat.qc.ca/"
+};
+
 export const ProcessingObj = {
     name: "Processing [external]",
     logoFile: "images/processing_logo.svg",
@@ -257,6 +220,15 @@ export const ProcessingObj = {
     input: ["Video", "Audio", "OSC", "Images"],
     output: [],
     docLink: "https://processing.org/"
+};
+
+export const PuaraObj = {
+    name: "Puara",
+    logoFile: "images/puara.jpg",
+    description: "A framework for building and deploying embedded systems",
+    input: ["Audio", "OSC", "Gestural Data", "Sensor Data"],
+    output: [],
+    docLink: "https://github.com/Puara"
 };
 
 export const PureDataObj = {
@@ -286,6 +258,24 @@ export const ResolumeObj = {
     docLink: "https://resolume.com/"
 };
 
+export const SatelliteObj = {
+    name: "Satellite",
+    logoFile: "images/Satellite.png",
+    description: "An immersive and social digital 3D environment accessible on the web",
+    input: ["Video"],
+    output: [],
+    docLink: "https://gitlab.com/sat-mtl/satellite"
+};
+
+export const ScoreObj = {
+    name: "ossia score",
+    logoFile: "images/ossiascore_logo.png",
+    description: "Interactive, intermedia audio-visual sequencer.",
+    input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images"],
+    output: [],
+    docLink: "https://github.com/ossia/score"
+};
+
 export const SmodeObj = {
     name: "Smode [external]",
     logoFile: "images/smode_logo.png",
@@ -294,6 +284,15 @@ export const SmodeObj = {
     input: ["Video", "Audio", "OSC", "NDI"],
     output: [],
     docLink: "https://smode.fr/"
+};
+
+export const SpatgrisObj = {
+    name: "SpatGRIS [external]",
+    logoFile: "images/SpatGRIS_logo.png",
+    description: "A software designed for multichannel spatialization in 2D and 3D",
+    input: ["Audio", "OSC"],
+    output: [],
+    docLink: "https://gris.musique.umontreal.ca/"
 };
 
 export const SplashObj = {
