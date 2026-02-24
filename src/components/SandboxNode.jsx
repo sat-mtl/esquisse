@@ -27,14 +27,14 @@ export default memo(({ data, isConnectable }) => {
     );
   }
 
-  const handleClick = () => {
+  const handleDoubleClick = () => {
     window.open(`${data.toolObj.docLink}`, "_blank");
   }
 
   let obj = data.toolObj;
 
   return (
-    <div className="sandbox-node" onClick={handleClick}> 
+    <div className="sandbox-node" onDoubleClick={handleDoubleClick}> 
       <Handle
         type="target"
         id="#b1b1b7"
