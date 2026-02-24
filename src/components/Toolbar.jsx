@@ -13,6 +13,7 @@ export function Toolbar(){
             <SidebarNode toolObj={tools.ChataigneObj} />
             <SidebarNode toolObj={tools.CinderObj} />
             <SidebarNode toolObj={tools.CubaseObj} />
+            <SidebarNode toolObj={tools.DomeportObj} />
             <SidebarNode toolObj={tools.IsadoraObj} />
             <SidebarNode toolObj={tools.KoaiaObj} />
             <SidebarNode toolObj={tools.LeapMotionObj} />
