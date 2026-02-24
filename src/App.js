@@ -25,6 +25,7 @@ import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
+import { Dropdown } from "./components/Dropdown.jsx";
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -52,7 +53,8 @@ const Flow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
   
-  const [menu, setMenu] = useState(null);
+  const [menu, setMenu] = useState({ type: null, data: {} });
+  
   const ref = useRef(null);
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -101,10 +103,14 @@ const Flow = () => {
         const sourceNode = newNodes.find(n => n.id.startsWith(e.source));
         const targetNode = newNodes.find(n => n.id.startsWith(e.target));
 
-        const sharedInput = tools.getSharedInput(
+        const sharedInput = 
+        e.data?.sharedInput ||
+        tools.getSharedInput(
           sourceNode.data.toolObj,
           targetNode.data.toolObj
         );
+
+        const protocol = e.data?.protocol || (sharedInput.length ? sharedInput[0] : "");
 
         return{
           ...e,
@@ -112,7 +118,7 @@ const Flow = () => {
           source: `${e.source}-${timestamp}`,
           target: `${e.target}-${timestamp}`,
           type: "custom",
-          data: {sharedInput},
+          data: {sharedInput, protocol},
         };
       });
 
@@ -164,7 +170,9 @@ const Flow = () => {
           addEndMarker({
             ...connection,
             type: "custom",
-            data: { sharedInput },
+            data: { 
+              sharedInput,
+              protocol: "" },
           }),
           eds
         )
@@ -267,19 +275,22 @@ const Flow = () => {
       // doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
       setMenu({
-        id: node.id,
-        top: event.clientY < pane.height - 200 && event.clientY,
-        left: event.clientX < pane.width - 200 && event.clientX,
-        right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-        bottom:
+        type: "node",
+        data: {
+          id: node.id,
+          top: event.clientY < pane.height - 200 && event.clientY,
+          left: event.clientX < pane.width - 200 && event.clientX,
+          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
+          bottom:
           event.clientY >= pane.height - 200 && pane.height - event.clientY,
+        }
       });
     },
     [setMenu],
   );
 
   // Close the context menu if it's open whenever the window is clicked.
-  const onPaneclick = useCallback(() => setMenu(null), [setMenu]);
+  const onPaneclick = useCallback(() => setMenu({type: null, data: null}), []);
 
   const duplicateNode = useCallback(
     (id) => {
@@ -295,6 +306,13 @@ const Flow = () => {
       setNodes((nds) => nds.concat(newNode));
     },
     [nodes],
+  );
+
+  const deleteNode = useCallback((id) => {
+        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+        setEdges((edges) => edges.filter((edge) => edge.source !== id));
+        setMenu({ type: null, data: null }); //Close context menu
+    }, [id, setNodes, setEdges]
   );
   
   
@@ -353,15 +371,19 @@ const Flow = () => {
           </Panel>
           
           
-
-          {menu && (
+          {menu.type === "node" && (
             <ContextMenu
-              onClick={onPaneclick}
-              duplicateNode={duplicateNode}
-              {...menu}
+              top={menu.data.top}
+              left={menu.data.left}
+              right={menu.data.right}
+              bottom={menu.data.bottom}
+              actions={[
+                { label: "Duplicate Node", onClick: () => duplicateNode(menu.data.id)},
+                { label: "Delete Node", onClick: () =>  deleteNode(menu.data.id)}
+              ]}
+              onClose={onPaneclick}
             />
           )}
-
           
           <Controls />
 

@@ -34,7 +34,6 @@ export function validateTemplate (template) {
     }
   }
 
-
   return true;
 }
 
@@ -57,7 +56,12 @@ export const Temp1 = {
         {
             id: "edge1",
             source: "node1",
-            target: "node2"
+            target: "node2",
+            type: "custom",
+            data: {
+                sharedInput: ["Video", "OSC"],
+                protocol: "Video"
+            }
         }
     ]
 };

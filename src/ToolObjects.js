@@ -35,11 +35,11 @@ export function canConnect(obj1, obj2) {
 }
 
 export function getSharedInput(toolA, toolB) {
-    const inputsA = toolA.input;
-    const inputsB = toolB.input;
-
-    const shared = inputsA.find(input => inputsB.includes(input));
-    return shared || null;
+  const inputsA = toolA.input; 
+  const inputsB = toolB.input; 
+  
+  const shared = inputsA.filter(input => inputsB.includes(input));
+  return shared || null; 
 }
 
 //Tools
