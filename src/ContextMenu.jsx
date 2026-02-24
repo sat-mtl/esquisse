@@ -16,7 +16,7 @@ export default function ContextMenu({
             onClick={(e) => e.stopPropagation()}
         >
             {actions.map(({ label, onClick, component }, i) => (
-                <div key={ i } onClick={ onClick }>
+                <div  key={ i } onClick={ onClick }>
                     { component ? component : <div onClick={onClick}> { label } </div>}
                 </div>
             ))}
