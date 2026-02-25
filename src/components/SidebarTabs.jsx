@@ -12,23 +12,23 @@ export function SidebarTabs(){
     const[active, setActive] = useState(0);
 
     return(
-        <>        
-        <div className="row">
-            {tabs.map((tab, i) => (
-                <button 
-                    key={i}
-                    className={active === i ? 'active' : ''}
-                    onClick={() => setActive(i)}
-                    >
-                        {tab.title}
-                </button>
-            ))}    
-        </div>
+        <div className="top-section-sidebar">        
+            <div className="menu-bar">
+                {tabs.map((tab, i) => (
+                    <button 
+                        key={i}
+                        className={active === i ? 'active' : ''}
+                        onClick={() => setActive(i)}
+                        >
+                            {tab.title}
+                    </button>
+                ))}    
+            </div>
 
-        <div className="tabcontent">
-            {tabs[active].content}  
+            <div className="tab-wrapper">
+                {tabs[active].content}  
+            </div>
         </div>
-        </>
         
     )
 }

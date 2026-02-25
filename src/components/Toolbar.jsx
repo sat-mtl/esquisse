@@ -5,7 +5,7 @@ import * as tools from "../ToolObjects.js";
 
 export function Toolbar(){
     return(
-         <aside>        
+         <aside className="tab-content">        
             <SidebarNode toolObj={tools.AbletonLiveObj} />
             <SidebarNode toolObj={tools.ArdourObj} />
             <SidebarNode toolObj={tools.BitwigObj} />
