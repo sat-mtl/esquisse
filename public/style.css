@@ -23,12 +23,16 @@ button{
     padding: 8px;
     margin: 4px;
     font-weight: bold;
-    background-color: #c8c8c8;
+    background-color: whitesmoke;
+    border-color: #4b46ff;
+    border-style: solid;
+   
 }
 
 button:hover{
-  background-color: #0d0b48;
-  color: white;
+  background-color: #000000;
+  color: whitesmoke;
+  
 }
 
 .textbox {
@@ -83,22 +87,15 @@ header, main, footer{
   flex-grow: 1;
   height: 100%;
   background-color: white;
+  margin: 0;
 }
   
 .dndflow aside {
   height: 100%;
-  border-right: 1px solid #eee;
-  padding: 15px 10px;
-  font-size: 12px;
-  background: #4b46ff;
-  overflow-y: auto;
-  border-radius: 10px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  align-content: start;
-  justify-items: center;
+  
 }
+
+
   
 .dndflow aside .description {
   margin-bottom: 10px;
@@ -217,18 +214,62 @@ header, main, footer{
   flex-direction: column;
 }
 
-.wrapper .row {
+.wrapper .menu-bar {
   flex-direction: row;
 }
 
-.tabcontent{
-  height: 95%;
-  width: 100%;
-  background-color: white;
-  overflow: scroll;
+
+.sidebar{
+  margin: 0;
+  width: 500px;
+  padding-left: 8px;
+  padding-right: 8px;
+  
+  display: flex;
+  flex-direction: column;
+  
 }
 
+sidebar .top-section-sidebar {
+ 
+
+}
+.tab-wrapper{
+  padding: 10px 10px;
+  font-size: 12px;
+  background: #4b46ff;
+  border-radius: 10px;
   
+  height: 50vmin;
+}
+
+
+.tab-content{
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-auto-rows: 80px;
+  column-gap: 5px;
+}
+  
+.menu-bar{
+  margin: 0;
+  
+  button{
+    margin-top: 0;
+  }
+
+}
+
+.node-details{
+  margin-top: 5px;
+  background: #1a192b;
+  border-radius: 10px;
+  height: 40vmin;
+
+}
+
 @media screen and (min-width: 768px) {
   .dndflow {
     flex-direction: row;

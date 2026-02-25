@@ -7,8 +7,8 @@ import * as templates from "./Templates.js";
 
 export function Templatebar(){
     return(
-         <aside>
+         <div className= "tab-content">
             <SidebarCompNode template={templates.Temp1} />
-        </aside>
+        </div>
     )
 };
