@@ -22,6 +22,7 @@ import Sidebar from "./Sidebar.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import { SelectionContextProvider, useSelectionContext } from "./SelectionContext.jsx";
 
+import { TopMenuBar } from "./components/TopMenuBar.jsx";
 
 import SandboxNode from './components/SandboxNode.jsx';
 import { TextboxNode } from "./components/TextboxNode.jsx";
@@ -420,12 +421,14 @@ const Flow = () => {
           </Panel>
           
           <Background />
-          <Panel position="top-right">
-            <input type="file" accept="application/json" onChange={onUpload}/>
-            <button onClick={onDownload}>download</button>
-            <button onClick={onSave}>save</button>
-            <button onClick={onRestore}>restore</button>
-            <button onClick= {onToggleLandingModal}> Instructions</button>
+          <Panel position="top-left">
+            <TopMenuBar
+              onDownload={onDownload}
+              onSave={onSave}
+              onRestore={onRestore}
+              onUpload={onUpload}
+              onInstructions={onToggleLandingModal}
+            />
           </Panel>
           
           

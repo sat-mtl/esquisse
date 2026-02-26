@@ -5,9 +5,13 @@ export function Dropdown({ options, value, onChange }) {
         onChange?.(e.target.value)
     }
 
-    return(    
-        <select value={ value || "" } onChange={handleChange}>
-            <option value="">-- Select --</option>
+    return (
+        <select
+            className="edge-dropdown"
+            value={value || ""}
+            onChange={handleChange}
+        >
+            <option value=""> select protocol</option>
             {options.map((option, i) => (
                 <option key= { i } value= { option }>
                     { option }

@@ -9,7 +9,7 @@ export function SidebarNode({toolObj}){
         const rect = e.currentTarget.getBoundingClientRect();
         setDescr({
             x: rect.left,
-            y: rect.top + rect.height / 2,
+            y: rect.top + rect.height / 2 + 50,
         });
     };
 

@@ -5,9 +5,9 @@ import { IObar } from "./IObar.jsx";
 
 //Add here to create additional tabs
 const tabs = [
-    {title: "Tools", content: <Toolbar />},
-    { title: "Template Flows", content: <Templatebar /> },
-    { title: "I/O Devices", content: <IObar />}
+    {title: "TOOLS", content: <Toolbar />},
+    { title: "I/O DEVICES", content: <IObar />},
+    { title: "TEMPLATES", content: <Templatebar /> }
 ]
 
 export function SidebarTabs(){
