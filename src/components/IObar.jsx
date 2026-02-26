@@ -15,6 +15,15 @@ export function IObar() {
       <SidebarNode toolObj={tools.CameraObj} />
       <SidebarNode toolObj={tools.KeyboardObj} />
       <SidebarNode toolObj={tools.MouseObj} />
+      <SidebarNode toolObj={tools.RaspberryPiObj} />
+      <SidebarNode toolObj={tools.HeadphoneObj} />
+      <SidebarNode toolObj={tools.OrbbecFemtoObj} />
+      <SidebarNode toolObj={tools.NetworkSwitchObj} />
+      <SidebarNode toolObj={tools.RouterObj} />
+      <SidebarNode toolObj={tools.ProjectorObj} />
+      <SidebarNode toolObj={tools.MidiControllerObj} />
+      <SidebarNode toolObj={tools.IMUMicrocontrollerObj} />
+      <SidebarNode toolObj={tools.ComputerObj} />
     </aside>
   );
 }

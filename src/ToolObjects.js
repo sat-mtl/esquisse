@@ -44,6 +44,91 @@ export function getMatchingIO(toolA, toolB) {
 
 // I/O devices
 
+export const ComputerObj = {
+  name: "Computer",
+  description: "A standard computer",
+  logoFile: "./images/computer.png",
+  input: ["MIDI", "Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  output: ["MIDI", "Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  docLink: ".",
+}
+
+export const RouterObj = {
+  name: "Router",
+  description: "A WiFi-capable router",
+  logoFile: "./images/router.jpg",
+  input: ["WiFi", "Wired"],
+  output: ["WiFi", "Wired"],
+  docLink: "."
+}
+
+export const NetworkSwitchObj = {
+  name: "Network Switch",
+  description: "A network switch",
+  logoFile: "./images/switch.jpg",
+  input: ["WiFi", "Wired"],
+  output: ["WiFi", "Wired"],
+  docLink: "."
+}
+
+export const ProjectorObj = {
+  name: "Projector",
+  description: "A projector",
+  logoFile: "./images/projector.jpg",
+  input: ["WiFi", "Bluetooth", "Video", "Images", "Wired"],
+  isIO: true, 
+  IOType: "Output",
+  docLink: "."
+}
+
+export const MidiControllerObj = {
+  name: "MIDI Controller",
+  description: "A MIDI microcontroller",
+  logoFile: "./images/midicontroller.jpg",
+  input: ["Audio"],
+  output: ["MIDI"],
+  docLink: "."
+}
+
+export const IMUMicrocontrollerObj = {
+  name: "IMU Microcontroller",
+  description: "An IMU-capable Microcontroller",
+  logoFile: "./images/imu.jpg",
+  input: ["Gestural Data", "Accelerometer Data"],
+  output: ["WiFi"],
+  docLink: "."
+}
+
+export const OrbbecFemtoObj = {
+  name: "Orbbec Femto Mega",
+  description: "A camera with 3D and IMU capabilities.",
+  logoFile: "./images/femtomega.jpg",
+  isIO: true,
+  IOType: "Input",
+  output: ["Gestural Data", "Accelerometer Data", "Video", "Depth Sensor Data"],
+  input: [],
+  docLink: "."
+}
+
+export const RaspberryPiObj = {
+  name: "Raspberry Pi",
+  logoFile: "./images/raspberry pi.jpg",
+  description: "A raspberry Pi microcontroller running SAT OS",
+  input: ["Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  output: ["Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  docLink: "https://www.raspberrypi.com/"
+}
+
+export const HeadphoneObj = {
+  name: "Headphones",
+  logoFile: "./images/headphones.jpg",
+  description: "An ordinary pair of headphones",
+  input: ["Audio", "Bluetooth"],
+  isIO: true, 
+  IOType: "Output",
+  docLink: "."
+}
+
 export const MicObj = {
   name: "Microphone", 
   logoFile: "./images/microphone.jpg", 
@@ -61,8 +146,8 @@ export const CameraObj = {
   logoFile: "./images/camera.png",
   description: "An ordinary camera",
   input: [],
-  output: ["Video", "Depth Data"],
-  isIO: true,
+  output: ["Video" , "Depth Data"],
+  isIO: true, 
   IOType: "Input",
   docLink: "."
 }
@@ -355,7 +440,7 @@ export const ReaperObj = {
     logoFile: "images/REAPER_logo.png",
     description: "A free digital audio workstation for multitrack audio recording and editing.",
     input: ["Audio", "OSC"],
-    output: [],
+    output: ["Audio", "OSC"],
     docLink: "https://www.reaper.fm/"
 };
 
@@ -454,7 +539,7 @@ export const VCVRackObj = {
     logoFile: "images/VCVrack_logo.png",
     description: "An open-source virtual modular synthesizer.",
     input: ["Audio", "OSC"],
-    output: [],
+    output: ["OSC"],
     docLink: "https://vcvrack.com/"
 };
 
