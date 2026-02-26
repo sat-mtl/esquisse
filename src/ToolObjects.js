@@ -49,6 +49,7 @@ export const MicObj = {
   logoFile: "./images/microphone.jpg", 
   description: "An ordinary microphone",
   input: [],
+  logoScale: 1.5,
   output: ["Audio"],
   isIO: true, 
   IOType: "Input",
@@ -60,8 +61,8 @@ export const CameraObj = {
   logoFile: "./images/camera.png",
   description: "An ordinary camera",
   input: [],
-  output: ["Video, Depth Data"],
-  isIO: true, 
+  output: ["Video", "Depth Data"],
+  isIO: true,
   IOType: "Input",
   docLink: "."
 }
@@ -94,6 +95,7 @@ export const ScreenObj = {
   logoFile: "./images/monitor.jpg",
   description: "An ordinary monitor or TV screen",
   input: ["Video"],
+  logoScale: 1.5,
   isIO: true,
   IOType: "Output",
   docLink: "."
@@ -112,7 +114,7 @@ export const SpeakerObj = {
 export const AudiodiceObj = {
   name: "Audiodice",
   logoFile: "./images/audiodice.png",
-  logoScale: 1.8,
+//   logoScale: 1.5,
   description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
   input: ["OSC", "Audio"],
   isIO: true, 
@@ -124,7 +126,7 @@ export const AudiodiceObj = {
 export const HapticFloorObj = {
   name: "Haptic Floor",
   logoFile: "./images/HapticFloor.png",
-  logoScale: 1.8, 
+  logoScale: 1.4, 
   description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
   input: ["OSC"],
   isIO: true, 
@@ -135,7 +137,8 @@ export const HapticFloorObj = {
 // Tools
 
 export const AbletonLiveObj = {
-    name: "Ableton Live [external]",
+    name: "Ableton Live",
+    external: true,
     logoFile: "images/AbletonLive_logo.png",
     logoScale: 1.8,
     description: "A digital audio workstation (DAW) for music production, composition, recording, and live performance.",
@@ -145,7 +148,8 @@ export const AbletonLiveObj = {
 };
 
 export const ArdourObj = {
-    name: "Ardour [external]",
+    name: "Ardour",
+    external: true,
     logoFile: "images/ardour_logo.png",
     description: "An open-source digital audio workstation for recording, editing, and mixing audio.",
     input: ["Audio", "OSC"],
@@ -154,7 +158,8 @@ export const ArdourObj = {
 };
 
 export const BitwigObj = {
-    name: "Bitwig Studio [external]",
+    name: "Bitwig Studio",
+    external: true,
     logoFile: "images/bitwig_logo.png",
     logoScale: 2,
     description: "A digital audio workstation for music production and live performance.",
@@ -164,7 +169,8 @@ export const BitwigObj = {
 };
 
 export const BlenderObj = {
-    name: "Blender [external]",
+    name: "Blender",
+    external: true,
     logoFile: "images/blender_logo.png",
     description: "An open-source 3D creation suite for modeling, animation, and rendering.",
     input: ["Video", "Images"],
@@ -173,7 +179,8 @@ export const BlenderObj = {
 };
 
 export const ChataigneObj = {
-    name: "Chataigne [external]",
+    name: "Chataigne",
+    external: true,
     logoFile: "images/chataigne_logo.png",
     description: "A creative control software for mapping and routing OSC, MIDI, and other protocols.",
     input: ["OSC", "Audio", "Video"],
@@ -182,7 +189,8 @@ export const ChataigneObj = {
 };
 
 export const CinderObj = {
-    name: "Cinder [external]",
+    name: "Cinder",
+    external: true,
     logoFile: "images/cinder_logo.png",
     description: "Open source library for professional-quality creative coding in C++.",
     input: ["Video", "Audio", "OSC", "Images"],
@@ -191,7 +199,8 @@ export const CinderObj = {
 };
 
 export const CubaseObj = {
-    name: "Cubase [external]",
+    name: "Cubase",
+    external: true,
     logoFile: "images/cubase_logo.png",
     description: "A digital audio workstation for music recording, mixing, and editing.",
     input: ["Audio", "OSC"],
@@ -210,7 +219,8 @@ export const DomeportObj = {
 };
 
 export const IsadoraObj = {
-    name: "Isadora [external]",
+    name: "Isadora",
+    external: true,
     logoFile: "images/isadora_logo.jpeg",
     logoScale: 1.8,
     description: "Scene-based media control software with integrated projection mapping.",
@@ -229,7 +239,8 @@ export const KoaiaObj = {
 };
 
 export const LeapMotionObj = {
-    name: "Leap Motion [external]",
+    name: "Leap Motion",
+    external: true,
     logoFile: "images/leapmotion_logo.png",
     logoScale: 1.5,
     description: "Sensor device that supports hand and finger motions as input.",
@@ -248,7 +259,8 @@ export const LivePoseObj = {
 };
 
 export const MadMapperObj = {
-    name: "MadMapper [external]",
+    name: "MadMapper",
+    external: true,
     logoFile: "images/MadMapper_logo.png",
     logoScale: 1.8,
     description: "Video mapping projections and Light mapping.",
@@ -258,7 +270,8 @@ export const MadMapperObj = {
 };
 
 export const MaxMSPObj = {
-    name: "Max/MSP [external]",
+    name: "Max/MSP",
+    external: true,
     logoFile: "images/MaxMSP_logo.jpeg",
     logoScale: 1.8,
     description: "Visual programming language for media.",
@@ -268,7 +281,8 @@ export const MaxMSPObj = {
 };
 
 export const NotchObj = {
-    name: "Notch [external]",
+    name: "Notch",
+    external: true,
     logoFile: "images/notch_logo.png",
     logoScale: 1.5,
     description: "Node-based authoring tool with a strong focus on real-time graphics.",
@@ -278,7 +292,8 @@ export const NotchObj = {
 };
 
 export const OBSStudioObj = {
-    name: "OBS Studio [external]",
+    name: "OBS Studio",
+    external: true,
     logoFile: "images/OBS_Studio_Logo.svg.png",
     description: "An open-source software for video recording and live streaming.",
     input: ["Video", "Audio", "NDI"],
@@ -287,7 +302,8 @@ export const OBSStudioObj = {
 };
 
 export const P5jsObj = {
-    name: "p5.js [external]",
+    name: "p5.js",
+    external: true,
     logoFile: "images/p5js_logo.svg",
     description: "A free and open-source JavaScript library.",
     input: ["Video", "Audio", "Images"],
@@ -305,7 +321,8 @@ export const PointMapperObj = {
 };
 
 export const ProcessingObj = {
-    name: "Processing [external]",
+    name: "Processing",
+    external: true,
     logoFile: "images/processing_logo.svg",
     description: "Computer programming language and IDE for visual arts.",
     input: ["Video", "Audio", "OSC", "Images"],
@@ -323,7 +340,8 @@ export const PuaraObj = {
 };
 
 export const PureDataObj = {
-    name: "Pure Data [external]",
+    name: "Pure Data",
+    external: true,
     logoFile: "images/puredata_logo.png",
     description: "Open source visual programming language for multimedia.",
     input: ["Audio", "OSC", "Video"],
@@ -332,7 +350,8 @@ export const PureDataObj = {
 };
 
 export const ReaperObj = {
-    name: "REAPER [external]",
+    name: "REAPER",
+    external: true,
     logoFile: "images/REAPER_logo.png",
     description: "A free digital audio workstation for multitrack audio recording and editing.",
     input: ["Audio", "OSC"],
@@ -341,7 +360,8 @@ export const ReaperObj = {
 };
 
 export const ResolumeObj = {
-    name: "Resolume [external]",
+    name: "Resolume",
+    external: true,
     logoFile: "images/resolume_logo.svg",
     description: "Mixing of digital video and effects in realtime.",
     input: ["Video", "Audio", "OSC", "NDI"],
@@ -368,7 +388,8 @@ export const ScoreObj = {
 };
 
 export const SmodeObj = {
-    name: "Smode [external]",
+    name: "Smode",
+    external: true,
     logoFile: "images/smode_logo.png",
     logoScale: 2,
     description: "A real-time 2D/3D creation, compositing and video-mapping engine.",
@@ -378,7 +399,8 @@ export const SmodeObj = {
 };
 
 export const SpatgrisObj = {
-    name: "SpatGRIS [external]",
+    name: "SpatGRIS",
+    external: true,
     logoFile: "images/SpatGRIS_logo.png",
     description: "A software designed for multichannel spatialization in 2D and 3D",
     input: ["Audio", "OSC"],
@@ -397,7 +419,8 @@ export const SplashObj = {
 };
 
 export const SuperColliderObj = {
-    name: "SuperCollider [external]",
+    name: "SuperCollider",
+    external: true,
     logoFile: "images/SuperCollider_logo.svg",
     description: "Platform for audio synthesis and algorithmic composition.",
     input: ["Audio", "OSC"],
@@ -406,7 +429,8 @@ export const SuperColliderObj = {
 };
 
 export const TouchDesignerObj = {
-    name: "TouchDesigner [external]",
+    name: "TouchDesigner",
+    external: true,
     logoFile: "images/TouchDesigner_logo.png",
     description: "Visual development platform to create realtime projects.",
     input: ["Video", "Audio", "OSC", "NDI"],
@@ -415,7 +439,8 @@ export const TouchDesignerObj = {
 };
 
 export const UnrealEngineObj = {
-    name: "Unreal Engine [external]",
+    name: "Unreal Engine",
+    external: true,
     logoFile: "images/unrealengine_logo.png",
     description: "A real-time 3D game engine used for simulations and immersive experiences.",
     input: ["Video", "Audio", "OSC", "NDI"],
@@ -424,7 +449,8 @@ export const UnrealEngineObj = {
 };
 
 export const VCVRackObj = {
-    name: "VCV Rack [external]",
+    name: "VCV Rack",
+    external: true,
     logoFile: "images/VCVrack_logo.png",
     description: "An open-source virtual modular synthesizer.",
     input: ["Audio", "OSC"],
@@ -433,7 +459,8 @@ export const VCVRackObj = {
 };
 
 export const VDMXObj = {
-    name: "VDMX [external]",
+    name: "VDMX",
+    external: true,
     logoFile: "images/vdmx_logo.png",
     logoScale: 2,
     description: "Realtime multimedia performance application.",
@@ -443,7 +470,8 @@ export const VDMXObj = {
 };
 
 export const VezerObj = {
-    name: "Vezér [external]",
+    name: "Vezér",
+    external: true,
     logoFile: "images/vezer_logo.png",
     description: "A timeline-based MIDI, OSC, and DMX sequencer for live shows.",
     input: ["OSC", "Audio"],
@@ -452,7 +480,8 @@ export const VezerObj = {
 };
 
 export const VRChatObj = {
-    name: "VRChat [external]",
+    name: "VRChat",
+    external: true,
     logoFile: "images/vrchat_logo.png",
     logoScale: 1.5,
     description: "A social virtual reality platform for creating and exploring 3D worlds.",
@@ -462,7 +491,8 @@ export const VRChatObj = {
 };
 
 export const VVVVObj = {
-    name: "vvvv [external]",
+    name: "vvvv",
+    external: true,
     logoFile: "images/vvvv_logoo.png",
     logoScale: 2,
     description: "Hybrid visual/textual live-programming environment for easy prototyping and development.",
@@ -472,7 +502,8 @@ export const VVVVObj = {
 };
 
 export const WwiseObj = {
-    name: "Wwise [external]",
+    name: "Wwise",
+    external: true,
     logoFile: "images/wwise_logo.png",
     description: "An audio middleware solution for interactive media and video games.",
     input: ["Audio", "OSC"],
