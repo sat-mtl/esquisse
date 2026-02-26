@@ -1,8 +1,8 @@
 import { useDnD } from "../DnDContext.jsx";
 
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { Handle, Position } from "@xyflow/react";
-
+import { useSelectionContext } from "../SelectionContext.jsx";
 
 /*
 Sandbox nodes are nodes that take in a toolObj feild that contains information on
@@ -13,10 +13,16 @@ Sandbox nodes are meant to be used outside of the sidebar
 */
 
 export default memo(({ data, isConnectable }) => {
+  
+  //get context info
+  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] = useSelectionContext();
+
   //debug
   //console.log("Object in SandboxNode")
   //console.log(data.toolObj);
 
+
+ 
   if (data.toolObj == null) {
     //check for broken reference
     return (
@@ -31,10 +37,21 @@ export default memo(({ data, isConnectable }) => {
     window.open(`${data.toolObj.docLink}`, "_blank");
   }
 
-  let obj = data.toolObj;
+
+  //update selected obj on click
+  const handleClick = useCallback(() => {
+    console.log("this is a test");
+    console.log(data);
+    if (!data?.toolObj) {
+      setSelectedNode(null);
+      return;
+    }
+    const nodeToSelect = { id: data.id, ...data.toolObj };
+    setSelectedNode(nodeToSelect);
+  }, [setSelectedNode, data?.id, data?.toolObj]);
 
   return (
-    <div className="sandbox-node" onDoubleClick={handleDoubleClick}> 
+    <div className="sandbox-node" onDoubleClick={handleDoubleClick} onClick={handleClick}> 
       <Handle
         className="target"
         type="target"
@@ -49,8 +66,8 @@ export default memo(({ data, isConnectable }) => {
         src={`/${data.toolObj.logoFile}`}
         alt="/logosat.png"
       />
-      <h5> {obj.name} </h5>
-      <p>{ obj.description }</p>
+      <h5>{data.toolObj.name}</h5>
+      <p>{data.toolObj.description}</p>
 
       <Handle
         className="source"

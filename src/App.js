@@ -15,7 +15,11 @@ import "@xyflow/react/dist/style.css";
 
 
 import Sidebar from "./Sidebar.jsx";
+
+//contexts
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
+import { SelectionContextProvider, useSelectionContext } from "./SelectionContext.jsx";
+
 
 import SandboxNode from './components/SandboxNode.jsx';
 import { TextboxNode } from "./components/TextboxNode.jsx";
@@ -25,6 +29,8 @@ import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
+
+
 
 let id = 0;
 const getId = () => `${id++}`;
@@ -60,6 +66,9 @@ const Flow = () => {
   const { setViewport } = useReactFlow();
 
   const [type, setType, obj, setObj] = useDnD(); //type of currently dragged item
+  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] = useSelectionContext();
+
+  
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -489,7 +498,9 @@ const Flow = () => {
 export default () => (
   <ReactFlowProvider>
     <DnDProvider>
-      <Flow />
+      <SelectionContextProvider>
+        <Flow />
+      </SelectionContextProvider>
     </DnDProvider>
   </ReactFlowProvider>
 );

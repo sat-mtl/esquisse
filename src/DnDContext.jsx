@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
-const DnDContext = createContext([null, (_) => {}]);
-
+const DnDContext = createContext([null, () => {}, null, () => {}]);
 
 /*
 This context stores information of what is currently being selected by the user.
@@ -18,8 +17,6 @@ export const DnDProvider = ({ children }) => {
         </DnDContext.Provider>
     );
 };
-
-export default DnDContext;
 
 export const useDnD = () => {
     return useContext(DnDContext);

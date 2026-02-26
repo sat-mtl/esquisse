@@ -248,7 +248,7 @@ sidebar .top-section-sidebar {
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
   grid-auto-rows: 80px;
   column-gap: 5px;
 }
@@ -264,9 +264,12 @@ sidebar .top-section-sidebar {
 
 .node-details{
   margin-top: 5px;
+  padding: 10px;
   background: #1a192b;
   border-radius: 10px;
   height: 40vmin;
+  color: white;
+
 
 }
 
@@ -281,6 +284,9 @@ sidebar .top-section-sidebar {
     color: #000;
   }
 }
+
+
+
 
 .modal-wrapper{
   position: fixed;
