@@ -15,6 +15,10 @@ export function NodeDetails() {
     );
   }
 
+  const handleClick = () => {
+    window.open(`${selectedNode.docLink}`, "_blank");
+  }
+
   console.log(selectedNode);
 
   return (
@@ -24,7 +28,7 @@ export function NodeDetails() {
         <img
           src={`/${selectedNode.logoFile}`}
         />
-        <button href={selectedNode.docLink} target="_blank" rel="noopener noreferrer">Documentation</button>
+        <button onClick={handleClick}>Documentation</button>
       </div>
 
       <h2>{selectedNode.name}</h2>
