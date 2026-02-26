@@ -25,21 +25,34 @@ export function checkValid(toolObj){
     return isValid;
 }
 
+//True if any output of the first tool is accepted as input by the second. 
 export function canConnect(obj1, obj2) {
-    for (const output of obj1.output) {
-        if (obj2.input.includes(output)) {
-            return true;
-        }
+    const out = obj1?.output;
+    const ins = obj2?.input;
+    if (!Array.isArray(out) || !Array.isArray(ins)) {
+        return false;
+    }
+    for (const output of out) {
+        if (ins.includes(output)) return true;
     }
     return false;
 }
 
+//Returns the list of output types that the first tool can send and the second accepts. Returns null if either tool is missing or has no matching i/o types.
 export function getMatchingIO(toolA, toolB) {
-  const outputsA = toolA.output;
-  const inputsB = toolB.input;
+    const out = toolA?.output;
+    const ins = toolB?.input;
 
-  const shared = outputsA.filter(output => inputsB.includes(output));
-  return shared || null; 
+    if (!Array.isArray(out) || !Array.isArray(ins)) {
+        return null;
+    }
+
+    const shared = out.filter((output) => ins.includes(output));
+
+    if (shared.length === 0) {
+        return null;
+    }
+    return shared;
 }
 
 // I/O devices
