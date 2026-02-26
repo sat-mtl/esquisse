@@ -26,19 +26,19 @@ export function checkValid(toolObj){
 }
 
 export function canConnect(obj1, obj2) {
-    for (const input of obj1.input) {
-        if (obj2.input.includes(input)) {
+    for (const output of obj1.output) {
+        if (obj2.input.includes(output)) {
             return true;
         }
     }
     return false;
 }
 
-export function getSharedInput(toolA, toolB) {
-  const inputsA = toolA.input; 
-  const inputsB = toolB.input; 
-  
-  const shared = inputsA.filter(input => inputsB.includes(input));
+export function getMatchingIO(toolA, toolB) {
+  const outputsA = toolA.output;
+  const inputsB = toolB.input;
+
+  const shared = outputsA.filter(output => inputsB.includes(output));
   return shared || null; 
 }
 
@@ -91,7 +91,7 @@ export const AbletonLiveObj = {
     logoScale: 1.8,
     description: "A digital audio workstation (DAW) for music production, composition, recording, and live performance.",
     input: ["Audio", "OSC"],
-    output: [],
+    output: ["Audio", "OSC"],
     docLink: "https://www.ableton.com/en/"
 };
 
@@ -175,7 +175,7 @@ export const KoaiaObj = {
     logoFile: "images/koaia_logo.png",
     description: "A tool for exploring generative AI.",
     input: ["Video", "NDI"],
-    output: [],
+    output: ["OSC", "RawData"],
     docLink: "https://github.com/sat-mtl/Koaia"
 };
 
@@ -193,8 +193,8 @@ export const LivePoseObj = {
     name: "LivePose",
     logoFile: "images/LivePose.png",
     description: "A command line tool which tracks people skeletons and applies filters",
-    input: ["Video", "OSC"],
-    output: [],
+    input: ["Video"],
+    output: ["OSC", "RawData"],
     docLink: "https://github.com/sat-mtl/livepose"
 };
 
@@ -203,8 +203,8 @@ export const MadMapperObj = {
     logoFile: "images/MadMapper_logo.png",
     logoScale: 1.8,
     description: "Video mapping projections and Light mapping.",
-    input: ["Video", "Audio", "OSC"],
-    output: [],
+    input: ["Video", "Audio"],
+    output: ["OSC"],
     docLink: "https://madmapper.com/"
 };
 
@@ -213,8 +213,8 @@ export const MaxMSPObj = {
     logoFile: "images/MaxMSP_logo.jpeg",
     logoScale: 1.8,
     description: "Visual programming language for media.",
-    input: ["Audio", "Video", "OSC"],
-    output: [],
+    input: ["Audio", "Video"],
+    output: ["OSC"],
     docLink: "https://cycling74.com/products/max"
 };
 
@@ -233,7 +233,7 @@ export const OBSStudioObj = {
     logoFile: "images/OBS_Studio_Logo.svg.png",
     description: "An open-source software for video recording and live streaming.",
     input: ["Video", "Audio", "NDI"],
-    output: [],
+    output: ["Video", "Audio", "NDI"],
     docLink: "https://obsproject.com/"
 };
 
@@ -251,7 +251,7 @@ export const PointMapperObj = {
     logoFile: "logosat.png",
     description: "A prototype web controller for SATIE",
     input: ["Video", "OSC",],
-    output: [],
+    output: ["Video", "OSC"],
     docLink: "https://toolbox.sat.qc.ca/"
 };
 
@@ -269,7 +269,7 @@ export const PuaraObj = {
     logoFile: "images/puara.jpg",
     description: "A framework for building and deploying embedded systems",
     input: ["Audio", "OSC", "Gestural Data", "Sensor Data"],
-    output: [],
+    output: ["OSC"],
     docLink: "https://github.com/Puara"
 };
 
@@ -313,8 +313,8 @@ export const ScoreObj = {
     name: "ossia score",
     logoFile: "images/ossiascore_logo.png",
     description: "Interactive, intermedia audio-visual sequencer.",
-    input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images"],
-    output: [],
+    input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images", "Audio"],
+    output: ["OSC", "Video", "Images", "Audio"],
     docLink: "https://github.com/ossia/score"
 };
 
