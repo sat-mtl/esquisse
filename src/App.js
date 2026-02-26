@@ -17,6 +17,8 @@ import "@xyflow/react/dist/style.css";
 import Sidebar from "./Sidebar.jsx";
 
 //contexts
+
+//contexts
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import { SelectionContextProvider, useSelectionContext } from "./SelectionContext.jsx";
 
@@ -29,8 +31,6 @@ import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
-
-
 
 let id = 0;
 const getId = () => `${id++}`;

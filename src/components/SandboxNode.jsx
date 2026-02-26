@@ -65,7 +65,6 @@ export default memo(({ data, isConnectable }) => {
   
         <img id="logo-img" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" />
         <h5> {obj.name} </h5>
-        <p>{obj.description}</p>
   
       </div>
     );
@@ -82,18 +81,22 @@ export default memo(({ data, isConnectable }) => {
         isConnectable={isConnectable}
         onConnect={(params) => console.log("handle onConnect", params)}
       />
-
-      <img id="logo-img" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" />
-      <h5> {obj.name} </h5>
-      <p>{obj.description}</p>
+      
+      <img
+        id="logo-img"
+        src={`/${data.toolObj.logoFile}`}
+      />
+      
 
       <Handle
         className="source"
         type="source"
         id="#b1b1b7"
-        position={Position.Right}
+        position={Position.Right} 
         isConnectable={isConnectable}
       />
+      <h5>{data.toolObj.name}</h5>
     </div>
+
   );
 });
