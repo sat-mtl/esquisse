@@ -42,7 +42,49 @@ export function getSharedInput(toolA, toolB) {
   return shared || null; 
 }
 
-//Tools
+// I/O devices
+
+export const ScreenObj = {
+  name: "Screen", 
+  logoFile: "./images/monitor.jpg",
+  description: "An ordinary monitor or TV screen",
+  input: ["Video"],
+  isIO: true,
+  docLink: ""
+}
+
+export const SpeakerObj = {
+  name: "Speaker",
+  logoFile: "./images/speaker.png",
+  description: "An ordinary speaker",
+  input: ["Bluetooth", "Audio"],
+  isIO: true,
+  docLink: ""
+}
+
+export const AudiodiceObj = {
+  name: "Audiodice",
+  logoFile: "./images/audiodice.png",
+  logoScale: 1.8,
+  description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
+  input: ["OSC", "Audio"],
+  isIO: true, 
+  docLink: ""
+  
+}
+
+export const HapticFloorObj = {
+  name: "Haptic Floor",
+  logoFile: "./images/HapticFloor.png",
+  logoScale: 1.8, 
+  description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
+  input: ["OSC"],
+  isIO: true, 
+  docLink: ""
+}
+
+// Tools
+
 export const AbletonLiveObj = {
     name: "Ableton Live [external]",
     logoFile: "images/AbletonLive_logo.png",
