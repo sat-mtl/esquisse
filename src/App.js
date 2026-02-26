@@ -114,7 +114,7 @@ const Flow = () => {
 
         const sharedInput = 
         e.data?.sharedInput ||
-        tools.getSharedInput(
+        tools.getMatchingIO(
           sourceNode.data.toolObj,
           targetNode.data.toolObj
         );
@@ -167,7 +167,7 @@ const Flow = () => {
       
       if (!sourceNode || !targetNode) return;
       
-      const sharedInput = tools.getSharedInput(
+      const sharedInput = tools.getMatchingIO(
         sourceNode.data.toolObj,
         targetNode.data.toolObj
       );
