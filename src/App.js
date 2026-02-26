@@ -345,7 +345,8 @@ const Flow = () => {
   const onPaneclick = useCallback(() => setMenu({type: null, data: null}), []);
 
   const duplicateNode = useCallback(
-    (id) => {
+    (id, e) => {
+      e.stopPropagation();
       const node = nodes.find((node) => node.id === id);
       const position = { x: node.position.x + 50, y: node.position.y + 50 };
 
@@ -435,7 +436,7 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                { label: "Duplicate Node", onClick: () => duplicateNode(menu.data.id)},
+                { label: "Duplicate Node", onClick: (e) => duplicateNode(menu.data.id, e)},
                 { label: "Delete Node", onClick: () =>  deleteNode(menu.data.id)}
               ]}
               onClose={onPaneclick}
