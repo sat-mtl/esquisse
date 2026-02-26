@@ -35,7 +35,7 @@ export default memo(({ data, isConnectable }) => {
 
   const handleDoubleClick = () => {
     window.open(`${data.toolObj.docLink}`, "_blank");
-  }
+  };
 
 
   //update selected obj on click
@@ -49,6 +49,28 @@ export default memo(({ data, isConnectable }) => {
     const nodeToSelect = { id: data.id, ...data.toolObj };
     setSelectedNode(nodeToSelect);
   }, [setSelectedNode, data?.id, data?.toolObj]);
+  let obj = data.toolObj;
+  
+  if (obj.isIO) {
+    return (
+      <div className="sandbox-node" onDoubleClick={handleDoubleClick} onClick={handleClick}>
+        <Handle
+          className="target"
+          type="target"
+          id="#b1b1b7"
+          position={Position.Left}
+          isConnectable={isConnectable}
+          onConnect={(params) => console.log("handle onConnect", params)}
+        />
+  
+        <img id="logo-img" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" />
+        <h5> {obj.name} </h5>
+        <p>{obj.description}</p>
+  
+      </div>
+    );
+  }
+  
 
   return (
     <div className="sandbox-node" onDoubleClick={handleDoubleClick} onClick={handleClick}> 
@@ -60,14 +82,10 @@ export default memo(({ data, isConnectable }) => {
         isConnectable={isConnectable}
         onConnect={(params) => console.log("handle onConnect", params)}
       />
-      
-      <img
-        id="logo-img"
-        src={`/${data.toolObj.logoFile}`}
-        alt="/logosat.png"
-      />
-      <h5>{data.toolObj.name}</h5>
-      <p>{data.toolObj.description}</p>
+
+      <img id="logo-img" src={`/${data.toolObj.logoFile}`} alt="/logosat.png" />
+      <h5> {obj.name} </h5>
+      <p>{obj.description}</p>
 
       <Handle
         className="source"
