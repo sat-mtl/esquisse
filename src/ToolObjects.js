@@ -44,13 +44,59 @@ export function getMatchingIO(toolA, toolB) {
 
 // I/O devices
 
+export const MicObj = {
+  name: "Microphone", 
+  logoFile: "./images/microphone.jpg", 
+  description: "An ordinary microphone",
+  input: [],
+  output: ["Audio"],
+  isIO: true, 
+  IOType: "Input",
+  docLink: "."
+}
+
+export const CameraObj = {
+  name: "Camera",
+  logoFile: "./images/camera.png",
+  description: "An ordinary camera",
+  input: [],
+  output: ["Video, Depth Data"],
+  isIO: true, 
+  IOType: "Input",
+  docLink: "."
+}
+
+export const KeyboardObj = {
+  name: "Keyboard",
+  logoFile: "./images/keyboard.jpg",
+  description: "A computer keyboard",
+  input: [],
+  output: ["ASCII"], 
+  isIO: true, 
+  IOType: "Input",
+  docLink: "."
+}
+
+export const MouseObj = {
+  name: "Mouse",
+  logoFile: "./images/mouse.jpg",
+  description: "A computer mouse",
+  input: [],
+  output: ["Mouse Data"],
+  isIO: true, 
+  IOType: "Input", 
+  docLink: "."
+  
+}
+
 export const ScreenObj = {
   name: "Screen", 
   logoFile: "./images/monitor.jpg",
   description: "An ordinary monitor or TV screen",
   input: ["Video"],
   isIO: true,
-  docLink: ""
+  IOType: "Output",
+  docLink: "."
 }
 
 export const SpeakerObj = {
@@ -59,7 +105,8 @@ export const SpeakerObj = {
   description: "An ordinary speaker",
   input: ["Bluetooth", "Audio"],
   isIO: true,
-  docLink: ""
+  IOType: "Output",
+  docLink: "."
 }
 
 export const AudiodiceObj = {
@@ -69,7 +116,8 @@ export const AudiodiceObj = {
   description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
   input: ["OSC", "Audio"],
   isIO: true, 
-  docLink: ""
+  IOType: "Output",
+  docLink: "."
   
 }
 
@@ -80,7 +128,8 @@ export const HapticFloorObj = {
   description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
   input: ["OSC"],
   isIO: true, 
-  docLink: ""
+  IOType: "Output",
+  docLink: "."
 }
 
 // Tools
