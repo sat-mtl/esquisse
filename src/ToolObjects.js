@@ -156,7 +156,7 @@ export const DomeportObj = {
     logoScale: 1.5,
     description: "A tool for visualizing any video file on a dome display",
     input: ["Audio", "Video"],
-    output: [],
+    output: ["Video"],
     docLink: "https://domeport.sat.qc.ca/"
 };
 
@@ -175,7 +175,7 @@ export const KoaiaObj = {
     logoFile: "images/koaia_logo.png",
     description: "A tool for exploring generative AI.",
     input: ["Video", "NDI"],
-    output: ["OSC", "RawData"],
+    output: ["OSC","Video"],
     docLink: "https://github.com/sat-mtl/Koaia"
 };
 
@@ -251,7 +251,7 @@ export const PointMapperObj = {
     logoFile: "logosat.png",
     description: "A prototype web controller for SATIE",
     input: ["Video", "OSC",],
-    output: ["Video", "OSC"],
+    output: ["PointCloud", "OSC"],
     docLink: "https://toolbox.sat.qc.ca/"
 };
 
@@ -269,7 +269,7 @@ export const PuaraObj = {
     logoFile: "images/puara.jpg",
     description: "A framework for building and deploying embedded systems",
     input: ["Audio", "OSC", "Gestural Data", "Sensor Data"],
-    output: ["OSC"],
+    output: ["OSC","RawData"],
     docLink: "https://github.com/Puara"
 };
 
@@ -305,7 +305,7 @@ export const SatelliteObj = {
     logoFile: "images/Satellite.png",
     description: "An immersive and social digital 3D environment accessible on the web",
     input: ["Video"],
-    output: [],
+    output: ["Video", "OSC", "Websocket"],
     docLink: "https://gitlab.com/sat-mtl/satellite"
 };
 
@@ -314,7 +314,7 @@ export const ScoreObj = {
     logoFile: "images/ossiascore_logo.png",
     description: "Interactive, intermedia audio-visual sequencer.",
     input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images", "Audio"],
-    output: ["OSC", "Video", "Images", "Audio"],
+    output: ["OSC", "Video", "Images", "Audio", "Spout", "Syphon","NDI"],
     docLink: "https://github.com/ossia/score"
 };
 
@@ -333,7 +333,7 @@ export const SpatgrisObj = {
     logoFile: "images/SpatGRIS_logo.png",
     description: "A software designed for multichannel spatialization in 2D and 3D",
     input: ["Audio", "OSC"],
-    output: [],
+    output: ["OSC", "Audio"],
     docLink: "https://gris.musique.umontreal.ca/"
 };
 
@@ -343,7 +343,7 @@ export const SplashObj = {
     logoScale: 2,
     description: "A video mapping software, dedicated to deploying immersive spaces.",
     input: ["Video", "NDI"],
-    output: [],
+    output: ["Video"],
     docLink: "https://gitlab.com/sat-mtl/tools/splash"
 };
 
@@ -361,7 +361,7 @@ export const TouchDesignerObj = {
     logoFile: "images/TouchDesigner_logo.png",
     description: "Visual development platform to create realtime projects.",
     input: ["Video", "Audio", "OSC", "NDI"],
-    output: [],
+    output: ["OSC", "NDI"],
     docLink: "https://derivative.ca/"
 };
 
