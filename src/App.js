@@ -231,6 +231,20 @@ const Flow = () => {
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
         setViewport({ x, y, zoom });
+        
+        /* Sync the ID counter with the uploaded file's counter to prevent nodes getting replaced: 
+            Node ids are assigned in the following convention "dndnode_x", where x is the number on the id global variable.
+            Since id may be 0 if you upload a json file, this lambda will check what the highest number of nodes is on the uploaded file 
+            and set the global id counter to that.
+           
+            We use .replace with that weird regex to get through the entire string and just know what the number at the end is. 
+        */
+        const maxId = (flow.nodes || []).reduce((max, node) => {
+          const num = parseInt(node.id.replace(/\D+/g, ""), 10);
+          return isNaN(num) ? max : Math.max(max, num);
+        }, -1);
+        id = maxId + 1; 
+        
       }
     };
     
@@ -246,6 +260,19 @@ const Flow = () => {
       setNodes(flow.nodes || []);
       setEdges(flow.edges || []);
       setViewport({ x, y, zoom });
+      
+      /* Sync the ID counter with the uploaded file's counter to prevent nodes getting replaced: 
+          Node ids are assigned in the following convention "dndnode_x", where x is the number on the id global variable.
+          Since id may be 0 if you upload a json file, this lambda will check what the highest number of nodes is on the uploaded file 
+          and set the global id counter to that.
+         
+          We use .replace with that weird regex to get through the entire string and just know what the number at the end is. 
+      */
+      const maxId = (flow.nodes || []).reduce((max, node) => {
+        const num = parseInt(node.id.replace(/\D+/g, ""), 10);
+        return isNaN(num) ? max : Math.max(max, num);
+      }, -1);
+      id = maxId + 1; 
     }
   }, [setNodes, setEdges, setViewport]);
   
