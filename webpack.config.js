@@ -17,6 +17,10 @@ module.exports = (env, argv) => {
         overlay: {
           errors: true,
           warnings: false,
+          runtimeErrors: (error) => !error.message?.includes('ResizeObserver loop'), 
+          // ResizeObserver loop notifications are a known false positive thrown by
+          // the browser when NodeResizer (from @xyflow/react) observes size changes
+          // during drag. This does not affect functionality and is safe to suppress.        
         },
       },
       static: {
