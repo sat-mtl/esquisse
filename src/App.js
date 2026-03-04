@@ -504,7 +504,8 @@ const Flow = () => {
                       id: "textbox_" + getId(),
                       type: "textbox",
                       position,
-                      data: {label: ""},
+                      data: { label: "" },
+                      style: { width: 200, height: 100},
                     };
                     setNodes(nds => nds.concat(newTextboxNode));
                     setMenu({ type: null, data: null})
