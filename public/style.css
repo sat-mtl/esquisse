@@ -742,3 +742,15 @@ a {
   text-align: right;
 
 }
+
+
+.custom-form{
+	width: 250px;
+
+
+}
+
+#sidebar-custom-node{
+	text-align: center;
+	color: #4a46ff;
+}

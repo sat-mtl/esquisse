@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
-const SelectionContext = createContext([null, () => {}, null, () => {}]);
+const SelectionContext = createContext([null, () => {}, null, () => {}], null, () =>{}, [], () =>{});
 
 /*
 This context stores information of what is currently being selected by the user.
@@ -10,8 +10,12 @@ obj is the toolObj information, as listed in ToolObjects.js
 export const SelectionContextProvider = ({ children }) => {
     const [selectedNode, setSelectedNode] = useState(null); 
     const [hoveredNode, setHoveredNode] = useState(null); 
+    const [isShowModal, setIsShowModal] = useState(false);
+ 
+    const [custDropInfo, setCustDropInfo] = useState(null);
+    
     return (
-        <SelectionContext.Provider value={[selectedNode, setSelectedNode, hoveredNode, setHoveredNode]}>
+        <SelectionContext.Provider value={[selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal, setIsShowModal, custDropInfo, setCustDropInfo]}>
             {children}
         </SelectionContext.Provider>
     );

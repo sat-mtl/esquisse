@@ -13,24 +13,43 @@ export function NodeDetails() {
   }
 
   const handleClick = () => {
-    window.open(`${selectedNode.docLink}`, "_blank");
+    if(docLink != "."){
+      window.open(`${selectedNode.docLink}`, "_blank");
+    }
   };
 
   const inputList = Array.isArray(selectedNode.input) ? selectedNode.input : [];
   const outputList = Array.isArray(selectedNode.output) ? selectedNode.output : [];
 
+
+  //do not display empty fields
+  let doDisplayDocButton = false;
+  if (selectedNode.docLink != "."){
+    doDisplayDocButton = true;
+  }
+
+  let doDisplayImage = false;
+  if (selectedNode.logoFile != ""){
+    doDisplayDocButton = true;
+  }
+
+  let doDisplayHeader = true;
+  if(doDisplayDocButton == false && doDisplayImage == false){ //nothing in header
+    doDisplayHeader = false;
+  }
+
   return (
     <div className="node-details node-details-visible">
-      <div className="node-details-header">
+      {doDisplayHeader && <div className="node-details-header">
         <img
           className="node-details-logo"
           src={`/${selectedNode.logoFile}`}
           alt=""
         />
-        <button type="button" className="node-details-doc-btn" onClick={handleClick}>
+        {doDisplayDocButton && <button type="button" className="node-details-doc-btn" onClick={handleClick}>
           Documentation
-        </button>
-      </div>
+        </button>}
+      </div>}
       <h2 className="node-details-title">{selectedNode.name}</h2>
       <p className="node-details-desc">{selectedNode.description}</p>
 
