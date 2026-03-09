@@ -16,9 +16,11 @@ import "@xyflow/react/dist/style.css";
 
 import Sidebar from "./Sidebar.jsx";
 
+
 //contexts
 
 //contexts
+import { FlowContextProvider, useFlowContext } from "./FlowContext.jsx";
 import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import { SelectionContextProvider, useSelectionContext } from "./SelectionContext.jsx";
 
@@ -32,12 +34,15 @@ import * as tools from "./ToolObjects.js";
 import ConnectionLine from './components/ConnectionLine.jsx'; 
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
+import { CustomNodeEditModal } from "./components/CustomNodeLogic.jsx";
+
 
 let id = 0;
 const getId = () => `${id++}`;
 
 const nodeTypes = {
   sandbox: SandboxNode,
+  custSandbox: SandboxNode,
   textbox: TextboxNode,
 };
 
@@ -56,10 +61,9 @@ const flowKey = 'saved-flow';
 
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
   const { screenToFlowPosition } = useReactFlow();
-  
+  const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
   
   const ref = useRef(null);
@@ -67,7 +71,8 @@ const Flow = () => {
   const { setViewport } = useReactFlow();
 
   const [type, setType, obj, setObj] = useDnD(); //type of currently dragged item
-  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] = useSelectionContext();
+  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal, 
+    setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
 
   
 
@@ -140,23 +145,31 @@ const Flow = () => {
     console.log("In App.js");
     console.log(obj);
     console.log(type);
-    
-    //If creating a sandbox node, check that there is a valid toolObj to pass to it.
-    if(type == 'sandbox' && !tools.checkValid(obj)){ 
-      throw "Invalid toolObj: " + obj.name;
-    }
 
-    const newNode = {
-      id: "dndNode_" + getId(),
-      type,
-      position,
-      data: { 
-        label: `${type} node`,
-        ...(type === 'sandbox' && {toolObj: obj}),
-      },
-    };
 
-      setNodes((nds) => nds.concat(newNode));
+    if(type == "custSandbox"){
+      setCustDropInfo([position, getId()]);
+      setIsShowModal(true);
+
+    } else {
+      
+      //If creating a sandbox node, check that there is a valid toolObj to pass to it.
+      if(type == 'sandbox' && !tools.checkValid(obj)){ 
+        throw "Invalid toolObj: " + obj.name;
+      }
+
+      const newNode = {
+        id: "dndNode_" + getId(),
+        type,
+        position,
+        data: { 
+          label: `${type} node`,
+          ...(type === 'sandbox' && {toolObj: obj}),
+        },
+      };
+
+        setNodes((nds) => nds.concat(newNode));
+      }
     },
     [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
@@ -445,6 +458,7 @@ const Flow = () => {
 
           <Panel>
             {isLandingModalOpen && <Landing onButtonClick={onToggleLandingModal}/>}
+            {isShowModal && <CustomNodeEditModal/>}
           </Panel>
           
           <Background />
@@ -529,10 +543,12 @@ const Flow = () => {
 
 export default () => (
   <ReactFlowProvider>
-    <DnDProvider>
-      <SelectionContextProvider>
-        <Flow />
-      </SelectionContextProvider>
-    </DnDProvider>
+    <FlowContextProvider>
+      <DnDProvider>
+        <SelectionContextProvider>
+          <Flow />
+        </SelectionContextProvider>
+      </DnDProvider>
+    </FlowContextProvider>
   </ReactFlowProvider>
 );

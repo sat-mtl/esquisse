@@ -1,11 +1,13 @@
 import React from "react";
 import { useDnD } from "../DnDContext.jsx";
 import { SidebarNode } from "./SidebarNode.jsx";
+import { SidebarCustomNode } from "./CustomNodeLogic.jsx";
 import * as tools from "../ToolObjects.js";
 
 export function Toolbar(){
     return(
-      <aside className="tab-content">        
+      <aside className="tab-content">  
+            <SidebarCustomNode />    
             <SidebarNode toolObj={tools.AbletonLiveObj} />
             <SidebarNode toolObj={tools.ArdourObj} />
             <SidebarNode toolObj={tools.BitwigObj} />

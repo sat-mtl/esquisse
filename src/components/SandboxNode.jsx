@@ -32,7 +32,9 @@ export default memo(({ data, isConnectable }) => {
   }
 
   const handleDoubleClick = () => {
-    window.open(`${data.toolObj.docLink}`, "_blank");
+    if(docLink != "."){
+      window.open(`${data.toolObj.docLink}`, "_blank");
+    }
   };
 
   //update selected obj on click
@@ -47,6 +49,12 @@ export default memo(({ data, isConnectable }) => {
     setSelectedNode(nodeToSelect);
   }, [setSelectedNode, data?.id, data?.toolObj]);
   let obj = data.toolObj;
+
+  let doDisplayImage = true;
+  if(data.toolObj.logoFile == ""){
+    doDisplayImage = false;
+
+  }
 
   if (obj.isIO) {
     if (obj.IOType === "Output") {
@@ -65,11 +73,12 @@ export default memo(({ data, isConnectable }) => {
             onConnect={(params) => console.log("handle onConnect", params)}
           />
 
-          <img
+          {doDisplayImage && <img
             id="logo-img"
             src={`/${data.toolObj.logoFile}`}
             alt="/logosat.png"
-          />
+          />}
+          
           <h5> {obj.name} </h5>
         </div>
       );
@@ -82,11 +91,11 @@ export default memo(({ data, isConnectable }) => {
           onClick={handleClick}
         >
 
-          <img
+          {doDisplayImage && <img
             id="logo-img"
             src={`/${data.toolObj.logoFile}`}
             alt="/logosat.png"
-          />
+          />}
           
           <Handle
             className="source"
@@ -117,7 +126,7 @@ export default memo(({ data, isConnectable }) => {
         onConnect={(params) => console.log("handle onConnect", params)}
       />
 
-      <img id="logo-img" src={`/${data.toolObj.logoFile}`} />
+      {doDisplayImage && <img id="logo-img" src={`/${data.toolObj.logoFile}`} />}
 
       <Handle
         className="source"
