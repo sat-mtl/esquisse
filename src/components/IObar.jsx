@@ -24,6 +24,7 @@ export function IObar() {
       <SidebarNode toolObj={tools.MidiControllerObj} />
       <SidebarNode toolObj={tools.IMUMicrocontrollerObj} />
       <SidebarNode toolObj={tools.ComputerObj} />
+      <SidebarNode toolObj={tools.LeapMotionObj} />
     </aside>
   );
 }

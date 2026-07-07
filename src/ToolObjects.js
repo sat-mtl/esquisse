@@ -5,7 +5,7 @@ While javascript is not a typed language we are treating toolObj as a type of st
 
 
 export function checkValid(toolObj){
-    let fields = ["name", "logoFile", "description", "input", "docLink"];
+    let fields = ["name", "logoFile", "description", "input", "output", "docLink"];
 
     if (toolObj == null){ // if given empty object, false
         return false;
@@ -61,8 +61,8 @@ export const ComputerObj = {
   name: "Computer",
   description: "A standard computer",
   logoFile: "./images/computer.png",
-  input: ["MIDI", "Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
-  output: ["MIDI", "Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  input: ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  output: ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
   docLink: ".",
 }
 
@@ -88,8 +88,9 @@ export const ProjectorObj = {
   name: "Projector",
   description: "A projector",
   logoFile: "./images/projector.jpg",
-  input: ["WiFi", "Bluetooth", "Video", "Images", "Wired"],
-  isIO: true, 
+  input: ["WiFi", "Bluetooth", "Video Stream", "Images", "Wired"],
+  output: [],
+  isIO: true,
   IOType: "Output",
   docLink: "."
 }
@@ -98,7 +99,7 @@ export const MidiControllerObj = {
   name: "MIDI Controller",
   description: "A MIDI microcontroller",
   logoFile: "./images/midicontroller.jpg",
-  input: ["Audio"],
+  input: ["Audio Stream"],
   output: ["MIDI"],
   docLink: "."
 }
@@ -118,7 +119,7 @@ export const OrbbecFemtoObj = {
   logoFile: "./images/femtomega.jpg",
   isIO: true,
   IOType: "Input",
-  output: ["Gestural Data", "Accelerometer Data", "Video", "Depth Sensor Data"],
+  output: ["Gestural Data", "Accelerometer Data", "Video Stream", "Depth Sensor Data"],
   input: [],
   docLink: "."
 }
@@ -127,8 +128,8 @@ export const RaspberryPiObj = {
   name: "Raspberry Pi",
   logoFile: "./images/raspberry pi.jpg",
   description: "A raspberry Pi microcontroller running SAT OS",
-  input: ["Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
-  output: ["Audio", "Video", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  input: ["Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+  output: ["Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
   docLink: "https://www.raspberrypi.com/"
 }
 
@@ -136,7 +137,8 @@ export const HeadphoneObj = {
   name: "Headphones",
   logoFile: "./images/headphones.jpg",
   description: "An ordinary pair of headphones",
-  input: ["Audio", "Bluetooth"],
+  input: ["Audio Stream", "Bluetooth"],
+  output: [],
   isIO: true, 
   IOType: "Output",
   docLink: "."
@@ -148,7 +150,7 @@ export const MicObj = {
   description: "An ordinary microphone",
   input: [],
   logoScale: 1.5,
-  output: ["Audio"],
+  output: ["Audio Stream"],
   isIO: true, 
   IOType: "Input",
   docLink: "."
@@ -159,7 +161,7 @@ export const CameraObj = {
   logoFile: "./images/camera.png",
   description: "An ordinary camera",
   input: [],
-  output: ["Video" , "Depth Data"],
+  output: ["Video Stream", "Depth Data"],
   isIO: true, 
   IOType: "Input",
   docLink: "."
@@ -192,7 +194,8 @@ export const ScreenObj = {
   name: "Screen", 
   logoFile: "./images/monitor.jpg",
   description: "An ordinary monitor or TV screen",
-  input: ["Video"],
+  input: ["Video Stream"],
+  output: [],
   logoScale: 1.5,
   isIO: true,
   IOType: "Output",
@@ -203,7 +206,8 @@ export const SpeakerObj = {
   name: "Speaker",
   logoFile: "./images/speaker.png",
   description: "An ordinary speaker",
-  input: ["Bluetooth", "Audio"],
+  input: ["Bluetooth", "Audio Stream"],
+  output: [],
   isIO: true,
   IOType: "Output",
   docLink: "."
@@ -214,7 +218,8 @@ export const AudiodiceObj = {
   logoFile: "./images/audiodice.png",
 //   logoScale: 1.5,
   description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
-  input: ["OSC", "Audio"],
+  input: ["OSC", "Audio Stream"],
+  output: [],
   isIO: true, 
   IOType: "Output",
   docLink: "."
@@ -227,10 +232,26 @@ export const HapticFloorObj = {
   logoScale: 1.4, 
   description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
   input: ["OSC"],
+  output: [],
   isIO: true, 
   IOType: "Output",
   docLink: "."
 }
+
+
+export const LeapMotionObj = {
+    name: "Leap Motion",
+    external: true,
+    logoFile: "images/leapmotion_logo.png",
+    logoScale: 1.5,
+    description: "Sensor device that supports hand and finger motions as input.",
+    input: [],
+    output: ["Gestural Data", "OSC"],
+    isIO: true,
+    IOType: "Input",
+    docLink: "https://www.ultraleap.com/"
+};
+
 
 // Tools
 
@@ -240,8 +261,8 @@ export const AbletonLiveObj = {
     logoFile: "images/AbletonLive_logo.png",
     logoScale: 1.8,
     description: "A digital audio workstation (DAW) for music production, composition, recording, and live performance.",
-    input: ["Audio", "OSC"],
-    output: ["Audio", "OSC"],
+    input: ["Audio Stream", "Audio File", "OSC", "MIDI"],
+    output: ["Audio Stream", "Audio File", "OSC"],
     docLink: "https://www.ableton.com/en/"
 };
 
@@ -250,8 +271,8 @@ export const ArdourObj = {
     external: true,
     logoFile: "images/ardour_logo.png",
     description: "An open-source digital audio workstation for recording, editing, and mixing audio.",
-    input: ["Audio", "OSC"],
-    output: [],
+    input: ["Audio Stream", "Audio File", "OSC", "MIDI"],
+    output: ["Audio Stream", "Audio File"],
     docLink: "https://ardour.org/"
 };
 
@@ -261,8 +282,8 @@ export const BitwigObj = {
     logoFile: "images/bitwig_logo.png",
     logoScale: 2,
     description: "A digital audio workstation for music production and live performance.",
-    input: ["Audio", "OSC"],
-    output: [],
+    input: ["Audio Stream", "Audio File", "OSC", "MIDI"],
+    output: ["Audio Stream", "Audio File"],
     docLink: "https://www.bitwig.com/"
 };
 
@@ -271,8 +292,8 @@ export const BlenderObj = {
     external: true,
     logoFile: "images/blender_logo.png",
     description: "An open-source 3D creation suite for modeling, animation, and rendering.",
-    input: ["Video", "Images"],
-    output: [],
+    input: ["Video File", "Images", "Audio File", "3D Models"],
+    output: ["Video File", "3D Models"],
     docLink: "https://www.blender.org/"
 };
 
@@ -281,8 +302,8 @@ export const ChataigneObj = {
     external: true,
     logoFile: "images/chataigne_logo.png",
     description: "A creative control software for mapping and routing OSC, MIDI, and other protocols.",
-    input: ["OSC", "Audio", "Video"],
-    output: [],
+    input: ["OSC", "Audio Stream", "Video Stream", "MIDI", "TCP", "UDP", "HTTP"],
+    output: ["OSC", "Audio Stream", "Video Stream", "TCP", "UDP", "HTTP"],
     docLink: "https://benjamin.kuperberg.fr/chataigne/en"
 };
 
@@ -291,8 +312,8 @@ export const CinderObj = {
     external: true,
     logoFile: "images/cinder_logo.png",
     description: "Open source library for professional-quality creative coding in C++.",
-    input: ["Video", "Audio", "OSC", "Images"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "Images"],
+    output: ["Video Stream", "Audio Stream", "OSC", "Images"],
     docLink: "https://libcinder.org/"
 };
 
@@ -301,8 +322,8 @@ export const CubaseObj = {
     external: true,
     logoFile: "images/cubase_logo.png",
     description: "A digital audio workstation for music recording, mixing, and editing.",
-    input: ["Audio", "OSC"],
-    output: [],
+    input: ["Audio Stream", "Audio File", "OSC"],
+    output: ["Audio Stream", "Audio File", "OSC"],
     docLink: "https://www.steinberg.net/cubase/"
 };
 
@@ -311,8 +332,8 @@ export const DomeportObj = {
     logoFile: "images/domeport_web.png",
     logoScale: 1.5,
     description: "A tool for visualizing any video file on a dome display",
-    input: ["Audio", "Video"],
-    output: ["Video"],
+    input: ["Audio File", "Video File"],
+    output: ["Video Stream"],
     docLink: "https://domeport.sat.qc.ca/"
 };
 
@@ -322,8 +343,8 @@ export const IsadoraObj = {
     logoFile: "images/isadora_logo.jpeg",
     logoScale: 1.8,
     description: "Scene-based media control software with integrated projection mapping.",
-    input: ["Video", "Audio", "OSC"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "Audio File", "OSC", "MIDI"],
+    output: ["Video Stream", "Audio Stream"],
     docLink: "https://troikatronix.com/"
 };
 
@@ -331,27 +352,16 @@ export const KoaiaObj = {
     name: "Koaia",
     logoFile: "images/koaia_logo.png",
     description: "A tool for exploring generative AI.",
-    input: ["Video", "NDI"],
-    output: ["OSC","Video"],
+    input: ["Video Stream", "NDI"],
+    output: ["OSC", "Video Stream"],
     docLink: "https://github.com/sat-mtl/Koaia"
-};
-
-export const LeapMotionObj = {
-    name: "Leap Motion",
-    external: true,
-    logoFile: "images/leapmotion_logo.png",
-    logoScale: 1.5,
-    description: "Sensor device that supports hand and finger motions as input.",
-    input: ["Gestural Data", "OSC"],
-    output: [],
-    docLink: "https://www.ultraleap.com/"
 };
 
 export const LivePoseObj = {
     name: "LivePose",
     logoFile: "images/LivePose.png",
     description: "A command line tool which tracks people skeletons and applies filters",
-    input: ["Video"],
+    input: ["Video Stream"],
     output: ["OSC", "RawData"],
     docLink: "https://github.com/sat-mtl/livepose"
 };
@@ -362,8 +372,8 @@ export const MadMapperObj = {
     logoFile: "images/MadMapper_logo.png",
     logoScale: 1.8,
     description: "Video mapping projections and Light mapping.",
-    input: ["Video", "Audio"],
-    output: ["OSC"],
+    input: ["Video Stream", "Video File", "Audio Stream", "MIDI", "3D Models", "OSC"],
+    output: ["OSC", "Video Stream"],
     docLink: "https://madmapper.com/"
 };
 
@@ -373,7 +383,7 @@ export const MaxMSPObj = {
     logoFile: "images/MaxMSP_logo.jpeg",
     logoScale: 1.8,
     description: "Visual programming language for media.",
-    input: ["Audio", "Video"],
+    input: ["Audio Stream", "Video Stream", "OSC"],
     output: ["OSC"],
     docLink: "https://cycling74.com/products/max"
 };
@@ -384,8 +394,8 @@ export const NotchObj = {
     logoFile: "images/notch_logo.png",
     logoScale: 1.5,
     description: "Node-based authoring tool with a strong focus on real-time graphics.",
-    input: ["Video", "Audio", "OSC", "NDI"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "NDI", "3D Models"],
+    output: ["Video Stream", "Audio Stream"],
     docLink: "https://www.notch.one/"
 };
 
@@ -394,8 +404,8 @@ export const OBSStudioObj = {
     external: true,
     logoFile: "images/OBS_Studio_Logo.svg.png",
     description: "An open-source software for video recording and live streaming.",
-    input: ["Video", "Audio", "NDI"],
-    output: ["Video", "Audio", "NDI"],
+    input: ["Video Stream", "Video File", "Audio Stream", "Audio File", "NDI"],
+    output: ["Video Stream", "Audio Stream", "NDI"],
     docLink: "https://obsproject.com/"
 };
 
@@ -404,8 +414,8 @@ export const P5jsObj = {
     external: true,
     logoFile: "images/p5js_logo.svg",
     description: "A free and open-source JavaScript library.",
-    input: ["Video", "Audio", "Images"],
-    output: [],
+    input: ["Video Stream", "Audio Stream", "Images"],
+    output: ["Video Stream", "Audio Stream", "Images"],
     docLink: "https://p5js.org/"
 };
 
@@ -413,7 +423,7 @@ export const PointMapperObj = {
     name: "PointMapper",
     logoFile: "logosat.png",
     description: "A prototype web controller for SATIE",
-    input: ["Video", "OSC",],
+    input: ["Video Stream", "OSC"],
     output: ["PointCloud", "OSC"],
     docLink: "https://toolbox.sat.qc.ca/"
 };
@@ -423,8 +433,8 @@ export const ProcessingObj = {
     external: true,
     logoFile: "images/processing_logo.svg",
     description: "Computer programming language and IDE for visual arts.",
-    input: ["Video", "Audio", "OSC", "Images"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "Images"],
+    output: ["Video Stream", "Audio Stream", "Images"],
     docLink: "https://processing.org/"
 };
 
@@ -432,8 +442,8 @@ export const PuaraObj = {
     name: "Puara",
     logoFile: "images/puara.jpg",
     description: "A framework for building and deploying embedded systems",
-    input: ["Audio", "OSC", "Gestural Data", "Sensor Data"],
-    output: ["OSC","RawData"],
+    input: ["Audio Stream", "OSC", "Gestural Data", "Sensor Data"],
+    output: ["OSC", "RawData"],
     docLink: "https://github.com/Puara"
 };
 
@@ -442,8 +452,8 @@ export const PureDataObj = {
     external: true,
     logoFile: "images/puredata_logo.png",
     description: "Open source visual programming language for multimedia.",
-    input: ["Audio", "OSC", "Video"],
-    output: [],
+    input: ["Audio Stream", "OSC", "Video Stream"],
+    output: ["Audio Stream", "OSC", "Video Stream"],
     docLink: "https://puredata.info/"
 };
 
@@ -452,8 +462,8 @@ export const ReaperObj = {
     external: true,
     logoFile: "images/REAPER_logo.png",
     description: "A free digital audio workstation for multitrack audio recording and editing.",
-    input: ["Audio", "OSC"],
-    output: ["Audio", "OSC"],
+    input: ["Audio Stream", "Audio File", "OSC"],
+    output: ["Audio Stream", "Audio File", "OSC"],
     docLink: "https://www.reaper.fm/"
 };
 
@@ -462,8 +472,8 @@ export const ResolumeObj = {
     external: true,
     logoFile: "images/resolume_logo.svg",
     description: "Mixing of digital video and effects in realtime.",
-    input: ["Video", "Audio", "OSC", "NDI"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "NDI"],
+    output: ["Video Stream", "Audio Stream", "OSC", "NDI"],
     docLink: "https://resolume.com/"
 };
 
@@ -471,8 +481,8 @@ export const SatelliteObj = {
     name: "Satellite",
     logoFile: "images/Satellite.png",
     description: "An immersive and social digital 3D environment accessible on the web",
-    input: ["Video"],
-    output: ["Video", "OSC", "Websocket"],
+    input: ["Video Stream"],
+    output: ["Video Stream", "OSC", "Websocket"],
     docLink: "https://gitlab.com/sat-mtl/satellite"
 };
 
@@ -480,8 +490,8 @@ export const ScoreObj = {
     name: "ossia score",
     logoFile: "images/ossiascore_logo.png",
     description: "Interactive, intermedia audio-visual sequencer.",
-    input: ["OSC", "Video", "Sensor Data", "Gestural Data", "Images", "Audio"],
-    output: ["OSC", "Video", "Images", "Audio", "Spout", "Syphon","NDI"],
+    input: ["OSC", "Video Stream", "Video File", "Sensor Data", "Gestural Data", "Images", "Audio Stream", "Audio File"],
+    output: ["OSC", "Video Stream", "Images", "Audio Stream", "Spout", "Syphon", "NDI"],
     docLink: "https://github.com/ossia/score"
 };
 
@@ -491,8 +501,8 @@ export const SmodeObj = {
     logoFile: "images/smode_logo.png",
     logoScale: 2,
     description: "A real-time 2D/3D creation, compositing and video-mapping engine.",
-    input: ["Video", "Audio", "OSC", "NDI"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "NDI"],
+    output: ["Video Stream", "Audio Stream"],
     docLink: "https://smode.fr/"
 };
 
@@ -501,8 +511,8 @@ export const SpatgrisObj = {
     external: true,
     logoFile: "images/SpatGRIS_logo.png",
     description: "A software designed for multichannel spatialization in 2D and 3D",
-    input: ["Audio", "OSC"],
-    output: ["OSC", "Audio"],
+    input: ["Audio Stream", "OSC"],
+    output: ["OSC", "Audio Stream"],
     docLink: "https://gris.musique.umontreal.ca/"
 };
 
@@ -511,8 +521,8 @@ export const SplashObj = {
     logoFile: "images/splash_logo.png",
     logoScale: 2,
     description: "A video mapping software, dedicated to deploying immersive spaces.",
-    input: ["Video", "NDI"],
-    output: ["Video"],
+    input: ["Video Stream", "Video File", "NDI"],
+    output: ["Video Stream"],
     docLink: "https://gitlab.com/sat-mtl/tools/splash"
 };
 
@@ -521,8 +531,8 @@ export const SuperColliderObj = {
     external: true,
     logoFile: "images/SuperCollider_logo.svg",
     description: "Platform for audio synthesis and algorithmic composition.",
-    input: ["Audio", "OSC"],
-    output: [],
+    input: ["Audio Stream", "OSC"],
+    output: ["Audio Stream"],
     docLink: "https://supercollider.github.io/"
 };
 
@@ -531,7 +541,7 @@ export const TouchDesignerObj = {
     external: true,
     logoFile: "images/TouchDesigner_logo.png",
     description: "Visual development platform to create realtime projects.",
-    input: ["Video", "Audio", "OSC", "NDI"],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "NDI"],
     output: ["OSC", "NDI"],
     docLink: "https://derivative.ca/"
 };
@@ -541,8 +551,8 @@ export const UnrealEngineObj = {
     external: true,
     logoFile: "images/unrealengine_logo.png",
     description: "A real-time 3D game engine used for simulations and immersive experiences.",
-    input: ["Video", "Audio", "OSC", "NDI"],
-    output: [],
+    input: ["Video Stream", "Video File", "Audio Stream", "Audio File", "OSC", "NDI", "MIDI", "3D Models"],
+    output: ["Video Stream", "Audio Stream"],
     docLink: "https://www.unrealengine.com/"
 };
 
@@ -551,8 +561,8 @@ export const VCVRackObj = {
     external: true,
     logoFile: "images/VCVrack_logo.png",
     description: "An open-source virtual modular synthesizer.",
-    input: ["Audio", "OSC"],
-    output: ["OSC"],
+    input: ["Audio Stream", "OSC"],
+    output: ["Audio Stream", "OSC"],
     docLink: "https://vcvrack.com/"
 };
 
@@ -562,7 +572,7 @@ export const VDMXObj = {
     logoFile: "images/vdmx_logo.png",
     logoScale: 2,
     description: "Realtime multimedia performance application.",
-    input: ["Video", "Audio", "OSC", "NDI"],
+    input: ["Video Stream", "Video File", "Audio Stream", "OSC", "NDI"],
     output: [],
     docLink: "https://vidvox.net/"
 };
@@ -572,7 +582,7 @@ export const VezerObj = {
     external: true,
     logoFile: "images/vezer_logo.png",
     description: "A timeline-based MIDI, OSC, and DMX sequencer for live shows.",
-    input: ["OSC", "Audio"],
+    input: ["OSC", "Audio Stream", "MIDI"],
     output: [],
     docLink: "https://imimot.com/vezer/"
 };
@@ -583,8 +593,8 @@ export const VRChatObj = {
     logoFile: "images/vrchat_logo.png",
     logoScale: 1.5,
     description: "A social virtual reality platform for creating and exploring 3D worlds.",
-    input: ["Video", "Audio", "OSC"],
-    output: [],
+    input: ["Video Stream", "Audio Stream", "OSC"],
+    output: ["Video Stream", "Audio Stream"],
     docLink: "https://hello.vrchat.com/"
 };
 
@@ -594,7 +604,7 @@ export const VVVVObj = {
     logoFile: "images/vvvv_logoo.png",
     logoScale: 2,
     description: "Hybrid visual/textual live-programming environment for easy prototyping and development.",
-    input: ["Video", "Audio", "OSC"],
+    input: ["Video Stream", "Audio Stream", "OSC"],
     output: [],
     docLink: "https://vvvv.org/"
 };
@@ -604,7 +614,7 @@ export const WwiseObj = {
     external: true,
     logoFile: "images/wwise_logo.png",
     description: "An audio middleware solution for interactive media and video games.",
-    input: ["Audio", "OSC"],
-    output: [],
+    input: ["Audio Stream", "Audio File", "OSC"],
+    output: ["Audio Stream"],
     docLink: "https://www.audiokinetic.com/en/wwise/overview/"
 };
