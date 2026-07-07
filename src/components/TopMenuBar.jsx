@@ -26,7 +26,7 @@ export function TopMenuBar({
             ref={fileInputRef}
             type="file"
             accept="application/json"
-            onChange={onUpload}
+            onChange={e => { onUpload(e); e.target.value = ""; }}
             className="top-menu-bar-file-input"
             aria-label="Browse and load diagram"
           />

@@ -237,7 +237,7 @@ const Flow = () => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = flowName ? `${flowName}.json` : "esquisse-flow.json";
+    a.download = flowName ? `${flowName.trim().replace(/\s+/g, "-").toLowerCase()}.json` : "esquisse-flow.json";
     a.click();
 
     URL.revokeObjectURL(url);
