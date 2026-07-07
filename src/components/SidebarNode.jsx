@@ -81,7 +81,7 @@ export function SidebarCompNode({ template }){
         setDescr(null);
     };
 
-    const initials = template.name
+    const initials = (template.name || "?")
         .split(" ")
         .slice(0, 2)
         .map(w => w[0])
