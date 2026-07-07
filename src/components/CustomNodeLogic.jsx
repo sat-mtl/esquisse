@@ -9,7 +9,6 @@ export function CustomNodeButton() {
     const [, , , , isShowModal, setIsShowModal] = useSelectionContext();
 
     const handleClick=() => {
-        console.log("customNode has been clicked.");
         setIsShowModal(true);
     }
 
@@ -37,11 +36,8 @@ export function CustomNodeEditModal(){
         let justEnded = false; //used to skip first space
         const entries = [];
 
-        console.log("In UnpackInput, length:"+ stringInfo.length);
         for(let i = 0; i < stringInfo.length; i++){
             let char = stringInfo[i];
-            console.log(char);
-            console.log(tempStr);
 
             if(char === ','){ //string end signifier
                 entries.push(tempStr);
@@ -68,7 +64,6 @@ export function CustomNodeEditModal(){
 
         }
 
-        console.log(entries);
         return entries;
 
     }
@@ -120,7 +115,6 @@ export function CustomNodeEditModal(){
             docLink: "."
         };
 
-        console.log(customNode);
         setSelectedNode(customNode);
         //close modal
         setIsShowModal(false);

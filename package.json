@@ -1,23 +1,15 @@
 {
-  "name": "gitlab-sat-mtl-sat-mtl-io",
+  "name": "esquisse",
   "version": "1.0.0",
-  "description": "Open-source tools created at the Society for Art and Technology",
-  "main": "./src/tools/script.js",
+  "description": "Visual tool for mapping and planning digital media workflows — by SAT Montréal.",
+  "main": "./src/toolbox.js",
   "scripts": {
     "build": "webpack --mode=production",
     "dev": "webpack serve --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@gitlab.com/sat-mtl/sat-mtl.gitlab.io.git"
-  },
-  "author": "Christian Frisson",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com/sat-mtl/sat-mtl.gitlab.io/issues"
-  },
-  "homepage": "https://gitlab.com/sat-mtl/sat-mtl.gitlab.io#readme",
+  "author": "Société des arts technologiques (SAT)",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@babel/core": "^7.26.7",
     "@babel/preset-env": "^7.26.7",
@@ -26,7 +18,6 @@
     "css-loader": "^6.7.3",
     "style-loader": "^3.3.1",
     "webpack": "^5.104.1",
-    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.2"
   },

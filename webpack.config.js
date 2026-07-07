@@ -1,6 +1,5 @@
 const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (env, argv) => {
   var config = {
@@ -69,9 +68,7 @@ module.exports = (env, argv) => {
         new TerserPlugin(), 
       ],
     },
-    plugins: [
-      new BundleAnalyzerPlugin(),
-    ]
+    plugins: []
   };
   if (argv.mode === 'development') {
     config.optimization.minimize = false;

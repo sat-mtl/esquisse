@@ -39,8 +39,6 @@ export default memo(({ data, isConnectable }) => {
 
   //update selected obj on click
   const handleClick = useCallback(() => {
-    console.log("this is a test");
-    console.log(data);
     if (!data?.toolObj) {
       setSelectedNode(null);
       return;
@@ -70,7 +68,7 @@ export default memo(({ data, isConnectable }) => {
             id="#b1b1b7"
             position={Position.Left}
             isConnectable={isConnectable}
-            onConnect={(params) => console.log("handle onConnect", params)}
+    
           />
 
           {doDisplayImage && <img
@@ -123,7 +121,7 @@ export default memo(({ data, isConnectable }) => {
         id="#b1b1b7"
         position={Position.Left}
         isConnectable={isConnectable}
-        onConnect={(params) => console.log("handle onConnect", params)}
+
       />
 
       {doDisplayImage && <img id="logo-img" src={`/${data.toolObj.logoFile}`} />}
