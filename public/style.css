@@ -237,14 +237,20 @@ a {
 
 .top-menu-bar {
 	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 12px;
+	flex-direction: column;
+	gap: 6px;
 	padding: 5px 10px;
 	background: var(--color-white);
 	border-radius: var(--br-small);
 	border: 1px solid var(--color-border);
 	box-shadow: var(--shadow-card);
+}
+
+.top-menu-bar-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }
 
 .top-menu-bar-logo {
@@ -273,6 +279,43 @@ a {
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+.top-menu-bar-flow-meta {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  padding-top: 2px;
+  border-top: 1px solid var(--color-border);
+}
+
+.flow-name-input,
+.flow-description-input {
+  border: none;
+  border-radius: 0;
+  padding: 2px 4px;
+  font-family: "DM Sans", sans-serif;
+  color: var(--color-black);
+  background: transparent;
+  outline: none;
+}
+
+.flow-name-input {
+  font-size: 0.8rem;
+  font-weight: bold;
+  width: 140px;
+  border-right: 1px solid var(--color-border);
+}
+
+.flow-description-input {
+  font-size: 0.8rem;
+  flex: 1;
+  color: #666;
+}
+
+.flow-name-input:focus,
+.flow-description-input:focus {
+  color: var(--color-blue);
 }
 
 .top-menu-bar-instructions {
