@@ -68,9 +68,12 @@ const Flow = () => {
   
   const ref = useRef(null);
   const [rfInstance, setRfInstance] = useState(null);
-  const { setViewport } = useReactFlow();
+  const { setViewport, fitView } = useReactFlow();
 
   const [type, setType, obj, setObj] = useDnD(); //type of currently dragged item
+
+  const [flowName, setFlowName] = useState("");
+  const [flowDescription, setFlowDescription] = useState("");
   const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal, 
     setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
 
@@ -110,7 +113,7 @@ const Flow = () => {
         ...n,
         id:`${n.id}-${timestamp}`,
         type: "sandbox",
-        data: {toolObj: n.toolObj},
+        data: {toolObj: n.data?.toolObj},
         position: {x: n.position.x + position.x, y: n.position.y + position.y},
       }));
 
@@ -139,6 +142,8 @@ const Flow = () => {
 
       setNodes(nds => nds.concat(newNodes));
       setEdges(eds => eds.concat(newEdges));
+      if (obj.name) setFlowName(obj.name);
+      if (obj.description) setFlowDescription(obj.description);
       return;
     }
     
@@ -207,28 +212,36 @@ const Flow = () => {
   /* Saves the state of the flow diagram to localStorage for future use */
   const onSave = useCallback(() => {
     if (rfInstance) {
-      const flow = rfInstance.toObject();
+      const flow = {
+        ...rfInstance.toObject(),
+        ...(flowName && { name: flowName }),
+        ...(flowDescription && { description: flowDescription }),
+      };
       localStorage.setItem(flowKey, JSON.stringify(flow));
     }
-  }, [rfInstance]);
+  }, [rfInstance, flowName, flowDescription]);
   
   /* Enables downloading the state of the flow diagram */
   const onDownload = useCallback(() => {
     if (!rfInstance) return;
-  
-    const flow = rfInstance.toObject();
+
+    const flow = {
+      ...rfInstance.toObject(),
+      ...(flowName && { name: flowName }),
+      ...(flowDescription && { description: flowDescription }),
+    };
     const json = JSON.stringify(flow, null, 2);
-  
+
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-  
+
     const a = document.createElement("a");
     a.href = url;
-    a.download = "reactflow-diagram.json";
-    a.click();  
-    
+    a.download = flowName ? `${flowName}.json` : "esquisse-flow.json";
+    a.click();
+
     URL.revokeObjectURL(url);
-  }, [rfInstance]);
+  }, [rfInstance, flowName, flowDescription]);
   
 /* Dev feature for now: enables uploading JSON flows */
   const onUpload = useCallback((event) => {
@@ -240,10 +253,16 @@ const Flow = () => {
       const flow = JSON.parse(e.target.result);
       
       if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport ?? {};
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
+        setFlowName(flow.name || "");
+        setFlowDescription(flow.description || "");
+        if (flow.viewport) {
+          setViewport({ x, y, zoom });
+        } else {
+          setTimeout(() => fitView({ padding: 0.2 }), 0);
+        }
         
         /* Sync the ID counter with the uploaded file's counter to prevent nodes getting replaced: 
             Node ids are assigned in the following convention "dndnode_x", where x is the number on the id global variable.
@@ -262,18 +281,20 @@ const Flow = () => {
     };
     
     reader.readAsText(file);
-  }, [setNodes, setEdges, setViewport]); 
+  }, [setNodes, setEdges, setViewport, setFlowName, setFlowDescription, fitView]);
   
   /* Restores the state of the flow diagram to whatever is saved in localStorage if it exists */
   const restoreFlow = useCallback(() => {
     const flow = JSON.parse(localStorage.getItem(flowKey));
     
     if (flow) {
-      const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+      const { x = 0, y = 0, zoom = 1 } = flow.viewport ?? {};
       setNodes(flow.nodes || []);
       setEdges(flow.edges || []);
       setViewport({ x, y, zoom });
-      
+      setFlowName(flow.name || "");
+      setFlowDescription(flow.description || "");
+
       /* Sync the ID counter with the uploaded file's counter to prevent nodes getting replaced: 
           Node ids are assigned in the following convention "dndnode_x", where x is the number on the id global variable.
           Since id may be 0 if you upload a json file, this lambda will check what the highest number of nodes is on the uploaded file 
@@ -469,6 +490,11 @@ const Flow = () => {
               onRestore={onRestore}
               onUpload={onUpload}
               onInstructions={onToggleLandingModal}
+              flowName={flowName}
+              setFlowName={setFlowName}
+              flowDescription={flowDescription}
+              setFlowDescription={setFlowDescription}
+              hasNodes={nodes.length > 0}
             />
           </Panel>
           

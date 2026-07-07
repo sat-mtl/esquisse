@@ -9,7 +9,7 @@ export function validateTemplate (template) {
 
     //Check if individual nodes are valid
     for(const node of template.nodes){
-        if(!checkValid(node.toolObj)){
+        if(!checkValid(node.data?.toolObj)){
             console.error("Node is invalid");
             return false;
         }
@@ -25,9 +25,9 @@ export function validateTemplate (template) {
       return false;
     }
 
-    if (!canConnect(sourceNode.toolObj, targetNode.toolObj)) {
+    if (!canConnect(sourceNode.data?.toolObj, targetNode.data?.toolObj)) {
       console.error(
-        `Invalid connection inside template: ${sourceNode.toolObj.name} → ${targetNode.toolObj.name}`
+        `Invalid connection inside template: ${sourceNode.data?.toolObj?.name} → ${targetNode.data?.toolObj?.name}`
       );
       return false;
     }
