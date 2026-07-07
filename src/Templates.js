@@ -1,5 +1,4 @@
 import { checkValid, canConnect } from "./ToolObjects";
-import * as tools from "./ToolObjects.js";
 
 export function validateTemplate (template) {
     //Check if template is missing nodes or edges
@@ -36,32 +35,3 @@ export function validateTemplate (template) {
 
   return true;
 }
-
-export const Temp1 = {
-    name: "LivePose + Score", 
-    description: "LivePose goes to Score",
-    nodes: [
-        {
-            id:"node1",
-            position: { x:0, y: 0},
-            toolObj: tools.LivePoseObj
-        },
-        {
-            id:"node2",
-            position: { x:200, y: 0},
-            toolObj: tools.ScoreObj
-        }
-    ],
-    edges: [
-        {
-            id: "edge1",
-            source: "node1",
-            target: "node2",
-            type: "custom",
-            data: {
-                sharedInput: ["Video", "OSC"],
-                protocol: "Video"
-            }
-        }
-    ]
-};

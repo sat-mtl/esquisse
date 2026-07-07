@@ -61,25 +61,53 @@ export function SidebarNode({toolObj}){
 }
 
 export function SidebarCompNode({ template }){
-    //Makes it so that the node is draggable
+    const [descr, setDescr] = useState(null);
     const [type, setType, obj, setObj] = useDnD();
 
-    //Moves when dragged
-    const onDragStart = (event) => {
-        setType("composite");
-
-        setObj(template); //to update toolObj for creating a sandbox node
-
-        event.dataTransfer.effectAllowed = "move";
-        
-        //debug
-        //console.log("On Drag Start");
-        //console.log(obj);
+    const handleMouseEnter = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setDescr({
+            x: rect.left,
+            y: rect.top + rect.height / 2 + 50,
+        });
     };
 
-    return(
-        <div className="dndnode input" onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
-            { template.name } 
-        </div>  
-    )
+    const handleMouseLeave = () => setDescr(null);
+
+    const onDragStart = (event) => {
+        setType("composite");
+        setObj(template);
+        event.dataTransfer.effectAllowed = "move";
+        setDescr(null);
+    };
+
+    const initials = template.name
+        .split(" ")
+        .slice(0, 2)
+        .map(w => w[0])
+        .join("")
+        .toUpperCase();
+
+    return (
+        <>
+            <div
+                className="dndnode input"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onDragStart={onDragStart}
+                draggable
+                style={{ fontSize: "0.65rem", fontWeight: "bold", color: "var(--color-blue)", overflow: "visible" }}
+            >
+                {initials}
+            </div>
+
+            {descr && (
+                <div className="popup" style={{ left: descr.x - 50, top: descr.y }}>
+                    <b>{template.name}</b>
+                    <br />
+                    {template.description}
+                </div>
+            )}
+        </>
+    );
 }

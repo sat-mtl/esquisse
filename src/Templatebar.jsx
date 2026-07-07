@@ -1,14 +1,16 @@
 import React from "react";
-import { useDnD } from "./DnDContext.jsx";
 import { SidebarCompNode } from "./components/SidebarNode.jsx";
-import * as templates from "./Templates.js";
 
+// Auto-loads all JSON files from src/templates/ — add a file there and it appears here
+const templateContext = require.context('./templates', false, /\.json$/);
+const allTemplates = templateContext.keys().map(key => templateContext(key));
 
-
-export function Templatebar(){
-    return(
-         <div className= "tab-content">
-            <SidebarCompNode template={templates.Temp1} />
+export function Templatebar() {
+    return (
+        <div className="tab-content">
+            {allTemplates.map((template, i) => (
+                <SidebarCompNode key={i} template={template} />
+            ))}
         </div>
-    )
-};
+    );
+}
