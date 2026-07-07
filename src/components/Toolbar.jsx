@@ -18,7 +18,6 @@ export function Toolbar(){
             <SidebarNode toolObj={tools.DomeportObj} />
             <SidebarNode toolObj={tools.IsadoraObj} />
             <SidebarNode toolObj={tools.KoaiaObj} />
-            <SidebarNode toolObj={tools.LeapMotionObj} />
             <SidebarNode toolObj={tools.LivePoseObj} />
             <SidebarNode toolObj={tools.MadMapperObj} />
             <SidebarNode toolObj={tools.MaxMSPObj} />
