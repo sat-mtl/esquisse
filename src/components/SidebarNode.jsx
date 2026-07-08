@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useDnD } from "../DnDContext.jsx";
+import { useTapAdd } from "../TapAddContext.jsx";
+
+const isTouchDevice = () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
 export function SidebarNode({toolObj}){
     const[descr, setDescr] = useState(null);
+    const tapAddRef = useTapAdd();
 
     //Description box appears when mouse is inside node
     const handleMouseEnter = (e) => {
@@ -30,19 +34,25 @@ export function SidebarNode({toolObj}){
         event.dataTransfer.effectAllowed = "move";
         setDescr(null);
         
-        //debug
-        //console.log("On Drag Start");
-        //console.log(obj);
+    };
+
+    const handleClick = () => {
+        setDescr(null);
+        if (isTouchDevice() && tapAddRef.current) {
+            tapAddRef.current("sandbox", toolObj);
+        }
     };
 
     //Links to external documentation when clicked
     const handleDoubleClick = () => {
-        window.open(`${toolObj.docLink}`, "_blank");
+        if (toolObj.docLink && toolObj.docLink !== ".") {
+            window.open(toolObj.docLink, "_blank", "noopener,noreferrer");
+        }
     }
 
     return (
         <>
-            <div className="dndnode input" onDoubleClick={handleDoubleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
+            <div className={`dndnode input${toolObj.isSAT ? " dndnode--sat" : ""}`} onClick={handleClick} onDoubleClick={handleDoubleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "sandbox")} draggable>
                 <img className="image" src={`/${toolObj.logoFile}`} alt="/logosat.png" style={toolObj.logoScale ? { width: `${toolObj.logoScale * 90}%`, height: `${toolObj.logoScale * 90}%` } : undefined} />
             </div>
 
@@ -63,6 +73,7 @@ export function SidebarNode({toolObj}){
 export function SidebarCompNode({ template }){
     const [descr, setDescr] = useState(null);
     const [type, setType, obj, setObj] = useDnD();
+    const tapAddRef = useTapAdd();
 
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -81,6 +92,13 @@ export function SidebarCompNode({ template }){
         setDescr(null);
     };
 
+    const handleClick = () => {
+        setDescr(null);
+        if (isTouchDevice() && tapAddRef.current) {
+            tapAddRef.current("composite", null, template);
+        }
+    };
+
     const initials = (template.name || "?")
         .split(" ")
         .slice(0, 2)
@@ -92,11 +110,12 @@ export function SidebarCompNode({ template }){
         <>
             <div
                 className="dndnode input"
+                onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onDragStart={onDragStart}
                 draggable
-                style={{ fontSize: "0.65rem", fontWeight: "bold", color: "var(--color-blue)", overflow: "visible" }}
+                style={{ fontSize: "1rem", fontWeight: "bold", color: "var(--color-blue)", overflow: "visible" }}
             >
                 {initials}
             </div>

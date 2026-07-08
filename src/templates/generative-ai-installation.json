@@ -1,0 +1,180 @@
+{
+  "name": "Generative AI Installation",
+  "description": "Live camera feed into Koaia for generative AI visuals, mapped onto a surface via Splash, with OSC control via ossia score.",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "sandbox",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "toolObj": {
+          "name": "Camera",
+          "logoFile": "images/camera.png",
+          "description": "An ordinary camera",
+          "input": [],
+          "output": [
+            "Video Stream",
+            "Depth Data"
+          ],
+          "isIO": true,
+          "IOType": "Input",
+          "docLink": "."
+        }
+      },
+      "measured": {
+        "width": 130,
+        "height": 76
+      }
+    },
+    {
+      "id": "n2",
+      "type": "sandbox",
+      "position": {
+        "x": 300,
+        "y": 0
+      },
+      "data": {
+        "toolObj": {
+          "name": "Koaia",
+          "logoFile": "images/koaia_logo.png",
+          "description": "A tool for exploring generative AI.",
+          "input": [
+            "Video Stream",
+            "NDI"
+          ],
+          "output": [
+            "OSC",
+            "Video Stream"
+          ],
+          "docLink": "https://github.com/sat-mtl/Koaia"
+        }
+      },
+      "measured": {
+        "width": 104,
+        "height": 76
+      }
+    },
+    {
+      "id": "dndNode_6",
+      "type": "sandbox",
+      "position": {
+        "x": 642.7826086956521,
+        "y": -134.17391304347825
+      },
+      "data": {
+        "label": "sandbox node",
+        "toolObj": {
+          "name": "Screen",
+          "logoFile": "./images/monitor.jpg",
+          "description": "An ordinary monitor or TV screen",
+          "input": [
+            "Video Stream"
+          ],
+          "output": [],
+          "logoScale": 1.5,
+          "isIO": true,
+          "IOType": "Output",
+          "docLink": "."
+        }
+      },
+      "measured": {
+        "width": 116,
+        "height": 76
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "dndNode_7",
+      "type": "sandbox",
+      "position": {
+        "x": 646.455652173913,
+        "y": 83.45391304347825
+      },
+      "data": {
+        "label": "sandbox node",
+        "toolObj": {
+          "name": "Projector",
+          "description": "A projector",
+          "logoFile": "./images/projector.jpg",
+          "input": [
+            "WiFi",
+            "Bluetooth",
+            "Video Stream",
+            "Images",
+            "Wired"
+          ],
+          "output": [],
+          "isIO": true,
+          "IOType": "Output",
+          "docLink": "."
+        }
+      },
+      "measured": {
+        "width": 156,
+        "height": 76
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "n1",
+      "target": "n2",
+      "type": "custom",
+      "data": {
+        "sharedInput": [
+          "Video Stream"
+        ],
+        "protocol": "Video Stream"
+      }
+    },
+    {
+      "source": "n2",
+      "sourceHandle": "#b1b1b7",
+      "target": "dndNode_6",
+      "targetHandle": "#b1b1b7",
+      "type": "custom",
+      "data": {
+        "sharedInput": [
+          "Video Stream"
+        ],
+        "protocol": "Video Stream"
+      },
+      "markerEnd": {
+        "type": "arrow"
+      },
+      "id": "xy-edge__n2#b1b1b7-dndNode_6#b1b1b7",
+      "selected": false
+    },
+    {
+      "source": "n2",
+      "sourceHandle": "#b1b1b7",
+      "target": "dndNode_7",
+      "targetHandle": "#b1b1b7",
+      "type": "custom",
+      "data": {
+        "sharedInput": [
+          "Video Stream"
+        ],
+        "protocol": "Video Stream"
+      },
+      "markerEnd": {
+        "type": "arrow"
+      },
+      "id": "xy-edge__n2#b1b1b7-dndNode_7#b1b1b7",
+      "selected": false
+    }
+  ],
+  "viewport": {
+    "x": 114,
+    "y": 500.11742424242425,
+    "zoom": 1.0890151515151516
+  }
+}  
+

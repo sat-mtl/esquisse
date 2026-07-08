@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect, use } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -9,7 +9,6 @@ import {
   Controls,
   useNodesState,
   useEdgesState,
-  Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -25,6 +24,7 @@ import { DnDProvider, useDnD } from "./DnDContext.jsx";
 import { SelectionContextProvider, useSelectionContext } from "./SelectionContext.jsx";
 
 import { TopMenuBar } from "./components/TopMenuBar.jsx";
+import { TapAddProvider, useTapAdd } from "./TapAddContext.jsx";
 
 import SandboxNode from './components/SandboxNode.jsx';
 import { TextboxNode } from "./components/TextboxNode.jsx";
@@ -43,6 +43,7 @@ const getId = () => `${id++}`;
 const nodeTypes = {
   sandbox: SandboxNode,
   custSandbox: SandboxNode,
+  custDevice: SandboxNode,
   textbox: TextboxNode,
 };
 
@@ -62,20 +63,27 @@ const flowKey = 'saved-flow';
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition } = useReactFlow();
-  const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange] = useFlowContext();
+  const { screenToFlowPosition, deleteElements } = useReactFlow();
+  const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
   
   const ref = useRef(null);
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport, fitView } = useReactFlow();
 
-  const [type, setType, obj, setObj] = useDnD(); //type of currently dragged item
+  const [type, setType, obj, setObj] = useDnD();
+  const tapAddRef = useTapAdd();
 
   const [flowName, setFlowName] = useState("");
   const [flowDescription, setFlowDescription] = useState("");
-  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal, 
+  const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal,
     setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
+
+  const [connectToast, setConnectToast] = useState(null);
+  const connectSourceRef = useRef(null);
+  const connectCompletedRef = useRef(false);
+  const toastTimerRef = useRef(null);
+  const connectFailReasonRef = useRef(null);
 
   
 
@@ -83,6 +91,42 @@ const Flow = () => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
+
+  // Prevent the browser from navigating when a drag ends outside the canvas
+  useEffect(() => {
+    const blockDrop = (e) => e.preventDefault();
+    document.addEventListener("dragover", blockDrop);
+    document.addEventListener("drop", blockDrop);
+    return () => {
+      document.removeEventListener("dragover", blockDrop);
+      document.removeEventListener("drop", blockDrop);
+    };
+  }, []);
+
+  // Undo/redo + delete keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      // Skip if user is typing in an input/textarea
+      if (e.target.closest("input, textarea, [contenteditable]")) return;
+
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod) {
+        if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(nodes, edges); return; }
+        if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); redo(nodes, edges); return; }
+      }
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        const selectedNodes = nodes.filter(n => n.selected);
+        const selectedEdges = edges.filter(ed => ed.selected);
+        if (!selectedNodes.length && !selectedEdges.length) return;
+        e.preventDefault();
+        snapshot(nodes, edges);
+        deleteElements({ nodes: selectedNodes, edges: selectedEdges });
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements]);
 
   const onDrop = useCallback(
     (event) => {
@@ -107,6 +151,7 @@ const Flow = () => {
         return;
       }
 
+      snapshot(nodes, edges);
       const timestamp = Date.now();
 
       const newNodes = obj.nodes.map(n => ({
@@ -147,14 +192,12 @@ const Flow = () => {
       return;
     }
     
-    console.log("In App.js");
-    console.log(obj);
-    console.log(type);
-
-
     if(type == "custSandbox"){
       setCustDropInfo([position, getId()]);
-      setIsShowModal(true);
+      setIsShowModal("tool");
+    } else if (type == "custDevice") {
+      setCustDropInfo([position, getId()]);
+      setIsShowModal("device");
 
     } else {
       
@@ -173,14 +216,93 @@ const Flow = () => {
         },
       };
 
+        snapshot(nodes, edges);
         setNodes((nds) => nds.concat(newNode));
       }
     },
-    [screenToFlowPosition, type, obj], //end of useCallback, tells useCallback what to update to prevent staleClosures
+    [screenToFlowPosition, type, obj, nodes, edges, snapshot], //end of useCallback, tells useCallback what to update to prevent staleClosures
   );
+
+  const addNodeAtCenter = useCallback((nodeType, toolObj, template) => {
+    const canvasEl = reactFlowWrapper.current;
+    if (!canvasEl) return;
+    const bounds = canvasEl.getBoundingClientRect();
+    const position = screenToFlowPosition({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height / 2,
+    });
+
+    if (nodeType === "composite" && template) {
+      if (!validateTemplate(template)) { alert("Template Invalid"); return; }
+      const timestamp = Date.now();
+      const newNodes = template.nodes.map(n => ({
+        ...n,
+        id: `${n.id}-${timestamp}`,
+        type: "sandbox",
+        data: { toolObj: n.data?.toolObj },
+        position: { x: n.position.x + position.x, y: n.position.y + position.y },
+      }));
+      const newEdges = template.edges.map(e => {
+        const sourceNode = newNodes.find(n => n.id.startsWith(e.source));
+        const targetNode = newNodes.find(n => n.id.startsWith(e.target));
+        const sharedInput = e.data?.sharedInput || tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj);
+        const protocol = e.data?.protocol || (sharedInput.length ? sharedInput[0] : "");
+        return { ...e, id: `${e.id}-${timestamp}`, source: `${e.source}-${timestamp}`, target: `${e.target}-${timestamp}`, type: "custom", data: { sharedInput, protocol } };
+      });
+      setNodes(nds => nds.concat(newNodes));
+      setEdges(eds => eds.concat(newEdges));
+      if (template.name) setFlowName(template.name);
+      if (template.description) setFlowDescription(template.description);
+      setTimeout(() => fitView({ padding: 0.2 }), 0);
+      return;
+    }
+
+    if (nodeType === "sandbox" && !tools.checkValid(toolObj)) return;
+
+    setNodes(nds => nds.concat({
+      id: "dndNode_" + getId(),
+      type: nodeType,
+      position,
+      data: { label: `${nodeType} node`, ...(nodeType === "sandbox" && { toolObj }) },
+    }));
+    setTimeout(() => fitView({ padding: 0.5, maxZoom: 0.75 }), 50);
+  }, [screenToFlowPosition, setNodes, setEdges, setFlowName, setFlowDescription, fitView]);
+
+  useEffect(() => {
+    tapAddRef.current = addNodeAtCenter;
+  }, [addNodeAtCenter]);
+
+  const onConnectStart = useCallback((_, { nodeId }) => {
+    connectSourceRef.current = nodeId;
+    connectCompletedRef.current = false;
+  }, []);
+
+  const onConnectEnd = useCallback(() => {
+    if (!connectCompletedRef.current && connectSourceRef.current) {
+      const sourceNode = nodes.find(n => n.id === connectSourceRef.current);
+      if (sourceNode?.data?.toolObj) {
+        const reason = connectFailReasonRef.current;
+        let msg;
+        if (reason === "direction") {
+          msg = "Wrong direction — connect from the right handle (output) to the left handle (input) of another tool.";
+        } else {
+          const outputs = sourceNode.data.toolObj.output;
+          msg = outputs?.length
+            ? `No shared protocol — ${sourceNode.data.toolObj.name} outputs: ${outputs.join(", ")}`
+            : `No compatible protocols between these tools.`;
+        }
+        setConnectToast(msg);
+        clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setConnectToast(null), 4000);
+      }
+    }
+    connectSourceRef.current = null;
+    connectFailReasonRef.current = null;
+  }, [nodes]);
 
   const onConnect = useCallback(
     (connection) => {
+      connectCompletedRef.current = true;
       const sourceNode = nodes.find(n => n.id === connection.source);
       const targetNode = nodes.find(n => n.id === connection.target);
       
@@ -192,7 +314,8 @@ const Flow = () => {
       );
       
       if (!sharedInput) return;
-      
+
+      snapshot(nodes, edges);
       setEdges((eds) =>
         addEdge(
           addEndMarker({
@@ -206,20 +329,19 @@ const Flow = () => {
         )
       );
     },
-    [nodes, setEdges],
+    [nodes, edges, setEdges, snapshot],
   );
 
-  /* Saves the state of the flow diagram to localStorage for future use */
-  const onSave = useCallback(() => {
-    if (rfInstance) {
-      const flow = {
-        ...rfInstance.toObject(),
-        ...(flowName && { name: flowName }),
-        ...(flowDescription && { description: flowDescription }),
-      };
-      localStorage.setItem(flowKey, JSON.stringify(flow));
-    }
-  }, [rfInstance, flowName, flowDescription]);
+  /* Auto-save whenever canvas content changes */
+  useEffect(() => {
+    if (!rfInstance) return;
+    const flow = {
+      ...rfInstance.toObject(),
+      ...(flowName && { name: flowName }),
+      ...(flowDescription && { description: flowDescription }),
+    };
+    localStorage.setItem(flowKey, JSON.stringify(flow));
+  }, [nodes, edges, flowName, flowDescription]); // rfInstance intentionally omitted — accessed via closure, not a trigger
   
   /* Enables downloading the state of the flow diagram */
   const onDownload = useCallback(() => {
@@ -250,7 +372,8 @@ const Flow = () => {
     
     const reader = new FileReader();
     reader.onload = (e) => {
-      const flow = JSON.parse(e.target.result);
+      let flow;
+      try { flow = JSON.parse(e.target.result); } catch { return; }
       
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport ?? {};
@@ -258,6 +381,7 @@ const Flow = () => {
         setEdges(flow.edges || []);
         setFlowName(flow.name || "");
         setFlowDescription(flow.description || "");
+        initHistory(flow.nodes || [], flow.edges || []);
         if (flow.viewport) {
           setViewport({ x, y, zoom });
         } else {
@@ -281,11 +405,12 @@ const Flow = () => {
     };
     
     reader.readAsText(file);
-  }, [setNodes, setEdges, setViewport, setFlowName, setFlowDescription, fitView]);
-  
+  }, [setNodes, setEdges, setViewport, setFlowName, setFlowDescription, fitView, initHistory]);
+
   /* Restores the state of the flow diagram to whatever is saved in localStorage if it exists */
   const restoreFlow = useCallback(() => {
-    const flow = JSON.parse(localStorage.getItem(flowKey));
+    let flow;
+    try { flow = JSON.parse(localStorage.getItem(flowKey)); } catch { return; }
     
     if (flow) {
       const { x = 0, y = 0, zoom = 1 } = flow.viewport ?? {};
@@ -294,6 +419,7 @@ const Flow = () => {
       setViewport({ x, y, zoom });
       setFlowName(flow.name || "");
       setFlowDescription(flow.description || "");
+      initHistory(flow.nodes || [], flow.edges || []);
 
       /* Sync the ID counter with the uploaded file's counter to prevent nodes getting replaced: 
           Node ids are assigned in the following convention "dndnode_x", where x is the number on the id global variable.
@@ -308,21 +434,23 @@ const Flow = () => {
       }, -1);
       id = maxId + 1; 
     }
-  }, [setNodes, setEdges, setViewport]);
+  }, [setNodes, setEdges, setViewport, initHistory]);
   
-  const onRestore = useCallback(() => {
-    restoreFlow();
-  }, [restoreFlow]);
+
+  const onNewFile = useCallback(() => {
+    setNodes([]);
+    setEdges([]);
+    setFlowName("");
+    setFlowDescription("");
+    initHistory([], []);
+  }, [setNodes, setEdges, initHistory]);
   
   /* Controls toggling the landing page*/
   const [isLandingModalOpen, setLandingModalOpen] = useState(true);
   const onToggleLandingModal = useCallback(()=>{
     if(isLandingModalOpen){
-      //console.log("landing is on, turn off");
       setLandingModalOpen(false);
-     
     }else{
-      //console.log("landing is off, turn on");
       setLandingModalOpen(true);
     }
 
@@ -332,8 +460,8 @@ const Flow = () => {
   
   /* Restores the state of the node diagram each time the page is reloaded */
   useEffect(() => {
-    
-  }, [rfInstance]); 
+    if (rfInstance) restoreFlow();
+  }, [rfInstance]);
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
@@ -403,44 +531,70 @@ const Flow = () => {
     [screenToFlowPosition],
   )
 
-  // Close the context menu if it's open whenever the window is clicked.
-  const onPaneclick = useCallback(() => setMenu({type: null, data: null}), []);
+  // Close context menu and deselect node when canvas is clicked
+  const onPaneclick = useCallback(() => {
+    setMenu({ type: null, data: null });
+    setSelectedNode(null);
+  }, [setSelectedNode]);
 
   const duplicateNode = useCallback(
-    (id, e) => {
-      e.stopPropagation();
-      const node = nodes.find((node) => node.id === id);
-      const position = { x: node.position.x + 50, y: node.position.y + 50 };
+    (id) => {
+      // Collect all selected duplicable nodes; fall back to the right-clicked node
+      const targets = nodes.filter(n => n.selected && n.data?.toolObj?.isIO);
+      const toClone = targets.length > 0 ? targets : nodes.filter(n => n.id === id && n.data?.toolObj?.isIO);
 
-      const newNode = {
-        ...node,
-        id: "duplicate_" + getId(),
-        position,
-      };
+      if (!toClone.length) return;
 
-      setNodes((nds) => nds.concat(newNode));
+      snapshot(nodes, edges);
+      setNodes(nds => nds.concat(
+        toClone.map(node => ({
+          ...node,
+          id: "duplicate_" + getId(),
+          position: { x: node.position.x + 50, y: node.position.y + 50 },
+          selected: false,
+        }))
+      ));
     },
-    [nodes],
+    [nodes, edges, snapshot],
   );
 
   const deleteNode = useCallback((id) => {
-        setNodes((nodes) => nodes.filter((node) => node.id !== id));
-        setEdges((edges) => edges.filter((edge) => edge.source !== id));
-        setMenu({ type: null, data: null }); //Close context menu
-    }, [setNodes, setEdges]
+        const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+        if (!selectedIds.has(id)) selectedIds.add(id); // always include right-clicked node
+        snapshot(nodes, edges);
+        deleteElements({ nodes: [...selectedIds].map(nid => ({ id: nid })) });
+        setMenu({ type: null, data: null });
+    }, [nodes, edges, snapshot, deleteElements, setMenu]
   );
 
-  const deleteEdge = useCallback((id) =>{
+  const deleteEdge = useCallback((id) => {
+    snapshot(nodes, edges);
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
-    setMenu({ type: null, data: null }); //Close context menu
-  }, [setEdges]);    
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setEdges]);    
 
   return (
     <div className="dndflow">
+      {isLandingModalOpen && <Landing onButtonClick={onToggleLandingModal}/>}
+      {isShowModal && <CustomNodeEditModal/>}
+
+      <div className="dndflow-left">
+      <TopMenuBar
+        onDownload={onDownload}
+        onUpload={onUpload}
+        onInstructions={onToggleLandingModal}
+        onNewFile={onNewFile}
+        flowName={flowName}
+        setFlowName={setFlowName}
+        flowDescription={flowDescription}
+        setFlowDescription={setFlowDescription}
+        hasNodes={nodes.length > 0}
+      />
+
+      <div className="dndflow-canvas-area">
       <div
         className="reactflow-wrapper"
         ref={reactFlowWrapper}
-        style={{ height: "100%" }}
       >
         <ReactFlow
           nodes={nodes}
@@ -450,6 +604,8 @@ const Flow = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onConnectStart={onConnectStart}
+          onConnectEnd={onConnectEnd}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onInit={setRfInstance}
@@ -458,45 +614,37 @@ const Flow = () => {
           onEdgeContextMenu={onEdgeContextMenu}
           onPaneContextMenu={onPaneContextMenu}
           onPaneClick={onPaneclick}
+          deleteKeyCode={null}
           nodeTypes={nodeTypes}
           isValidConnection={
             (connection) => {
               const sourceNode = nodes.find(n => n.id === connection.source);
               const targetNode = nodes.find(n => n.id === connection.target);
-              
+
               if (!sourceNode || !targetNode)
                 return false;
-              
-              return tools.canConnect(
-                sourceNode.data.toolObj, 
+
+              // Drop on an output handle = wrong direction (output→output or input→output)
+              if (connection.targetHandle === "output") {
+                connectFailReasonRef.current = "direction";
+                return false;
+              }
+
+              const valid = tools.canConnect(
+                sourceNode.data.toolObj,
                 targetNode.data.toolObj
-              )
+              );
+              if (!valid) {
+                connectFailReasonRef.current = "protocol";
+              }
+              return valid;
             }
           }
-          
+
           fitView
         >
 
-          <Panel>
-            {isLandingModalOpen && <Landing onButtonClick={onToggleLandingModal}/>}
-            {isShowModal && <CustomNodeEditModal/>}
-          </Panel>
-          
           <Background />
-          <Panel position="top-left">
-            <TopMenuBar
-              onDownload={onDownload}
-              onSave={onSave}
-              onRestore={onRestore}
-              onUpload={onUpload}
-              onInstructions={onToggleLandingModal}
-              flowName={flowName}
-              setFlowName={setFlowName}
-              flowDescription={flowDescription}
-              setFlowDescription={setFlowDescription}
-              hasNodes={nodes.length > 0}
-            />
-          </Panel>
           
           
           {menu.type === "node" && (
@@ -506,8 +654,10 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                { label: "Duplicate Node", onClick: (e) => duplicateNode(menu.data.id, e)},
-                { label: "Delete Node", onClick: () =>  deleteNode(menu.data.id)}
+                ...(nodes.find(n => n.id === menu.data.id)?.data?.toolObj?.isIO
+                  ? [{ label: "Duplicate Node", onClick: () => duplicateNode(menu.data.id) }]
+                  : []),
+                { label: "Delete Node", onClick: () => deleteNode(menu.data.id), danger: true }
               ]}
               onClose={onPaneclick}
             />
@@ -521,7 +671,7 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                { label: "Delete Edge", onClick: () =>  deleteEdge(menu.data.id)}
+                { label: "Delete Edge", onClick: () => deleteEdge(menu.data.id), danger: true }
               ]}
               onClose={onPaneclick}
             />
@@ -537,8 +687,7 @@ const Flow = () => {
               actions={[
                 { 
                   label: "Add comment", 
-                  onClick: (e) =>  {
-                    e.stopPropagation();
+                  onClick: () =>  {
                     const position = menu.data.position;
                     const newTextboxNode = {
                       id: "textbox_" + getId(),
@@ -562,7 +711,10 @@ const Flow = () => {
         </ReactFlow>
 
       </div>
+      </div>
+      </div>
       <Sidebar />
+      {connectToast && <div className="connect-toast">{connectToast}</div>}
     </div>
   );
 };
@@ -572,7 +724,9 @@ export default () => (
     <FlowContextProvider>
       <DnDProvider>
         <SelectionContextProvider>
-          <Flow />
+          <TapAddProvider>
+            <Flow />
+          </TapAddProvider>
         </SelectionContextProvider>
       </DnDProvider>
     </FlowContextProvider>

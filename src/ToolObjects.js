@@ -90,7 +90,6 @@ export const ProjectorObj = {
   logoFile: "./images/projector.jpg",
   input: ["WiFi", "Bluetooth", "Video Stream", "Images", "Wired"],
   output: [],
-  isIO: true,
   IOType: "Output",
   docLink: "."
 }
@@ -117,7 +116,6 @@ export const OrbbecFemtoObj = {
   name: "Orbbec Femto Mega",
   description: "A camera with 3D and IMU capabilities.",
   logoFile: "./images/femtomega.jpg",
-  isIO: true,
   IOType: "Input",
   output: ["Gestural Data", "Accelerometer Data", "Video Stream", "Depth Sensor Data"],
   input: [],
@@ -139,7 +137,6 @@ export const HeadphoneObj = {
   description: "An ordinary pair of headphones",
   input: ["Audio Stream", "Bluetooth"],
   output: [],
-  isIO: true, 
   IOType: "Output",
   docLink: "."
 }
@@ -151,7 +148,6 @@ export const MicObj = {
   input: [],
   logoScale: 1.5,
   output: ["Audio Stream"],
-  isIO: true, 
   IOType: "Input",
   docLink: "."
 }
@@ -162,7 +158,6 @@ export const CameraObj = {
   description: "An ordinary camera",
   input: [],
   output: ["Video Stream", "Depth Data"],
-  isIO: true, 
   IOType: "Input",
   docLink: "."
 }
@@ -173,7 +168,6 @@ export const KeyboardObj = {
   description: "A computer keyboard",
   input: [],
   output: ["ASCII"], 
-  isIO: true, 
   IOType: "Input",
   docLink: "."
 }
@@ -184,7 +178,6 @@ export const MouseObj = {
   description: "A computer mouse",
   input: [],
   output: ["Mouse Data"],
-  isIO: true, 
   IOType: "Input", 
   docLink: "."
   
@@ -197,7 +190,6 @@ export const ScreenObj = {
   input: ["Video Stream"],
   output: [],
   logoScale: 1.5,
-  isIO: true,
   IOType: "Output",
   docLink: "."
 }
@@ -208,7 +200,6 @@ export const SpeakerObj = {
   description: "An ordinary speaker",
   input: ["Bluetooth", "Audio Stream"],
   output: [],
-  isIO: true,
   IOType: "Output",
   docLink: "."
 }
@@ -218,23 +209,23 @@ export const AudiodiceObj = {
   logoFile: "./images/audiodice.png",
 //   logoScale: 1.5,
   description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
-  input: ["OSC", "Audio Stream"],
+  input: ["Audio Stream"],
   output: [],
-  isIO: true, 
   IOType: "Output",
+  isSAT: true,
   docLink: "."
-  
+
 }
 
 export const HapticFloorObj = {
   name: "Haptic Floor",
   logoFile: "./images/HapticFloor.png",
-  logoScale: 1.4, 
+  logoScale: 1.4,
   description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
   input: ["OSC"],
   output: [],
-  isIO: true, 
   IOType: "Output",
+  isSAT: true,
   docLink: "."
 }
 
@@ -247,7 +238,6 @@ export const LeapMotionObj = {
     description: "Sensor device that supports hand and finger motions as input.",
     input: [],
     output: ["Gestural Data", "OSC"],
-    isIO: true,
     IOType: "Input",
     docLink: "https://www.ultraleap.com/"
 };
@@ -334,6 +324,7 @@ export const DomeportObj = {
     description: "A tool for visualizing any video file on a dome display",
     input: ["Audio File", "Video File"],
     output: ["Video Stream"],
+    isSAT: true,
     docLink: "https://domeport.sat.qc.ca/"
 };
 
@@ -354,6 +345,7 @@ export const KoaiaObj = {
     description: "A tool for exploring generative AI.",
     input: ["Video Stream", "NDI"],
     output: ["OSC", "Video Stream"],
+    isSAT: true,
     docLink: "https://github.com/sat-mtl/Koaia"
 };
 
@@ -363,6 +355,7 @@ export const LivePoseObj = {
     description: "A command line tool which tracks people skeletons and applies filters",
     input: ["Video Stream"],
     output: ["OSC", "RawData"],
+    isSAT: true,
     docLink: "https://github.com/sat-mtl/livepose"
 };
 
@@ -420,11 +413,12 @@ export const P5jsObj = {
 };
 
 export const PointMapperObj = {
-    name: "PointMapper",
+    name: "CARTO",
     logoFile: "logosat.png",
     description: "A prototype web controller for SATIE",
     input: ["Video Stream", "OSC"],
     output: ["PointCloud", "OSC"],
+    isSAT: true,
     docLink: "https://toolbox.sat.qc.ca/"
 };
 
@@ -444,6 +438,7 @@ export const PuaraObj = {
     description: "A framework for building and deploying embedded systems",
     input: ["Audio Stream", "OSC", "Gestural Data", "Sensor Data"],
     output: ["OSC", "RawData"],
+    isSAT: true,
     docLink: "https://github.com/Puara"
 };
 
@@ -483,6 +478,7 @@ export const SatelliteObj = {
     description: "An immersive and social digital 3D environment accessible on the web",
     input: ["Video Stream"],
     output: ["Video Stream", "OSC", "Websocket"],
+    isSAT: true,
     docLink: "https://gitlab.com/sat-mtl/satellite"
 };
 
@@ -492,6 +488,7 @@ export const ScoreObj = {
     description: "Interactive, intermedia audio-visual sequencer.",
     input: ["OSC", "Video Stream", "Video File", "Sensor Data", "Gestural Data", "Images", "Audio Stream", "Audio File"],
     output: ["OSC", "Video Stream", "Images", "Audio Stream", "Spout", "Syphon", "NDI"],
+    isSAT: true,
     docLink: "https://github.com/ossia/score"
 };
 
@@ -508,11 +505,11 @@ export const SmodeObj = {
 
 export const SpatgrisObj = {
     name: "SpatGRIS",
-    external: true,
     logoFile: "images/SpatGRIS_logo.png",
     description: "A software designed for multichannel spatialization in 2D and 3D",
     input: ["Audio Stream", "OSC"],
     output: ["OSC", "Audio Stream"],
+    isSAT: true,
     docLink: "https://gris.musique.umontreal.ca/"
 };
 
@@ -523,6 +520,7 @@ export const SplashObj = {
     description: "A video mapping software, dedicated to deploying immersive spaces.",
     input: ["Video Stream", "Video File", "NDI"],
     output: ["Video Stream"],
+    isSAT: true,
     docLink: "https://gitlab.com/sat-mtl/tools/splash"
 };
 

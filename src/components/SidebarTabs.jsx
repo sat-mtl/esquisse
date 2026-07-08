@@ -6,31 +6,27 @@ import { IObar } from "./IObar.jsx";
 //Add here to create additional tabs
 const tabs = [
     {title: "TOOLS", content: <Toolbar />},
-    { title: "I/O DEVICES", content: <IObar />},
+    { title: "I/O DEVICES", content: <IObar />},
     { title: "TEMPLATES", content: <Templatebar /> }
 ]
 
-export function SidebarTabs(){
-    const[active, setActive] = useState(0);
-
-    return(
-        <div className="top-section-sidebar">        
+export function SidebarTabs({ activeTab, setActiveTab }) {
+    return (
+        <div className="top-section-sidebar">
             <div className="menu-bar">
                 {tabs.map((tab, i) => (
-                    <button 
+                    <button
                         key={i}
-                        className={active === i ? 'active' : ''}
-                        onClick={() => setActive(i)}
-                        >
-                            {tab.title}
+                        className={activeTab === i ? "active" : ""}
+                        onClick={() => setActiveTab(i)}
+                    >
+                        {tab.title}
                     </button>
-                ))}    
+                ))}
             </div>
-
             <div className="tab-wrapper">
-                {tabs[active].content}  
+                {tabs[activeTab].content}
             </div>
         </div>
-        
-    )
+    );
 }

@@ -1,49 +1,41 @@
-import React from "react";
-import { useDnD } from "../DnDContext.jsx";
+import React, { useState } from "react";
 import { SidebarNode } from "./SidebarNode.jsx";
 import { SidebarCustomNode } from "./CustomNodeLogic.jsx";
+import { ProtocolFilter } from "./ProtocolFilter.jsx";
 import * as tools from "../ToolObjects.js";
 
-export function Toolbar(){
-    return(
-      <aside className="tab-content">  
-            <SidebarCustomNode />    
-            <SidebarNode toolObj={tools.AbletonLiveObj} />
-            <SidebarNode toolObj={tools.ArdourObj} />
-            <SidebarNode toolObj={tools.BitwigObj} />
-            <SidebarNode toolObj={tools.BlenderObj} />
-            <SidebarNode toolObj={tools.ChataigneObj} />
-            <SidebarNode toolObj={tools.CinderObj} />
-            <SidebarNode toolObj={tools.CubaseObj} />
-            <SidebarNode toolObj={tools.DomeportObj} />
-            <SidebarNode toolObj={tools.IsadoraObj} />
-            <SidebarNode toolObj={tools.KoaiaObj} />
-            <SidebarNode toolObj={tools.LivePoseObj} />
-            <SidebarNode toolObj={tools.MadMapperObj} />
-            <SidebarNode toolObj={tools.MaxMSPObj} />
-            <SidebarNode toolObj={tools.NotchObj} />
-            <SidebarNode toolObj={tools.OBSStudioObj} />
-            <SidebarNode toolObj={tools.P5jsObj} />
-            <SidebarNode toolObj={tools.PointMapperObj} />
-            <SidebarNode toolObj={tools.ProcessingObj} />
-            <SidebarNode toolObj={tools.PuaraObj} />
-            <SidebarNode toolObj={tools.PureDataObj} />
-            <SidebarNode toolObj={tools.ReaperObj} />
-            <SidebarNode toolObj={tools.ResolumeObj} />
-            <SidebarNode toolObj={tools.SatelliteObj} />
-            <SidebarNode toolObj={tools.ScoreObj} />
-            <SidebarNode toolObj={tools.SmodeObj} />
-            <SidebarNode toolObj={tools.SpatgrisObj} />
-            <SidebarNode toolObj={tools.SplashObj} />
-            <SidebarNode toolObj={tools.SuperColliderObj} />
-            <SidebarNode toolObj={tools.TouchDesignerObj} />
-            <SidebarNode toolObj={tools.UnrealEngineObj} />
-            <SidebarNode toolObj={tools.VCVRackObj} />
-            <SidebarNode toolObj={tools.VDMXObj} />
-            <SidebarNode toolObj={tools.VezerObj} />
-            <SidebarNode toolObj={tools.VRChatObj} />
-            <SidebarNode toolObj={tools.VVVVObj} />
-            <SidebarNode toolObj={tools.WwiseObj} />
+const toolList = [
+    tools.AbletonLiveObj, tools.ArdourObj, tools.BitwigObj, tools.BlenderObj,
+    tools.ChataigneObj, tools.CinderObj, tools.CubaseObj, tools.DomeportObj,
+    tools.IsadoraObj, tools.KoaiaObj, tools.LivePoseObj, tools.MadMapperObj,
+    tools.MaxMSPObj, tools.NotchObj, tools.OBSStudioObj, tools.P5jsObj,
+    tools.PointMapperObj, tools.ProcessingObj, tools.PuaraObj, tools.PureDataObj,
+    tools.ReaperObj, tools.ResolumeObj, tools.SatelliteObj, tools.ScoreObj,
+    tools.SmodeObj, tools.SpatgrisObj, tools.SplashObj, tools.SuperColliderObj,
+    tools.TouchDesignerObj, tools.UnrealEngineObj, tools.VCVRackObj, tools.VDMXObj,
+    tools.VezerObj, tools.VRChatObj, tools.VVVVObj, tools.WwiseObj,
+].sort((a, b) => {
+    if (a.isSAT && !b.isSAT) return -1;
+    if (!a.isSAT && b.isSAT) return 1;
+    return a.name.localeCompare(b.name);
+});
+
+export function Toolbar() {
+    const [activeProtocol, setActiveProtocol] = useState(null);
+
+    const filtered = activeProtocol
+        ? toolList.filter(t => t.input?.includes(activeProtocol) || t.output?.includes(activeProtocol))
+        : toolList;
+
+    return (
+        <aside className="tab-content">
+            <ProtocolFilter tools={toolList} activeProtocol={activeProtocol} onSelect={setActiveProtocol} />
+            <div className="tab-nodes">
+                <SidebarCustomNode />
+                {filtered.map(tool => (
+                    <SidebarNode key={tool.name} toolObj={tool} />
+                ))}
+            </div>
         </aside>
-    )
-};
+    );
+}

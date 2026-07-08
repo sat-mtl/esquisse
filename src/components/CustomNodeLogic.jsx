@@ -1,237 +1,180 @@
-import React , {useState} from "react";
+import React, { useState } from "react";
 import SandboxNode from "./SandboxNode.jsx";
 import { useSelectionContext } from "../SelectionContext.jsx";
 import { useDnD } from "../DnDContext.jsx";
 import { useFlowContext } from "../FlowContext.jsx";
 
-/* A button version of pulling up the custom node pop up */
 export function CustomNodeButton() {
     const [, , , , isShowModal, setIsShowModal] = useSelectionContext();
-
-    const handleClick=() => {
-        setIsShowModal(true);
-    }
-
-
-    return(
-        <>
-        <button type="button" onClick={handleClick}>
-          Custom Node
+    return (
+        <button type="button" onClick={() => setIsShowModal("tool")}>
+            Custom Node
         </button>
-        </>
     );
 }
 
+function unpackProtocols(str) {
+    if (!str.trim()) return [];
+    return str.split(",").map(s => s.trim()).filter(Boolean);
+}
 
-// Popup for custom node edit screen, relies on isShowModal to toggle on and off.
-// on form submit creates a new sandbox node using the information stored in custDropInfo
-export function CustomNodeEditModal(){
-    const [selectedNode, setSelectedNode, , ,isShowModal, setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
+export function CustomNodeEditModal() {
+    const [selectedNode, setSelectedNode, , , isShowModal, setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
     const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange] = useFlowContext();
+    const [ioType, setIoType] = useState("Both");
 
-    /*Read in strings in the format of "entry, entry, entry
-    and convert to an array" */
-    const unpackInput=(stringInfo)=>{ 
-        let tempStr = "";
-        let justEnded = false; //used to skip first space
-        const entries = [];
+    const isDevice = isShowModal === "device";
 
-        for(let i = 0; i < stringInfo.length; i++){
-            let char = stringInfo[i];
-
-            if(char === ','){ //string end signifier
-                entries.push(tempStr);
-
-                //reset
-                justEnded = true;
-                tempStr = "";
-            } 
-            else if(char === ' ' && justEnded){
-                //skip and move on
-                justEnded == false;
-                //also reset tempStr 
-                // (should have already been done but this reduces errors if a space is forgotten but included elsewhere)
-                tempStr = "";
-
-            }else{//add
-                tempStr += char;
-            }
-
-            //check if your at the end
-            if(i == stringInfo.length -1){
-                entries.push(tempStr);
-            }
-
-        }
-
-        return entries;
-
-    }
-
-    const addCustomNode =(custObj) =>{
-    
-        const [position, id] = custDropInfo; //unpack
-
-        const newNode = {
-        id: "dndNode_" + id,
-        type: "sandbox",
-        position: position,
-        data: { 
-            //label: `${type} node`,
-           toolObj: custObj,
-        },
+    const addCustomNode = (custObj) => {
+        const [position, id] = custDropInfo;
+        setNodes(nds => nds.concat({
+            id: "dndNode_" + id,
+            type: "sandbox",
+            position,
+            data: { toolObj: custObj },
+        }));
     };
-    setNodes((nds) => nds.concat(newNode));
 
-    }
-
-    
-    const handleSubmit=(formID) => {
-        // Prevent the browser from reloading the page
-        formID.preventDefault();
-
-        // Read the form data
-        
-        const form = formID.currentTarget;
-        
-        
-        //form.member.value*/
-        let name = String(document.getElementById("objName").value);
-        let desc = String(document.getElementById("desc").value);
-        let inputStr = String(document.getElementById("inputField").value);
-        let outputStr = String(document.getElementById("outputField").value);
-        
-        
-        
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById("objName").value.trim();
+        const desc = document.getElementById("desc").value.trim();
+        const inputStr = document.getElementById("inputField").value;
+        const outputStr = document.getElementById("outputField").value;
 
         const customNode = {
-            name: name,
-            external: true,
+            name,
             logoFile: "",
-            logoScale: 1,
             description: desc,
-            input: unpackInput(inputStr),
-            output: unpackInput(outputStr),
-            docLink: "."
+            input: unpackProtocols(inputStr),
+            output: unpackProtocols(outputStr),
+            docLink: ".",
+            ...(isDevice && {
+                isIO: true,
+                ...(ioType !== "Both" && { IOType: ioType }),
+            }),
         };
 
         setSelectedNode(customNode);
-        //close modal
-        setIsShowModal(false);
-        //create node
-        addCustomNode(customNode)
-    }
+        setIsShowModal(null);
+        addCustomNode(customNode);
+    };
 
-    const closeModal=()=>{ //close the modal
-        setIsShowModal(false);
-
-    }
-
-    return(
+    return (
         <div className="modal-wrapper">
             <div className="modal-body">
                 <h1 className="landing-title">
-                Custom Node
+                    {isDevice ? "Custom Device" : "Custom Node"}
                 </h1>
+                <button type="button" onClick={() => setIsShowModal(null)}>Close</button>
 
-                <button type="button" onClick={closeModal}>
-                    Close
-                </button>
-                   
-                <form className = "custom-form" onSubmit= {handleSubmit} method= "POST">
-                    <label for="objName">Tool name: </label>
-                    <input type="text" id="objName" name= "objName" 
-                        pattern="^[a-zA-Z0-9!?&#%$\. ]*$" title="Only characters, numbers, and basic punctuation" required >
-                    </input> <br/> <br/>
+                <form className="custom-form" onSubmit={handleSubmit} method="POST">
+                    <label htmlFor="objName">{isDevice ? "Device name" : "Tool name"}</label>
+                    <input type="text" id="objName" name="objName"
+                        pattern="^[a-zA-Z0-9!?&#%$\. ]*$"
+                        title="Only characters, numbers, and basic punctuation" required />
 
-                    <label for="desc">Description: </label>
-                    <input type="text" id="desc" name= "desc" 
-                    pattern= "^[a-zA-Z0-9!?&%$\. ]*$" title="Only characters, numbers, and basic punctuation" required>
-                    </input>
+                    <label htmlFor="desc">Description</label>
+                    <input type="text" id="desc" name="desc"
+                        pattern="^[a-zA-Z0-9!?&%$\. ]*$"
+                        title="Only characters, numbers, and basic punctuation" required />
 
-                    <p>Please list valid inputs and outputs below with a comma between entries.
-                         Connections are case sensitive and must be spelled identically.</p>
+                    {isDevice && (
+                        <>
+                            <label htmlFor="ioType">Direction</label>
+                            <select id="ioType" value={ioType} onChange={e => setIoType(e.target.value)}>
+                                <option value="Both">Input &amp; Output</option>
+                                <option value="Input">Input only (sends signal)</option>
+                                <option value="Output">Output only (receives signal)</option>
+                            </select>
+                        </>
+                    )}
 
-                    <label for="inputField">Inputs: </label>
-                    <input type="text" id="inputField" name= "inputField" placeholder="Audio, Video, ..." pattern="^[a-zA-Z, ]*$" required>
-                    </input> <br/> <br/>
+                    <p>List protocols separated by commas. Connections are case-sensitive.</p>
 
-                    <label for="outputField">Outputs: </label>
-                    <input type="text" id="outputField" name= "outputField" placeholder="Audio, Video, ..." pattern="^[a-zA-Z, ]*$" required>
-                    </input>
-                    <br/>
+                    <label htmlFor="inputField">Input protocols</label>
+                    <input type="text" id="inputField" name="inputField"
+                        placeholder="OSC, MIDI, Audio Stream, ..."
+                        pattern="^[a-zA-Z, ]*$" />
 
-                  
-                    <button type="submit" >
-                    Submit
-                    </button>
+                    <label htmlFor="outputField">Output protocols</label>
+                    <input type="text" id="outputField" name="outputField"
+                        placeholder="OSC, MIDI, Audio Stream, ..."
+                        pattern="^[a-zA-Z, ]*$" />
 
+                    <button type="submit">Add to canvas</button>
                 </form>
-
-
-               
             </div>
         </div>
     );
-
 }
 
 
-
-
-
-
-
-//Sidebar node that on pull off pulls up the custom Node modal
-export function SidebarCustomNode(){
-    const[descr, setDescr] = useState(null);
+export function SidebarCustomNode() {
+    const [descr, setDescr] = useState(null);
     const [type, setType, obj, setObj] = useDnD();
 
-    //Description box appears when mouse is inside node
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        setDescr({
-            x: rect.left,
-            y: rect.top + rect.height / 2 + 50,
-        });
+        setDescr({ x: rect.left, y: rect.top + rect.height / 2 + 50 });
     };
 
-    //Description box disappears when mouse is outside node
-    const handleMouseLeave = () => {
-        setDescr(null);
-    }
-    
-    //Moves when dragged
-    const onDragStart = (event, nodeType) => {
-        setType(nodeType);
-
-        setObj(null); //to update toolObj for creating a sandbox node
-
+    const onDragStart = (event) => {
+        setType("custSandbox");
+        setObj(null);
         event.dataTransfer.effectAllowed = "move";
         setDescr(null);
     };
 
-    //
-    const handleDoubleClick = () => {
-        //
-    }
-
     return (
         <>
-            <div className="dndnode input" id="sidebar-custom-node" 
-            onDoubleClick={handleDoubleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onDragStart={(event) => onDragStart(event, "custSandbox")} draggable>
-                <h3 > Custom Node</h3>
+            <div className="dndnode input" id="sidebar-custom-node"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={() => setDescr(null)}
+                onDragStart={onDragStart}
+                draggable>
+                <h3>Custom Node</h3>
             </div>
-
             {descr && (
-                <div className="popup" style={{
-                    left: descr.x - 50,
-                    top: descr.y,
-                }}>
-                    <p> A way to add a local custom node to your diagram. Drag out to use.</p>
+                <div className="popup" style={{ left: descr.x - 50, top: descr.y }}>
+                    <p>Add a custom software tool. Drag out to use.</p>
                 </div>
             )}
         </>
-    )
-    
+    );
+}
+
+
+export function SidebarCustomDevice() {
+    const [descr, setDescr] = useState(null);
+    const [type, setType, obj, setObj] = useDnD();
+
+    const handleMouseEnter = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setDescr({ x: rect.left, y: rect.top + rect.height / 2 + 50 });
+    };
+
+    const onDragStart = (event) => {
+        setType("custDevice");
+        setObj(null);
+        event.dataTransfer.effectAllowed = "move";
+        setDescr(null);
+    };
+
+    return (
+        <>
+            <div className="dndnode input"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={() => setDescr(null)}
+                onDragStart={onDragStart}
+                draggable>
+                <h3>Custom Device</h3>
+            </div>
+            {descr && (
+                <div className="popup" style={{ left: descr.x - 50, top: descr.y }}>
+                    <p>Add a custom hardware device. Drag out to use.</p>
+                </div>
+            )}
+        </>
+    );
 }

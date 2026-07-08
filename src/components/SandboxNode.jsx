@@ -1,8 +1,8 @@
-import { useDnD } from "../DnDContext.jsx";
-
 import React, { memo, useCallback } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { useSelectionContext } from "../SelectionContext.jsx";
+
+const isTouchDevice = () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
 /*
 Sandbox nodes are nodes that take in a toolObj feild that contains information on
@@ -12,14 +12,11 @@ You can find the requirments of a toolObj at the top of ToolObjects.js
 Sandbox nodes are meant to be used outside of the sidebar
 */
 
-export default memo(({ data, isConnectable }) => {
+export default memo(({ data, isConnectable, selected }) => {
   //get context info
   const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] =
     useSelectionContext();
-
-  //debug
-  //console.log("Object in SandboxNode")
-  //console.log(data.toolObj);
+  const { deleteElements } = useReactFlow();
 
   if (data.toolObj == null) {
     //check for broken reference
@@ -31,11 +28,14 @@ export default memo(({ data, isConnectable }) => {
     );
   }
 
-  const handleDoubleClick = () => {
-    if(docLink != "."){
-      window.open(`${data.toolObj.docLink}`, "_blank");
+  const handleDoubleClick = useCallback(() => {
+    if (isTouchDevice()) {
+      deleteElements({ nodes: [{ id: data.id }] });
+      setSelectedNode(null);
+    } else if (data.toolObj.docLink && data.toolObj.docLink !== ".") {
+      window.open(data.toolObj.docLink, "_blank", "noopener,noreferrer");
     }
-  };
+  }, [data.id, data.toolObj, deleteElements, setSelectedNode]);
 
   //update selected obj on click
   const handleClick = useCallback(() => {
@@ -58,25 +58,25 @@ export default memo(({ data, isConnectable }) => {
     if (obj.IOType === "Output") {
       return (
         <div
-          className="sandbox-node"
+          className={`sandbox-node sandbox-node--device${selected ? " sandbox-node--selected" : ""}`}
           onDoubleClick={handleDoubleClick}
           onClick={handleClick}
         >
           <Handle
             className="target"
             type="target"
-            id="#b1b1b7"
+            id="input"
             position={Position.Left}
             isConnectable={isConnectable}
-    
+
           />
 
           {doDisplayImage && <img
-            id="logo-img"
+            className="logo-img"
             src={`/${data.toolObj.logoFile}`}
             alt="/logosat.png"
           />}
-          
+
           <h5> {obj.name} </h5>
         </div>
       );
@@ -84,21 +84,21 @@ export default memo(({ data, isConnectable }) => {
     else if (obj.IOType === "Input") {
       return (
         <div
-          className="sandbox-node"
+          className={`sandbox-node sandbox-node--device${selected ? " sandbox-node--selected" : ""}`}
           onDoubleClick={handleDoubleClick}
           onClick={handleClick}
         >
 
           {doDisplayImage && <img
-            id="logo-img"
+            className="logo-img"
             src={`/${data.toolObj.logoFile}`}
             alt="/logosat.png"
           />}
-          
+
           <Handle
             className="source"
             type="source"
-            id="#b1b1b7"
+            id="output"
             position={Position.Right}
             isConnectable={isConnectable}
           />
@@ -111,25 +111,24 @@ export default memo(({ data, isConnectable }) => {
 
   return (
     <div
-      className="sandbox-node"
+      className={`sandbox-node${obj.isIO ? " sandbox-node--device" : ""}${selected ? " sandbox-node--selected" : ""}`}
       onDoubleClick={handleDoubleClick}
       onClick={handleClick}
     >
       <Handle
         className="target"
         type="target"
-        id="#b1b1b7"
+        id="input"
         position={Position.Left}
         isConnectable={isConnectable}
-
       />
 
-      {doDisplayImage && <img id="logo-img" src={`/${data.toolObj.logoFile}`} />}
+      {doDisplayImage && <img className="logo-img" src={`/${data.toolObj.logoFile}`} />}
 
       <Handle
         className="source"
         type="source"
-        id="#b1b1b7"
+        id="output"
         position={Position.Right}
         isConnectable={isConnectable}
       />

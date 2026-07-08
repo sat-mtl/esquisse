@@ -1,0 +1,115 @@
+{
+  "name": "Pose Tracking Performance",
+  "description": "Camera feed into LivePose for skeleton tracking, routed via ossia score to SpatGRIS and Audiodice for spatial audio.",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "sandbox",
+      "position": { "x": 0, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "Camera",
+          "logoFile": "images/camera.png",
+          "description": "An ordinary camera",
+          "input": [],
+          "output": ["Video Stream", "Depth Data"],
+          "isIO": true,
+          "IOType": "Input",
+          "docLink": "."
+        }
+      }
+    },
+    {
+      "id": "n2",
+      "type": "sandbox",
+      "position": { "x": 300, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "LivePose",
+          "logoFile": "images/LivePose.png",
+          "description": "A command line tool which tracks people skeletons and applies filters",
+          "input": ["Video Stream"],
+          "output": ["OSC", "RawData"],
+          "docLink": "https://github.com/sat-mtl/livepose"
+        }
+      }
+    },
+    {
+      "id": "n3",
+      "type": "sandbox",
+      "position": { "x": 600, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "ossia score",
+          "logoFile": "images/ossiascore_logo.png",
+          "description": "Interactive, intermedia audio-visual sequencer.",
+          "input": ["OSC", "Video Stream", "Video File", "Sensor Data", "Gestural Data", "Images", "Audio Stream", "Audio File"],
+          "output": ["OSC", "Video Stream", "Images", "Audio Stream", "Spout", "Syphon", "NDI"],
+          "docLink": "https://github.com/ossia/score"
+        }
+      }
+    },
+    {
+      "id": "n4",
+      "type": "sandbox",
+      "position": { "x": 900, "y": -100 },
+      "data": {
+        "toolObj": {
+          "name": "SpatGRIS",
+          "logoFile": "images/SpatGRIS_logo.png",
+          "description": "A software designed for multichannel spatialization in 2D and 3D",
+          "input": ["Audio Stream", "OSC"],
+          "output": ["OSC", "Audio Stream"],
+          "docLink": "https://gris.musique.umontreal.ca/"
+        }
+      }
+    },
+    {
+      "id": "n5",
+      "type": "sandbox",
+      "position": { "x": 900, "y": 100 },
+      "data": {
+        "toolObj": {
+          "name": "Audiodice",
+          "logoFile": "images/audiodice.png",
+          "description": "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
+          "input": ["OSC", "Audio Stream"],
+          "output": [],
+          "isIO": true,
+          "IOType": "Output",
+          "docLink": "."
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "n1",
+      "target": "n2",
+      "type": "custom",
+      "data": { "sharedInput": ["Video Stream"], "protocol": "Video Stream" }
+    },
+    {
+      "id": "e2-3",
+      "source": "n2",
+      "target": "n3",
+      "type": "custom",
+      "data": { "sharedInput": ["OSC"], "protocol": "OSC" }
+    },
+    {
+      "id": "e3-4",
+      "source": "n3",
+      "target": "n4",
+      "type": "custom",
+      "data": { "sharedInput": ["OSC"], "protocol": "OSC" }
+    },
+    {
+      "id": "e3-5",
+      "source": "n3",
+      "target": "n5",
+      "type": "custom",
+      "data": { "sharedInput": ["OSC"], "protocol": "OSC" }
+    }
+  ]
+}

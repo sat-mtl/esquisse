@@ -1,12 +1,10 @@
 import React, { useRef } from "react";
-import { CustomNodeButton } from "./CustomNodeLogic.jsx";
 
 export function TopMenuBar({
   onDownload,
-  onSave,
-  onRestore,
   onUpload,
   onInstructions,
+  onNewFile,
   flowName,
   setFlowName,
   flowDescription,
@@ -33,11 +31,14 @@ export function TopMenuBar({
           <button type="button" onClick={onInstructions} className="top-menu-bar-instructions">
             INSTRUCTIONS
           </button>
-          <button type="button" onClick={onSave}>
-            SAVE
-          </button>
-          <button type="button" onClick={onRestore}>
-            RESTORE
+          <button
+            type="button"
+            onClick={onNewFile}
+            disabled={!hasNodes}
+            className="top-menu-bar-new"
+            title="Clear canvas"
+          >
+            NEW
           </button>
           <button type="button" onClick={onDownload}>
             DOWNLOAD

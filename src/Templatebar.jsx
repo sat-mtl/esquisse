@@ -7,7 +7,7 @@ const allTemplates = templateContext.keys().map(key => templateContext(key));
 
 export function Templatebar() {
     return (
-        <div className="tab-content">
+        <div className="tab-content tab-content--templates">
             {allTemplates.map((template, i) => (
                 <SidebarCompNode key={i} template={template} />
             ))}

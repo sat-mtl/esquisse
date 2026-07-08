@@ -10,7 +10,7 @@ obj is the toolObj information, as listed in ToolObjects.js
 export const SelectionContextProvider = ({ children }) => {
     const [selectedNode, setSelectedNode] = useState(null); 
     const [hoveredNode, setHoveredNode] = useState(null); 
-    const [isShowModal, setIsShowModal] = useState(false);
+    const [isShowModal, setIsShowModal] = useState(null);
  
     const [custDropInfo, setCustDropInfo] = useState(null);
     

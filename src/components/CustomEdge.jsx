@@ -51,6 +51,13 @@ export default function CustomEdge({
         markerEnd={markerEnd}
         style={style}
       />
+      <path
+        d={path}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={20}
+        className="react-flow__edge-interaction"
+      />
 
       
         <EdgeLabelRenderer>

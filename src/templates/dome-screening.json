@@ -1,0 +1,70 @@
+{
+  "name": "Dome Screening",
+  "description": "Load a video file from a computer into Domeport Web for dome display via a projector.",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "sandbox",
+      "position": { "x": 0, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "Computer",
+          "description": "A standard computer",
+          "logoFile": "./images/computer.png",
+          "input": ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+          "output": ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
+          "docLink": "."
+        }
+      }
+    },
+    {
+      "id": "n2",
+      "type": "sandbox",
+      "position": { "x": 300, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "Domeport Web",
+          "logoFile": "images/domeport_web.png",
+          "logoScale": 1.5,
+          "description": "A tool for visualizing any video file on a dome display",
+          "input": ["Audio File", "Video File"],
+          "output": ["Video Stream"],
+          "docLink": "https://domeport.sat.qc.ca/"
+        }
+      }
+    },
+    {
+      "id": "n3",
+      "type": "sandbox",
+      "position": { "x": 600, "y": 0 },
+      "data": {
+        "toolObj": {
+          "name": "Projector",
+          "description": "A projector",
+          "logoFile": "images/projector.jpg",
+          "input": ["WiFi", "Bluetooth", "Video Stream", "Images", "Wired"],
+          "output": [],
+          "isIO": true,
+          "IOType": "Output",
+          "docLink": "."
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "n1",
+      "target": "n2",
+      "type": "custom",
+      "data": { "sharedInput": ["Video File", "Audio File"], "protocol": "Video File" }
+    },
+    {
+      "id": "e2-3",
+      "source": "n2",
+      "target": "n3",
+      "type": "custom",
+      "data": { "sharedInput": ["Video Stream"], "protocol": "Video Stream" }
+    }
+  ]
+}

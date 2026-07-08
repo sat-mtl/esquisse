@@ -1,20 +1,26 @@
 import React from "react";
 import { useSelectionContext } from "../SelectionContext.jsx";
 
-export function NodeDetails() {
+const EMPTY_MESSAGES = [
+  "Drag a tool onto the canvas, then click it to see its details here.",
+  "Drag a device onto the canvas, then click it to see its details here.",
+  "Drag a template onto the canvas to load it as a starting point.",
+];
+
+export function NodeDetails({ activeTab = 0 }) {
   const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] = useSelectionContext();
 
   if (!selectedNode) {
     return (
       <div className="node-details node-details-empty">
-        <p>Drag and drop a tool or device to the canvas to see its details here.</p>
+        <p>{EMPTY_MESSAGES[activeTab] ?? EMPTY_MESSAGES[0]}</p>
       </div>
     );
   }
 
   const handleClick = () => {
-    if(docLink != "."){
-      window.open(`${selectedNode.docLink}`, "_blank");
+    if (selectedNode.docLink && selectedNode.docLink !== ".") {
+      window.open(selectedNode.docLink, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -47,7 +53,11 @@ export function NodeDetails() {
           alt=""
         />
         {doDisplayDocButton && <button type="button" className="node-details-doc-btn" onClick={handleClick}>
-          Documentation
+          {selectedNode.isIO ? "Data Sheet" : "Documentation"}
+          <svg viewBox="0 0 128 75" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" width="20" height="12" style={{ transform: 'scaleY(-1)' }}>
+            <path d="M120.3,67.2l-62-62H0" strokeWidth="10" />
+            <path d="M123.9,29v41.7H82.2" strokeWidth="8" />
+          </svg>
         </button>}
       </div>}
       <h2 className="node-details-title">{selectedNode.name}</h2>

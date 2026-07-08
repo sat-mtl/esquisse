@@ -5,7 +5,7 @@ export default function Landing({ onButtonClick }) {
     <div className="modal-wrapper">
       <div className="modal-body">
         <h1 className="landing-title">
-          Welcome to the SAT's Toolbox node editor
+          Welcome to Esquisse
           <span className="landing-info-wrap">
             <span className="landing-info-icon" aria-label="About this tool" tabIndex={0}>i</span>
             <span className="landing-info-tooltip">
@@ -16,15 +16,15 @@ export default function Landing({ onButtonClick }) {
         <ol className="landing-steps">
           <li>
             <span className="landing-step-circle">1</span>
-            <span className="landing-step-text">Drag a tool or device from the sidebar and drop it onto the canvas.</span>
+            <span className="landing-step-text">Drag a tool or device from the sidebar onto the canvas. On mobile, tap a tool to add it.</span>
           </li>
           <li>
             <span className="landing-step-circle">2</span>
-            <span className="landing-step-text">Connect nodes by dragging from the left handle of one to the right handle of another.</span>
+            <span className="landing-step-text">Connect nodes by dragging from one handle to another. On mobile, connections are not supported.</span>
           </li>
           <li>
             <span className="landing-step-circle">3</span>
-            <span className="landing-step-text">Click a tool in the sidebar or on the canvas to open its documentation or website.</span>
+            <span className="landing-step-text">Click a tool in the sidebar to see its documentation. On mobile, tap a tool on the canvas to view its details.</span>
           </li>
           <li>
             <span className="landing-step-circle">4</span>
@@ -39,6 +39,9 @@ export default function Landing({ onButtonClick }) {
             You can reopen this anytime with the <strong>Instructions</strong> button in the top bar.
           </span>
         </div>
+        <p className="landing-mobile-note">
+          For the best experience, use Esquisse on a desktop or laptop.
+        </p>
       </div>
     </div>
   );
