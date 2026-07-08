@@ -10,6 +10,7 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].bundle.js',
+      publicPath: argv.mode === 'development' ? '/' : '/esquisse/',
     },
     devServer: {
       client: {
