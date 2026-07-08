@@ -73,7 +73,7 @@ export default memo(({ data, isConnectable, selected }) => {
 
           {doDisplayImage && <img
             className="logo-img"
-            src={`/${data.toolObj.logoFile}`}
+            src={`${data.toolObj.logoFile}`}
             alt="/logosat.png"
           />}
 
@@ -91,7 +91,7 @@ export default memo(({ data, isConnectable, selected }) => {
 
           {doDisplayImage && <img
             className="logo-img"
-            src={`/${data.toolObj.logoFile}`}
+            src={`${data.toolObj.logoFile}`}
             alt="/logosat.png"
           />}
 
@@ -123,7 +123,7 @@ export default memo(({ data, isConnectable, selected }) => {
         isConnectable={isConnectable}
       />
 
-      {doDisplayImage && <img className="logo-img" src={`/${data.toolObj.logoFile}`} />}
+      {doDisplayImage && <img className="logo-img" src={`${data.toolObj.logoFile}`} />}
 
       <Handle
         className="source"

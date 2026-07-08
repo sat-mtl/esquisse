@@ -49,7 +49,7 @@ export function NodeDetails({ activeTab = 0 }) {
       {doDisplayHeader && <div className="node-details-header">
         <img
           className="node-details-logo"
-          src={`/${selectedNode.logoFile}`}
+          src={`${selectedNode.logoFile}`}
           alt=""
         />
         {doDisplayDocButton && <button type="button" className="node-details-doc-btn" onClick={handleClick}>

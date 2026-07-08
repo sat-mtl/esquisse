@@ -17,7 +17,7 @@ export function TopMenuBar({
     <div className="top-menu-bar">
       <div className="top-menu-bar-row">
         <div className="top-menu-bar-logo">
-          <img src="/logosat.png" alt="SAT" className="sat-logo" />
+          <img src="logosat.png" alt="SAT" className="sat-logo" />
         </div>
         <div className="top-menu-bar-actions">
           <input
