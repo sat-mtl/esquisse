@@ -67,6 +67,7 @@ export default function CustomEdge({
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
               pointerEvents: "all",
             }}
+            onMouseDown={e => e.stopPropagation()}
           >
             <Dropdown
               options={data?.sharedInput || []}
