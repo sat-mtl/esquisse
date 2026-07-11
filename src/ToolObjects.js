@@ -476,7 +476,7 @@ export const SatelliteObj = {
     name: "Satellite",
     logoFile: "images/Satellite.png",
     description: "An immersive and social digital 3D environment accessible on the web",
-    input: ["Video Stream"],
+    input: ["Video Stream", "3D Models"],
     output: ["Video Stream", "OSC", "Websocket"],
     isSAT: true,
     docLink: "https://gitlab.com/sat-mtl/satellite"
