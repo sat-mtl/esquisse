@@ -35,6 +35,7 @@ import ConnectionLine from './components/ConnectionLine.jsx';
 import CustomEdge from "./components/CustomEdge.jsx";
 import { validateTemplate } from "./Templates.js";
 import { CustomNodeEditModal } from "./components/CustomNodeLogic.jsx";
+import { useLang, localizedName } from "./LangContext.jsx";
 
 
 let id = 0;
@@ -78,6 +79,8 @@ const Flow = () => {
   const [flowDescription, setFlowDescription] = useState("");
   const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode, isShowModal,
     setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
+
+  const { t, lang } = useLang();
 
   const [connectToast, setConnectToast] = useState(null);
   const connectSourceRef = useRef(null);
@@ -147,7 +150,7 @@ const Flow = () => {
 
       //Validate template
       if(!validateTemplate(obj)){
-        alert("Template Invalid");
+        alert(t.templateInvalid);
         return;
       }
 
@@ -187,8 +190,10 @@ const Flow = () => {
 
       setNodes(nds => nds.concat(newNodes));
       setEdges(eds => eds.concat(newEdges));
-      if (obj.name) setFlowName(obj.name);
-      if (obj.description) setFlowDescription(obj.description);
+      if (nodes.length === 0) {
+        if (obj.name) setFlowName(obj.name);
+        if (obj.description) setFlowDescription(obj.description);
+      }
       return;
     }
     
@@ -233,7 +238,7 @@ const Flow = () => {
     });
 
     if (nodeType === "composite" && template) {
-      if (!validateTemplate(template)) { alert("Template Invalid"); return; }
+      if (!validateTemplate(template)) { alert(t.templateInvalid); return; }
       const timestamp = Date.now();
       const newNodes = template.nodes.map(n => ({
         ...n,
@@ -251,8 +256,10 @@ const Flow = () => {
       });
       setNodes(nds => nds.concat(newNodes));
       setEdges(eds => eds.concat(newEdges));
-      if (template.name) setFlowName(template.name);
-      if (template.description) setFlowDescription(template.description);
+      if (nodes.length === 0) {
+        if (template.name) setFlowName(template.name);
+        if (template.description) setFlowDescription(template.description);
+      }
       setTimeout(() => fitView({ padding: 0.2 }), 0);
       return;
     }
@@ -284,12 +291,12 @@ const Flow = () => {
         const reason = connectFailReasonRef.current;
         let msg;
         if (reason === "direction") {
-          msg = "Wrong direction — connect from the right handle (output) to the left handle (input) of another tool.";
+          msg = t.toastDirection;
         } else {
           const outputs = sourceNode.data.toolObj.output;
           msg = outputs?.length
-            ? `No shared protocol — ${sourceNode.data.toolObj.name} outputs: ${outputs.join(", ")}`
-            : `No compatible protocols between these tools.`;
+            ? `${t.toastNoProtocol} — ${localizedName(sourceNode.data.toolObj, lang)}: ${outputs.join(", ")}`
+            : t.toastNoProtocol;
         }
         setConnectToast(msg);
         clearTimeout(toastTimerRef.current);
@@ -616,6 +623,13 @@ const Flow = () => {
           onPaneClick={onPaneclick}
           deleteKeyCode={null}
           nodeTypes={nodeTypes}
+          ariaLabelConfig={{
+            "controls.ariaLabel": t.controlsPanel,
+            "controls.zoomIn.ariaLabel": t.controlsZoomIn,
+            "controls.zoomOut.ariaLabel": t.controlsZoomOut,
+            "controls.fitView.ariaLabel": t.controlsFitView,
+            "controls.interactive.ariaLabel": t.controlsInteractive,
+          }}
           isValidConnection={
             (connection) => {
               const sourceNode = nodes.find(n => n.id === connection.source);
@@ -655,9 +669,9 @@ const Flow = () => {
               bottom={menu.data.bottom}
               actions={[
                 ...(nodes.find(n => n.id === menu.data.id)?.data?.toolObj?.isIO
-                  ? [{ label: "Duplicate Node", onClick: () => duplicateNode(menu.data.id) }]
+                  ? [{ label: t.duplicateNode, onClick: () => duplicateNode(menu.data.id) }]
                   : []),
-                { label: "Delete Node", onClick: () => deleteNode(menu.data.id), danger: true }
+                { label: t.deleteNode, onClick: () => deleteNode(menu.data.id), danger: true }
               ]}
               onClose={onPaneclick}
             />
@@ -671,7 +685,7 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                { label: "Delete Edge", onClick: () => deleteEdge(menu.data.id), danger: true }
+                { label: t.deleteEdge, onClick: () => deleteEdge(menu.data.id), danger: true }
               ]}
               onClose={onPaneclick}
             />
@@ -685,8 +699,8 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                { 
-                  label: "Add comment", 
+                {
+                  label: t.addComment,
                   onClick: () =>  {
                     const position = menu.data.position;
                     const newTextboxNode = {

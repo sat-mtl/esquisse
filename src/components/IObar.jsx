@@ -28,10 +28,10 @@ export function IObar() {
         <aside className="tab-content">
             <ProtocolFilter tools={deviceList} activeProtocol={activeProtocol} onSelect={setActiveProtocol} />
             <div className="tab-nodes">
-                <SidebarCustomDevice />
                 {filtered.map(device => (
                     <SidebarNode key={device.name} toolObj={device} />
                 ))}
+                <SidebarCustomDevice />
             </div>
         </aside>
     );

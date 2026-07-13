@@ -1,5 +1,22 @@
 @import url('./xy-theme.css');
 
+::view-transition-old(root) {
+  animation: 200ms ease forwards lang-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 320ms ease forwards lang-fade-in;
+}
+
+@keyframes lang-fade-out {
+  to { opacity: 0; transform: translateY(-4px); }
+}
+
+@keyframes lang-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* taken from sat-website theme/styles */
 :root {
 	--xxs: 8px;
@@ -350,6 +367,44 @@ a {
 .top-menu-bar-new:disabled:hover {
   background: var(--color-white) !important;
   color: var(--color-black) !important;
+}
+
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+
+.lang-opt {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #aaa;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.lang-opt:hover {
+  color: var(--color-black);
+}
+
+.lang-opt--active {
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+.lang-sep {
+  font-size: 0.65rem;
+  color: #ccc;
+  pointer-events: none;
 }
 
 .dndflow {
@@ -861,6 +916,7 @@ a {
 }
 
 .modal-body {
+	position: relative;
 	margin: 80px;
 	margin-right: 30%;
 	padding: 24px;
@@ -971,9 +1027,30 @@ a {
 }
 .landing-actions {
 	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 10px;
+}
+
+.landing-actions-row {
+	display: flex;
 	align-items: center;
 	gap: 16px;
-	flex-wrap: wrap;
+}
+
+.landing-lang-switch {
+	background: none !important;
+	border: none !important;
+	color: var(--color-grey) !important;
+	font-size: 0.85rem !important;
+	padding: 0 !important;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.landing-lang-switch:hover {
+	color: var(--color-black) !important;
+	background: none !important;
 }
 .landing-actions .landing-note {
 	font-size: 0.85rem;
@@ -1046,8 +1123,12 @@ a {
 	}
 
 	.landing-actions {
-		justify-content: center;
+		align-items: center;
 		padding-top: 28px;
+	}
+
+	.landing-actions-row {
+		justify-content: center;
 	}
 
 	.landing-actions .landing-note {
@@ -1097,7 +1178,19 @@ a {
 
 }
 
-#sidebar-custom-node{
-	text-align: center;
-	color: #4a46ff;
+.dndnode--add {
+  cursor: pointer !important;
+}
+
+.custom-node-plus {
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--color-grey);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dndnode--add:hover .custom-node-plus {
+  color: var(--color-blue);
 }

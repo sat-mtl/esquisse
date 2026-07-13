@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useDnD } from "../DnDContext.jsx";
 import { useTapAdd } from "../TapAddContext.jsx";
+import { useLang, localizedName, localizedDesc } from "../LangContext.jsx";
 
 const isTouchDevice = () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
 export function SidebarNode({toolObj}){
     const[descr, setDescr] = useState(null);
     const tapAddRef = useTapAdd();
+    const { lang } = useLang();
 
     //Description box appears when mouse is inside node
     const handleMouseEnter = (e) => {
@@ -61,9 +63,9 @@ export function SidebarNode({toolObj}){
                     left: descr.x - 50,
                     top: descr.y,
                 }}>
-                    <b>{toolObj.name} </b>
+                    <b>{localizedName(toolObj, lang)} </b>
                      <br />
-                    {toolObj.description}
+                    {localizedDesc(toolObj, lang)}
                 </div>
             )}
         </>

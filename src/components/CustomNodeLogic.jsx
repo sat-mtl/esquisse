@@ -1,17 +1,8 @@
 import React, { useState } from "react";
-import SandboxNode from "./SandboxNode.jsx";
 import { useSelectionContext } from "../SelectionContext.jsx";
-import { useDnD } from "../DnDContext.jsx";
 import { useFlowContext } from "../FlowContext.jsx";
-
-export function CustomNodeButton() {
-    const [, , , , isShowModal, setIsShowModal] = useSelectionContext();
-    return (
-        <button type="button" onClick={() => setIsShowModal("tool")}>
-            Custom Node
-        </button>
-    );
-}
+import { useLang } from "../LangContext.jsx";
+import { useTapAdd } from "../TapAddContext.jsx";
 
 function unpackProtocols(str) {
     if (!str.trim()) return [];
@@ -19,21 +10,13 @@ function unpackProtocols(str) {
 }
 
 export function CustomNodeEditModal() {
-    const [selectedNode, setSelectedNode, , , isShowModal, setIsShowModal, custDropInfo, setCustDropInfo] = useSelectionContext();
-    const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange] = useFlowContext();
+    const [selectedNode, setSelectedNode, , , isShowModal, setIsShowModal, custDropInfo] = useSelectionContext();
+    const [nodes, setNodes] = useFlowContext();
     const [ioType, setIoType] = useState("Both");
+    const { t } = useLang();
+    const tapAddRef = useTapAdd();
 
     const isDevice = isShowModal === "device";
-
-    const addCustomNode = (custObj) => {
-        const [position, id] = custDropInfo;
-        setNodes(nds => nds.concat({
-            id: "dndNode_" + id,
-            type: "sandbox",
-            position,
-            data: { toolObj: custObj },
-        }));
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -57,52 +40,65 @@ export function CustomNodeEditModal() {
 
         setSelectedNode(customNode);
         setIsShowModal(null);
-        addCustomNode(customNode);
+
+        if (custDropInfo) {
+            // came from a drag — place at drop position
+            const [position, id] = custDropInfo;
+            setNodes(nds => nds.concat({
+                id: "dndNode_" + id,
+                type: "sandbox",
+                position,
+                data: { toolObj: customNode },
+            }));
+        } else {
+            // came from a click — place at canvas center
+            tapAddRef.current?.("sandbox", customNode);
+        }
     };
 
     return (
         <div className="modal-wrapper">
             <div className="modal-body">
                 <h1 className="landing-title">
-                    {isDevice ? "Custom Device" : "Custom Node"}
+                    {isDevice ? t.customHardwareTitle : t.customSoftwareTitle}
                 </h1>
-                <button type="button" onClick={() => setIsShowModal(null)}>Close</button>
+                <button type="button" onClick={() => setIsShowModal(null)}>{t.customClose}</button>
 
                 <form className="custom-form" onSubmit={handleSubmit} method="POST">
-                    <label htmlFor="objName">{isDevice ? "Device name" : "Tool name"}</label>
+                    <label htmlFor="objName">{isDevice ? t.customHardwareName : t.customSoftwareName}</label>
                     <input type="text" id="objName" name="objName"
                         pattern="^[a-zA-Z0-9!?&#%$\. ]*$"
-                        title="Only characters, numbers, and basic punctuation" required />
+                        title={t.inputValidation} required />
 
-                    <label htmlFor="desc">Description</label>
+                    <label htmlFor="desc">{t.customDescription}</label>
                     <input type="text" id="desc" name="desc"
                         pattern="^[a-zA-Z0-9!?&%$\. ]*$"
-                        title="Only characters, numbers, and basic punctuation" required />
+                        title={t.inputValidation} required />
 
                     {isDevice && (
                         <>
-                            <label htmlFor="ioType">Direction</label>
+                            <label htmlFor="ioType">{t.customDirection}</label>
                             <select id="ioType" value={ioType} onChange={e => setIoType(e.target.value)}>
-                                <option value="Both">Input &amp; Output</option>
-                                <option value="Input">Input only (sends signal)</option>
-                                <option value="Output">Output only (receives signal)</option>
+                                <option value="Both">{t.customDirectionBoth}</option>
+                                <option value="Input">{t.customDirectionInput}</option>
+                                <option value="Output">{t.customDirectionOutput}</option>
                             </select>
                         </>
                     )}
 
-                    <p>List protocols separated by commas. Connections are case-sensitive.</p>
+                    <p>{t.customProtocolsHint}</p>
 
-                    <label htmlFor="inputField">Input protocols</label>
+                    <label htmlFor="inputField">{t.customInputProtocols}</label>
                     <input type="text" id="inputField" name="inputField"
                         placeholder="OSC, MIDI, Audio Stream, ..."
                         pattern="^[a-zA-Z, ]*$" />
 
-                    <label htmlFor="outputField">Output protocols</label>
+                    <label htmlFor="outputField">{t.customOutputProtocols}</label>
                     <input type="text" id="outputField" name="outputField"
                         placeholder="OSC, MIDI, Audio Stream, ..."
                         pattern="^[a-zA-Z, ]*$" />
 
-                    <button type="submit">Add to canvas</button>
+                    <button type="submit">{t.customSubmit}</button>
                 </form>
             </div>
         </div>
@@ -112,32 +108,33 @@ export function CustomNodeEditModal() {
 
 export function SidebarCustomNode() {
     const [descr, setDescr] = useState(null);
-    const [type, setType, obj, setObj] = useDnD();
+    const [, , , , , setIsShowModal, , setCustDropInfo] = useSelectionContext();
+    const { t } = useLang();
 
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         setDescr({ x: rect.left, y: rect.top + rect.height / 2 + 50 });
     };
 
-    const onDragStart = (event) => {
-        setType("custSandbox");
-        setObj(null);
-        event.dataTransfer.effectAllowed = "move";
+    const handleClick = () => {
+        setCustDropInfo(null);
+        setIsShowModal("tool");
         setDescr(null);
     };
 
     return (
         <>
-            <div className="dndnode input" id="sidebar-custom-node"
+            <div
+                className="dndnode input dndnode--add"
+                onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={() => setDescr(null)}
-                onDragStart={onDragStart}
-                draggable>
-                <h3>Custom Node</h3>
+            >
+                <span className="custom-node-plus">+</span>
             </div>
             {descr && (
                 <div className="popup" style={{ left: descr.x - 50, top: descr.y }}>
-                    <p>Add a custom software tool. Drag out to use.</p>
+                    <p>{t.customSoftwareTooltip}</p>
                 </div>
             )}
         </>
@@ -147,32 +144,33 @@ export function SidebarCustomNode() {
 
 export function SidebarCustomDevice() {
     const [descr, setDescr] = useState(null);
-    const [type, setType, obj, setObj] = useDnD();
+    const [, , , , , setIsShowModal, , setCustDropInfo] = useSelectionContext();
+    const { t } = useLang();
 
     const handleMouseEnter = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         setDescr({ x: rect.left, y: rect.top + rect.height / 2 + 50 });
     };
 
-    const onDragStart = (event) => {
-        setType("custDevice");
-        setObj(null);
-        event.dataTransfer.effectAllowed = "move";
+    const handleClick = () => {
+        setCustDropInfo(null);
+        setIsShowModal("device");
         setDescr(null);
     };
 
     return (
         <>
-            <div className="dndnode input"
+            <div
+                className="dndnode input dndnode--add"
+                onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={() => setDescr(null)}
-                onDragStart={onDragStart}
-                draggable>
-                <h3>Custom Device</h3>
+            >
+                <span className="custom-node-plus">+</span>
             </div>
             {descr && (
                 <div className="popup" style={{ left: descr.x - 50, top: descr.y }}>
-                    <p>Add a custom hardware device. Drag out to use.</p>
+                    <p>{t.customHardwareTooltip}</p>
                 </div>
             )}
         </>
