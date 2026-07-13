@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from "react";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { useSelectionContext } from "../SelectionContext.jsx";
+import { useLang, localizedName } from "../LangContext.jsx";
 
 const isTouchDevice = () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
@@ -17,13 +18,13 @@ export default memo(({ data, isConnectable, selected }) => {
   const [selectedNode, setSelectedNode, hoveredNode, setHoveredNode] =
     useSelectionContext();
   const { deleteElements } = useReactFlow();
+  const { lang, t } = useLang();
 
   if (data.toolObj == null) {
-    //check for broken reference
     return (
       <>
-        <p>There is an error displaying this node.</p>
-        <p>No toolObj passed as input</p>
+        <p>{t.nodeError}</p>
+        <p>{t.nodeErrorDetail}</p>
       </>
     );
   }
@@ -77,7 +78,7 @@ export default memo(({ data, isConnectable, selected }) => {
             alt="/logosat.png"
           />}
 
-          <h5> {obj.name} </h5>
+          <h5> {localizedName(obj, lang)} </h5>
         </div>
       );
     }
@@ -103,7 +104,7 @@ export default memo(({ data, isConnectable, selected }) => {
             isConnectable={isConnectable}
           />
           
-          <h5> {obj.name} </h5>
+          <h5> {localizedName(obj, lang)} </h5>
         </div>
       );
     }
@@ -132,7 +133,7 @@ export default memo(({ data, isConnectable, selected }) => {
         position={Position.Right}
         isConnectable={isConnectable}
       />
-      <h5>{data.toolObj.name}</h5>
+      <h5>{localizedName(data.toolObj, lang)}</h5>
     </div>
   );
 });

@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { Toolbar } from "./Toolbar.jsx";
 import { Templatebar } from "../Templatebar.jsx";
 import { IObar } from "./IObar.jsx";
-
-//Add here to create additional tabs
-const tabs = [
-    {title: "TOOLS", content: <Toolbar />},
-    { title: "I/O DEVICES", content: <IObar />},
-    { title: "TEMPLATES", content: <Templatebar /> }
-]
+import { useLang } from "../LangContext.jsx";
 
 export function SidebarTabs({ activeTab, setActiveTab }) {
+    const { t } = useLang();
+
+    const tabs = [
+        { title: t.tabSoftware, content: <Toolbar /> },
+        { title: t.tabHardware, content: <IObar /> },
+        { title: t.tabTemplates, content: <Templatebar /> },
+    ];
+
     return (
         <div className="top-section-sidebar">
             <div className="menu-bar">

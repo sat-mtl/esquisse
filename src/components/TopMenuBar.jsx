@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { useLang } from "../LangContext.jsx";
+import { LangSwitcher } from "./LangSwitcher.jsx";
 
 export function TopMenuBar({
   onDownload,
@@ -12,6 +14,7 @@ export function TopMenuBar({
   hasNodes,
 }) {
   const fileInputRef = useRef(null);
+  const { t, lang, setLang } = useLang();
 
   return (
     <div className="top-menu-bar">
@@ -29,7 +32,7 @@ export function TopMenuBar({
             aria-label="Browse and load diagram"
           />
           <button type="button" onClick={onInstructions} className="top-menu-bar-instructions">
-            INSTRUCTIONS
+            {t.instructions}
           </button>
           <button
             type="button"
@@ -38,29 +41,30 @@ export function TopMenuBar({
             className="top-menu-bar-new"
             title="Clear canvas"
           >
-            NEW
+            {t.newFile}
           </button>
           <button type="button" onClick={onDownload}>
-            DOWNLOAD
+            {t.download}
           </button>
           <button type="button" onClick={() => fileInputRef.current?.click()}>
-            UPLOAD
+            {t.upload}
           </button>
         </div>
+        <LangSwitcher />
       </div>
       {hasNodes && (
         <div className="top-menu-bar-flow-meta">
           <input
             type="text"
             className="flow-name-input"
-            placeholder="Flow name…"
+            placeholder={t.flowNamePlaceholder}
             value={flowName}
             onChange={e => setFlowName(e.target.value)}
           />
           <input
             type="text"
             className="flow-description-input"
-            placeholder="Description…"
+            placeholder={t.flowDescriptionPlaceholder}
             value={flowDescription}
             onChange={e => setFlowDescription(e.target.value)}
           />

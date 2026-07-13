@@ -59,7 +59,9 @@ export function getMatchingIO(toolA, toolB) {
 
 export const ComputerObj = {
   name: "Computer",
+  nameFr: "Ordinateur",
   description: "A standard computer",
+  descriptionFr: "Un ordinateur standard",
   logoFile: "./images/computer.png",
   input: ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
   output: ["MIDI", "Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
@@ -68,7 +70,9 @@ export const ComputerObj = {
 
 export const RouterObj = {
   name: "Router",
+  nameFr: "Routeur",
   description: "A WiFi-capable router",
+  descriptionFr: "Un routeur WiFi",
   logoFile: "./images/router.jpg",
   input: ["WiFi", "Wired"],
   output: ["WiFi", "Wired"],
@@ -77,7 +81,9 @@ export const RouterObj = {
 
 export const NetworkSwitchObj = {
   name: "Network Switch",
+  nameFr: "Commutateur réseau",
   description: "A network switch",
+  descriptionFr: "Un commutateur réseau",
   logoFile: "./images/switch.jpg",
   input: ["WiFi", "Wired"],
   output: ["WiFi", "Wired"],
@@ -86,7 +92,9 @@ export const NetworkSwitchObj = {
 
 export const ProjectorObj = {
   name: "Projector",
+  nameFr: "Projecteur",
   description: "A projector",
+  descriptionFr: "Un projecteur",
   logoFile: "./images/projector.jpg",
   input: ["WiFi", "Bluetooth", "Video Stream", "Images", "Wired"],
   output: [],
@@ -96,7 +104,9 @@ export const ProjectorObj = {
 
 export const MidiControllerObj = {
   name: "MIDI Controller",
+  nameFr: "Contrôleur MIDI",
   description: "A MIDI microcontroller",
+  descriptionFr: "Un contrôleur MIDI",
   logoFile: "./images/midicontroller.jpg",
   input: ["Audio Stream"],
   output: ["MIDI"],
@@ -105,7 +115,9 @@ export const MidiControllerObj = {
 
 export const IMUMicrocontrollerObj = {
   name: "IMU Microcontroller",
+  nameFr: "Microcontrôleur IMU",
   description: "An IMU-capable Microcontroller",
+  descriptionFr: "Un microcontrôleur avec capteur IMU",
   logoFile: "./images/imu.jpg",
   input: ["Gestural Data", "Accelerometer Data"],
   output: ["WiFi"],
@@ -114,6 +126,7 @@ export const IMUMicrocontrollerObj = {
 
 export const OrbbecFemtoObj = {
   name: "Orbbec Femto Mega",
+  descriptionFr: "Une caméra avec capacités 3D et IMU.",
   description: "A camera with 3D and IMU capabilities.",
   logoFile: "./images/femtomega.jpg",
   IOType: "Input",
@@ -126,6 +139,7 @@ export const RaspberryPiObj = {
   name: "Raspberry Pi",
   logoFile: "./images/raspberry pi.jpg",
   description: "A raspberry Pi microcontroller running SAT OS",
+  descriptionFr: "Un microcontrôleur Raspberry Pi sous SAT OS",
   input: ["Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
   output: ["Audio Stream", "Audio File", "Video Stream", "Video File", "ASCII", "Mouse Input", "Gestural Data", "OSC", "Images", "WiFi", "Bluetooth"],
   docLink: "https://www.raspberrypi.com/"
@@ -133,8 +147,10 @@ export const RaspberryPiObj = {
 
 export const HeadphoneObj = {
   name: "Headphones",
+  nameFr: "Casque audio",
   logoFile: "./images/headphones.jpg",
   description: "An ordinary pair of headphones",
+  descriptionFr: "Un casque audio ordinaire",
   input: ["Audio Stream", "Bluetooth"],
   output: [],
   IOType: "Output",
@@ -142,9 +158,10 @@ export const HeadphoneObj = {
 }
 
 export const MicObj = {
-  name: "Microphone", 
-  logoFile: "./images/microphone.jpg", 
+  name: "Microphone",
+  logoFile: "./images/microphone.jpg",
   description: "An ordinary microphone",
+  descriptionFr: "Un microphone ordinaire",
   input: [],
   logoScale: 1.5,
   output: ["Audio Stream"],
@@ -154,8 +171,10 @@ export const MicObj = {
 
 export const CameraObj = {
   name: "Camera",
+  nameFr: "Caméra",
   logoFile: "./images/camera.png",
   description: "An ordinary camera",
+  descriptionFr: "Une caméra ordinaire",
   input: [],
   output: ["Video Stream", "Depth Data"],
   IOType: "Input",
@@ -164,8 +183,10 @@ export const CameraObj = {
 
 export const KeyboardObj = {
   name: "Keyboard",
+  nameFr: "Clavier",
   logoFile: "./images/keyboard.jpg",
   description: "A computer keyboard",
+  descriptionFr: "Un clavier d'ordinateur",
   input: [],
   output: ["ASCII"], 
   IOType: "Input",
@@ -174,8 +195,10 @@ export const KeyboardObj = {
 
 export const MouseObj = {
   name: "Mouse",
+  nameFr: "Souris",
   logoFile: "./images/mouse.jpg",
   description: "A computer mouse",
+  descriptionFr: "Une souris d'ordinateur",
   input: [],
   output: ["Mouse Data"],
   IOType: "Input", 
@@ -184,9 +207,11 @@ export const MouseObj = {
 }
 
 export const ScreenObj = {
-  name: "Screen", 
+  name: "Screen",
+  nameFr: "Écran",
   logoFile: "./images/monitor.jpg",
   description: "An ordinary monitor or TV screen",
+  descriptionFr: "Un écran ou téléviseur ordinaire",
   input: ["Video Stream"],
   output: [],
   logoScale: 1.5,
@@ -196,8 +221,10 @@ export const ScreenObj = {
 
 export const SpeakerObj = {
   name: "Speaker",
+  nameFr: "Haut-parleur",
   logoFile: "./images/speaker.png",
   description: "An ordinary speaker",
+  descriptionFr: "Un haut-parleur ordinaire",
   input: ["Bluetooth", "Audio Stream"],
   output: [],
   IOType: "Output",
@@ -209,6 +236,7 @@ export const AudiodiceObj = {
   logoFile: "./images/audiodice.png",
 //   logoScale: 1.5,
   description: "One of SAT's spatial audio speakers. Usually set up in an array to spatialize audio.",
+  descriptionFr: "Un haut-parleur audio spatial de la SAT. Généralement déployé en réseau pour spatialiser le son.",
   input: ["Audio Stream"],
   output: [],
   IOType: "Output",
@@ -219,9 +247,11 @@ export const AudiodiceObj = {
 
 export const HapticFloorObj = {
   name: "Haptic Floor",
+  nameFr: "Plancher haptique",
   logoFile: "./images/HapticFloor.png",
   logoScale: 1.4,
   description: "A self-moving haptic floor created at SAT that generates vibrations and bends under your feet.",
+  descriptionFr: "Un plancher haptique mobile créé à la SAT qui génère des vibrations et se déforme sous les pieds.",
   input: ["OSC"],
   output: [],
   IOType: "Output",
@@ -236,6 +266,7 @@ export const LeapMotionObj = {
     logoFile: "images/leapmotion_logo.png",
     logoScale: 1.5,
     description: "Sensor device that supports hand and finger motions as input.",
+    descriptionFr: "Capteur qui détecte les mouvements des mains et des doigts.",
     input: [],
     output: ["Gestural Data", "OSC"],
     IOType: "Input",

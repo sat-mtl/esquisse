@@ -7,6 +7,7 @@ import {
 } from "@xyflow/react";
 
 import { Dropdown } from "./Dropdown.jsx";
+import { useLang } from "../LangContext.jsx";
 
 export default function CustomEdge({
   id,
@@ -22,6 +23,7 @@ export default function CustomEdge({
 }) {
 
   const { setEdges } = useReactFlow();
+  const { t } = useLang();
 
   const [path, labelX, labelY] = getBezierPath({
     sourceX,
@@ -73,6 +75,7 @@ export default function CustomEdge({
               options={data?.sharedInput || []}
               value={data?.protocol}
               onChange={handleChange}
+              placeholder={t.selectProtocol}
             />
           </div>
         </EdgeLabelRenderer>

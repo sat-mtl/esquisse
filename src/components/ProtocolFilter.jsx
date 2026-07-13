@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useLang } from "../LangContext.jsx";
 
 export function ProtocolFilter({ tools, activeProtocol, onSelect }) {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
+    const { t } = useLang();
 
     const protocols = Array.from(
         new Set(tools.flatMap(t => [...(t.input || []), ...(t.output || [])]))
@@ -14,7 +16,7 @@ export function ProtocolFilter({ tools, activeProtocol, onSelect }) {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    const label = activeProtocol || "All protocols";
+    const label = activeProtocol || t.allProtocols;
 
     return (
         <div className="protocol-filter" ref={ref}>
@@ -33,7 +35,7 @@ export function ProtocolFilter({ tools, activeProtocol, onSelect }) {
                     <div
                         className={`protocol-option${!activeProtocol ? " active" : ""}`}
                         onClick={() => { onSelect(null); setOpen(false); }}
-                    >All protocols</div>
+                    >{t.allProtocols}</div>
                     {protocols.map(p => (
                         <div
                             key={p}

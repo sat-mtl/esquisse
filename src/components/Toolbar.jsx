@@ -31,10 +31,10 @@ export function Toolbar() {
         <aside className="tab-content">
             <ProtocolFilter tools={toolList} activeProtocol={activeProtocol} onSelect={setActiveProtocol} />
             <div className="tab-nodes">
-                <SidebarCustomNode />
                 {filtered.map(tool => (
                     <SidebarNode key={tool.name} toolObj={tool} />
                 ))}
+                <SidebarCustomNode />
             </div>
         </aside>
     );
