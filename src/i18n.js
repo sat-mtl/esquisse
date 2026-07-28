@@ -13,8 +13,8 @@ export const strings = {
     flowNamePlaceholder: "Nom du schéma…",
     flowDescriptionPlaceholder: "Description…",
 
-    // Protocol filter / edge dropdown
-    allProtocols: "Tous les protocoles",
+    // Search / edge dropdown
+    searchPlaceholder: "Rechercher… (ex. in:osc, out:midi)",
     selectProtocol: "choisir un protocole",
 
     // ReactFlow Controls tooltips
@@ -93,7 +93,7 @@ export const strings = {
     flowNamePlaceholder: "Flow name…",
     flowDescriptionPlaceholder: "Description…",
 
-    allProtocols: "All protocols",
+    searchPlaceholder: "Search… (e.g. in:osc, out:midi)",
     selectProtocol: "select protocol",
 
     // ReactFlow Controls tooltips
