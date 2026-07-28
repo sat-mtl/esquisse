@@ -506,14 +506,16 @@ a {
 	box-shadow: 0 0 0 3px rgba(74, 70, 255, 0.18);
 }
 
-/* Protocol filter pills — spans full grid width */
-.protocol-filter {
+/* Tool/template search input — spans full grid width */
+.tool-search {
+	width: 100%;
 	padding: 0 0 8px;
-	position: relative;
+	grid-column: 1 / -1;
 }
 
-.protocol-select-btn {
+.tool-search input {
 	width: 100%;
+	box-sizing: border-box;
 	padding: 5px 10px;
 	font-size: 11px;
 	font-family: "DM Sans", sans-serif;
@@ -522,41 +524,13 @@ a {
 	border: 1px solid rgba(255, 255, 255, 0.5);
 	background: transparent;
 	color: var(--color-white);
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 6px;
 }
-.protocol-select-btn.open {
-	background: rgba(255,255,255,0.15);
+.tool-search input::placeholder {
+	color: rgba(255, 255, 255, 0.5);
 }
-
-.protocol-dropdown {
-	position: absolute;
-	top: calc(100% - 4px);
-	left: 0;
-	right: 0;
-	background: var(--color-blue);
-	border: 1px solid rgba(255,255,255,0.3);
-	border-radius: 10px;
-	overflow-y: auto;
-	max-height: 200px;
-	z-index: 100;
-	box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-
-.protocol-option {
-	padding: 6px 12px;
-	font-size: 11px;
-	font-family: "DM Sans", sans-serif;
-	color: rgba(255,255,255,0.8);
-	cursor: pointer;
-}
-.protocol-option:hover,
-.protocol-option.active {
-	background: rgba(255,255,255,0.15);
-	color: var(--color-white);
+.tool-search input:focus {
+	outline: none;
+	background: rgba(255, 255, 255, 0.15);
 }
 
 /* Connection failure toast */
