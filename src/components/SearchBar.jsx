@@ -11,6 +11,7 @@ export function SearchBar({ query, onChange }) {
                 value={query}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={t.searchPlaceholder}
+                aria-label={t.searchPlaceholder}
             />
             {query && (
                 <button
