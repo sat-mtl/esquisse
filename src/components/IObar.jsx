@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { SidebarNode } from "./SidebarNode.jsx";
 import { SidebarCustomDevice } from "./CustomNodeLogic.jsx";
-import { ProtocolFilter } from "./ProtocolFilter.jsx";
+import { filterTools } from "../filterTools.js";
+import { useLang } from "../LangContext.jsx";
 import * as tools from "../ToolObjects.js";
 
 const deviceList = [
@@ -17,16 +18,14 @@ const deviceList = [
     return a.name.localeCompare(b.name);
 });
 
-export function IObar() {
-    const [activeProtocol, setActiveProtocol] = useState(null);
+export function IObar({ query }) {
+    const { t, lang } = useLang();
 
-    const filtered = activeProtocol
-        ? deviceList.filter(t => t.input?.includes(activeProtocol) || t.output?.includes(activeProtocol))
-        : deviceList;
+    const filtered = filterTools(deviceList, query, { lang });
 
     return (
         <aside className="tab-content">
-            <ProtocolFilter tools={deviceList} activeProtocol={activeProtocol} onSelect={setActiveProtocol} />
+            {filtered.length === 0 && <p className="tab-empty">{t.noResults}</p>}
             <div className="tab-nodes">
                 {filtered.map(device => (
                     <SidebarNode key={device.name} toolObj={device} />
