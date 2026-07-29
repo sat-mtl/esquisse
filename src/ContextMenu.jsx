@@ -11,7 +11,7 @@ export default function ContextMenu({ top, left, right, bottom, actions = [], on
                 <div
                     key={i}
                     className={`context-menu-item${danger ? " context-menu-item--danger" : ""}`}
-                    onClick={() => { onClick(); onClose?.(); }}
+                    onClick={(e) => { onClick(e); onClose?.(); }}
                 >
                     {label}
                 </div>

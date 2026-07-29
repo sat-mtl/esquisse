@@ -2,14 +2,35 @@ import React from "react";
 import { useConnection } from "@xyflow/react";
 import { canConnect } from "../ToolObjects.js";
 
-export default ({ fromX, fromY, toX, toY, fromNode, toNode }) => {
-  const { fromHandle } = useConnection();
+export default ({ fromX, fromY, toX, toY, fromNode, toNode, failReasonRef }) => {
+  const { fromHandle, toHandle } = useConnection();
 
-  const isValid = toNode
-    ? canConnect(fromNode.data.toolObj, toNode.data.toolObj)
-    : true;
+  // Same-type pairing (inlet-to-inlet or outlet-to-outlet) is always invalid,
+  // regardless of protocol overlap.
+  const sameTypeHandles = toHandle && toHandle.type === fromHandle.type;
 
-  const strokeColor = isValid ? fromHandle.id : "red";
+  /* React Flow normalizes the eventual connection's source/target by handle
+   * type, not by drag direction: starting from a "target" (input) handle and
+   * ending on a "source" (output) handle still produces an output->input
+   * edge under the hood. Mirror that here so the preview matches reality. */
+  const draggingFromInput = fromHandle.type === "target";
+  const outputNode = draggingFromInput ? toNode : fromNode;
+  const inputNode = draggingFromInput ? fromNode : toNode;
+
+  const isValid = !toNode
+    ? true
+    : sameTypeHandles
+      ? false
+      : canConnect(outputNode?.data.toolObj, inputNode?.data.toolObj);
+
+  /* isValidConnection (App.js) never runs for same-type pairs — React Flow's
+   * own strict-mode type check short-circuits before our callback fires — so
+   * this is the only place that can flag "direction" as the failure reason. */
+  if (failReasonRef) {
+    failReasonRef.current = !isValid && toNode ? (sameTypeHandles ? "direction" : "protocol") : null;
+  }
+
+  const strokeColor = isValid ? "var(--xy-connectionline-stroke-default, #b1b1b7)" : "red";
   const size = 4; // size of X arms
 
   return (
@@ -17,8 +38,8 @@ export default ({ fromX, fromY, toX, toY, fromNode, toNode }) => {
       <path
         fill="none"
         stroke={strokeColor}
-        strokeWidth={1}
-        className="animated"
+        strokeWidth={2}
+        className="connection-line-path"
         d={`M${fromX},${fromY} C ${fromX} ${toY} ${fromX} ${toY} ${toX},${toY}`}
       />
 

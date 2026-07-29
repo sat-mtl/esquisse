@@ -266,6 +266,15 @@ a {
 .react-flow__handle.source { background-color: var(--color-handle-source); }
 .react-flow__handle.target { background-color: var(--color-handle-target); }
 
+/* In-progress connection cable while dragging from a handle */
+.connection-line-path {
+	stroke-dasharray: 5;
+	animation: connection-dash 0.4s linear infinite;
+}
+@keyframes connection-dash {
+	to { stroke-dashoffset: -10; }
+}
+
 .top-menu-bar {
 	display: flex;
 	flex-direction: column;

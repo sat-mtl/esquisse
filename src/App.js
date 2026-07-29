@@ -88,7 +88,10 @@ const Flow = () => {
   const toastTimerRef = useRef(null);
   const connectFailReasonRef = useRef(null);
 
-  
+  const ConnectionLineWithReason = useCallback(
+    (props) => <ConnectionLine {...props} failReasonRef={connectFailReasonRef} />,
+    [],
+  );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -310,31 +313,35 @@ const Flow = () => {
   const onConnect = useCallback(
     (connection) => {
       connectCompletedRef.current = true;
-      const sourceNode = nodes.find(n => n.id === connection.source);
       const targetNode = nodes.find(n => n.id === connection.target);
-      
-      if (!sourceNode || !targetNode) return;
-      
-      const sharedInput = tools.getMatchingIO(
-        sourceNode.data.toolObj,
-        targetNode.data.toolObj
-      );
-      
-      if (!sharedInput) return;
+      if (!targetNode) return;
 
-      snapshot(nodes, edges);
-      setEdges((eds) =>
-        addEdge(
+      // Multi-connect: the actually-dragged source, plus any other selected
+      // nodes (Ctrl/Cmd-click to multi-select), all connect to the same target.
+      const sourceNodes = nodes.filter(
+        n => n.id !== targetNode.id && (n.id === connection.source || n.selected)
+      );
+
+      const newEdges = sourceNodes.reduce((eds, sourceNode) => {
+        const sharedInput = tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj);
+        if (!sharedInput) return eds;
+        return addEdge(
           addEndMarker({
-            ...connection,
+            source: sourceNode.id,
+            sourceHandle: connection.sourceHandle,
+            target: targetNode.id,
+            targetHandle: connection.targetHandle,
             type: "custom",
-            data: { 
-              sharedInput,
-              protocol: "" },
+            data: { sharedInput, protocol: "" },
           }),
           eds
-        )
-      );
+        );
+      }, edges);
+
+      if (newEdges === edges) return;
+
+      snapshot(nodes, edges);
+      setEdges(newEdges);
     },
     [nodes, edges, setEdges, snapshot],
   );
@@ -522,7 +529,6 @@ const Flow = () => {
       // Calculate the position of the context menu. We want to make sure it
       // doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       setMenu({
         type: "pane",
         data: {
@@ -531,11 +537,10 @@ const Flow = () => {
           right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
           bottom:
           event.clientY >= pane.height - 200 && pane.height - event.clientY,
-          position,
         }
       });
     },
-    [screenToFlowPosition],
+    [],
   )
 
   // Close context menu and deselect node when canvas is clicked
@@ -616,12 +621,13 @@ const Flow = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onInit={setRfInstance}
-          connectionLineComponent={ConnectionLine}
+          connectionLineComponent={ConnectionLineWithReason}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
           onPaneContextMenu={onPaneContextMenu}
           onPaneClick={onPaneclick}
           deleteKeyCode={null}
+          multiSelectionKeyCode={["Meta", "Control"]}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
@@ -637,12 +643,6 @@ const Flow = () => {
 
               if (!sourceNode || !targetNode)
                 return false;
-
-              // Drop on an output handle = wrong direction (output→output or input→output)
-              if (connection.targetHandle === "output") {
-                connectFailReasonRef.current = "direction";
-                return false;
-              }
 
               const valid = tools.canConnect(
                 sourceNode.data.toolObj,
@@ -701,8 +701,8 @@ const Flow = () => {
               actions={[
                 {
                   label: t.addComment,
-                  onClick: () =>  {
-                    const position = menu.data.position;
+                  onClick: (e) =>  {
+                    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
                     const newTextboxNode = {
                       id: "textbox_" + getId(),
                       type: "textbox",
