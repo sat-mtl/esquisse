@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { SidebarNode } from "./SidebarNode.jsx";
 import { SidebarCustomNode } from "./CustomNodeLogic.jsx";
-import { ProtocolFilter } from "./ProtocolFilter.jsx";
+import { filterTools } from "../filterTools.js";
+import { useLang } from "../LangContext.jsx";
 import * as tools from "../ToolObjects.js";
 
 const toolList = [
@@ -20,16 +21,14 @@ const toolList = [
     return a.name.localeCompare(b.name);
 });
 
-export function Toolbar() {
-    const [activeProtocol, setActiveProtocol] = useState(null);
+export function Toolbar({ query }) {
+    const { t, lang } = useLang();
 
-    const filtered = activeProtocol
-        ? toolList.filter(t => t.input?.includes(activeProtocol) || t.output?.includes(activeProtocol))
-        : toolList;
+    const filtered = filterTools(toolList, query, { lang });
 
     return (
         <aside className="tab-content">
-            <ProtocolFilter tools={toolList} activeProtocol={activeProtocol} onSelect={setActiveProtocol} />
+            {filtered.length === 0 && <p className="tab-empty">{t.noResults}</p>}
             <div className="tab-nodes">
                 {filtered.map(tool => (
                     <SidebarNode key={tool.name} toolObj={tool} />
