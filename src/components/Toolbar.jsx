@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { SidebarNode } from "./SidebarNode.jsx";
 import { SidebarCustomNode } from "./CustomNodeLogic.jsx";
-import { SearchBar } from "./SearchBar.jsx";
 import { filterTools } from "../filterTools.js";
 import { useLang } from "../LangContext.jsx";
 import * as tools from "../ToolObjects.js";
@@ -22,15 +21,13 @@ const toolList = [
     return a.name.localeCompare(b.name);
 });
 
-export function Toolbar() {
-    const [query, setQuery] = useState("");
+export function Toolbar({ query }) {
     const { lang } = useLang();
 
     const filtered = filterTools(toolList, query, { lang });
 
     return (
         <aside className="tab-content">
-            <SearchBar query={query} onChange={setQuery} />
             <div className="tab-nodes">
                 {filtered.map(tool => (
                     <SidebarNode key={tool.name} toolObj={tool} />

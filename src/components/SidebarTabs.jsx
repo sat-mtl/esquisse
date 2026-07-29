@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Toolbar } from "./Toolbar.jsx";
 import { Templatebar } from "../Templatebar.jsx";
 import { IObar } from "./IObar.jsx";
+import { SearchBar } from "./SearchBar.jsx";
 import { useLang } from "../LangContext.jsx";
 
 export function SidebarTabs({ activeTab, setActiveTab }) {
     const { t } = useLang();
+    const [query, setQuery] = useState("");
 
     const tabs = [
-        { title: t.tabSoftware, content: <Toolbar /> },
-        { title: t.tabHardware, content: <IObar /> },
-        { title: t.tabTemplates, content: <Templatebar /> },
+        { title: t.tabSoftware, content: <Toolbar query={query} /> },
+        { title: t.tabHardware, content: <IObar query={query} /> },
+        { title: t.tabTemplates, content: <Templatebar query={query} /> },
     ];
 
     return (
@@ -27,6 +29,7 @@ export function SidebarTabs({ activeTab, setActiveTab }) {
                 ))}
             </div>
             <div className="tab-wrapper">
+                <SearchBar query={query} onChange={setQuery} />
                 {tabs[activeTab].content}
             </div>
         </div>

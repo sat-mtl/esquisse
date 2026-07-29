@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { SidebarNode } from "./SidebarNode.jsx";
 import { SidebarCustomDevice } from "./CustomNodeLogic.jsx";
-import { SearchBar } from "./SearchBar.jsx";
 import { filterTools } from "../filterTools.js";
 import { useLang } from "../LangContext.jsx";
 import * as tools from "../ToolObjects.js";
@@ -19,15 +18,13 @@ const deviceList = [
     return a.name.localeCompare(b.name);
 });
 
-export function IObar() {
-    const [query, setQuery] = useState("");
+export function IObar({ query }) {
     const { lang } = useLang();
 
     const filtered = filterTools(deviceList, query, { lang });
 
     return (
         <aside className="tab-content">
-            <SearchBar query={query} onChange={setQuery} />
             <div className="tab-nodes">
                 {filtered.map(device => (
                     <SidebarNode key={device.name} toolObj={device} />
