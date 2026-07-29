@@ -15,6 +15,8 @@ export const strings = {
 
     // Search / edge dropdown
     searchPlaceholder: "Rechercher… (ex. in:osc, out:midi)",
+    clearSearch: "Effacer la recherche",
+    noResults: "Aucun résultat",
     selectProtocol: "choisir un protocole",
 
     // ReactFlow Controls tooltips
@@ -94,6 +96,8 @@ export const strings = {
     flowDescriptionPlaceholder: "Description…",
 
     searchPlaceholder: "Search… (e.g. in:osc, out:midi)",
+    clearSearch: "Clear search",
+    noResults: "No results",
     selectProtocol: "select protocol",
 
     // ReactFlow Controls tooltips

@@ -12,6 +12,16 @@ export function SearchBar({ query, onChange }) {
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={t.searchPlaceholder}
             />
+            {query && (
+                <button
+                    type="button"
+                    className="tool-search-clear"
+                    aria-label={t.clearSearch}
+                    onClick={() => onChange("")}
+                >
+                    ×
+                </button>
+            )}
         </div>
     );
 }

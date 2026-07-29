@@ -8,12 +8,13 @@ const templateContext = require.context('./templates', false, /\.json$/);
 const allTemplates = templateContext.keys().map(key => templateContext(key));
 
 export function Templatebar({ query }) {
-    const { lang } = useLang();
+    const { t, lang } = useLang();
 
     const filtered = filterTools(allTemplates, query, { lang });
 
     return (
         <div className="tab-content tab-content--templates">
+            {filtered.length === 0 && <p className="tab-empty">{t.noResults}</p>}
             {filtered.map((template, i) => (
                 <SidebarCompNode key={i} template={template} />
             ))}

@@ -9,7 +9,7 @@ export function filterTools(tools, query, { lang = "en" } = {}) {
             const match = token.match(PREFIX_RE);
             if (match) {
                 const [, dir, protocol] = match;
-                if (!protocol) return true; // "in:" / "out:" alone — no constraint, show everything
+                if (!protocol) return true;
                 const list = dir === "in" ? tool.input : tool.output;
                 return (list || []).some(p => p.toLowerCase().includes(protocol));
             }

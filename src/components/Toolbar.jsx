@@ -22,12 +22,13 @@ const toolList = [
 });
 
 export function Toolbar({ query }) {
-    const { lang } = useLang();
+    const { t, lang } = useLang();
 
     const filtered = filterTools(toolList, query, { lang });
 
     return (
         <aside className="tab-content">
+            {filtered.length === 0 && <p className="tab-empty">{t.noResults}</p>}
             <div className="tab-nodes">
                 {filtered.map(tool => (
                     <SidebarNode key={tool.name} toolObj={tool} />
