@@ -820,7 +820,6 @@ const Flow = () => {
           selectionMode={SelectionMode.Partial}
           selectNodesOnDrag={false}
           elevateNodesOnSelect={false}
-          elevateEdgesOnSelect={true}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
