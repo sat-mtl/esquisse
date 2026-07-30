@@ -266,6 +266,10 @@ a {
 	pointer-events: none !important;
 }
 
+.react-flow__edgelabel-renderer {
+	z-index: 3000;
+}
+
 /* In-progress connection cable while dragging from a handle */
 .connection-line-path {
 	stroke-dasharray: 5;

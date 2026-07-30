@@ -11,6 +11,9 @@ import {
   useNodesState,
   useEdgesState,
   SelectionMode,
+  reconnectEdge,
+  getBezierPath,
+  Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -66,7 +69,7 @@ const flowKey = 'saved-flow';
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition, deleteElements, getNodes } = useReactFlow();
+  const { screenToFlowPosition, deleteElements, getNodes, getInternalNode } = useReactFlow();
   const store = useStoreApi();
   const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
@@ -205,22 +208,35 @@ const Flow = () => {
         const targetNode = nodeById.get(edge.target);
         if (!sourceNode || !targetNode) return edge;
 
-        const sx = sourceNode.position.x + (sourceNode.measured?.width ?? 150);
-        const sy = sourceNode.position.y + (sourceNode.measured?.height ?? 40) / 2;
-        const tx = targetNode.position.x;
-        const ty = targetNode.position.y + (targetNode.measured?.height ?? 40) / 2;
-        const midX = (sx + tx) / 2;
-        const midY = (sy + ty) / 2;
+        const sourceInternal = getInternalNode(edge.source);
+        const targetInternal = getInternalNode(edge.target);
+        const sourceHandle = sourceInternal?.internals.handleBounds?.source?.[0];
+        const targetHandle = targetInternal?.internals.handleBounds?.target?.[0];
 
-        const inBox = midX >= minX && midX <= maxX && midY >= minY && midY <= maxY;
         const nodeBasedSelected = !!(sourceNode.selected || targetNode.selected);
+        if (!sourceHandle || !targetHandle) {
+          return edge.selected === nodeBasedSelected ? edge : { ...edge, selected: nodeBasedSelected };
+        }
+
+        const sourceX = sourceInternal.internals.positionAbsolute.x + sourceHandle.x + sourceHandle.width / 2;
+        const sourceY = sourceInternal.internals.positionAbsolute.y + sourceHandle.y + sourceHandle.height / 2;
+        const targetX = targetInternal.internals.positionAbsolute.x + targetHandle.x + targetHandle.width / 2;
+        const targetY = targetInternal.internals.positionAbsolute.y + targetHandle.y + targetHandle.height / 2;
+
+        const [, labelX, labelY] = getBezierPath({
+          sourceX, sourceY, targetX, targetY,
+          sourcePosition: Position.Right,
+          targetPosition: Position.Left,
+        });
+
+        const inBox = labelX >= minX && labelX <= maxX && labelY >= minY && labelY <= maxY;
         const nextSelected = inBox || nodeBasedSelected;
 
         return edge.selected === nextSelected ? edge : { ...edge, selected: nextSelected };
       }));
     });
     return unsubscribe;
-  }, [store, screenToFlowPosition, getNodes, setEdges]);
+  }, [store, screenToFlowPosition, getNodes, getInternalNode, setEdges]);
 
   // Undo/redo + delete keyboard shortcuts
   useEffect(() => {
@@ -709,7 +725,51 @@ const Flow = () => {
     snapshot(nodes, edges);
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
     setMenu({ type: null, data: null });
-  }, [nodes, edges, snapshot, setEdges]);    
+  }, [nodes, edges, snapshot, setEdges]);
+
+  // Drag an existing edge's endpoint onto empty canvas to delete it
+  const edgeReconnectSuccessfulRef = useRef(true);
+
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessfulRef.current = false;
+  }, []);
+
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessfulRef.current = true;
+    snapshot(nodes, edges);
+    setEdges(eds => {
+      // Dragging onto a pair that's already connected would create a
+      // duplicate edge — just drop the old one instead.
+      const isDuplicate = eds.some(
+        e => e.id !== oldEdge.id && e.source === newConnection.source && e.target === newConnection.target
+      );
+      if (isDuplicate) {
+        return eds.filter(e => e.id !== oldEdge.id);
+      }
+
+      // Recompute shared protocols for the new pair — reconnectEdge alone
+      // keeps the old edge's data, which would be stale for the new endpoint.
+      const sourceNode = nodes.find(n => n.id === newConnection.source);
+      const targetNode = nodes.find(n => n.id === newConnection.target);
+      const sharedInput = sourceNode && targetNode
+        ? tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj)
+        : null;
+
+      return reconnectEdge(
+        { ...oldEdge, data: { sharedInput, protocol: "" } },
+        newConnection,
+        eds
+      );
+    });
+  }, [nodes, edges, snapshot, setEdges]);
+
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessfulRef.current) {
+      snapshot(nodes, edges);
+      setEdges(eds => eds.filter(e => e.id !== edge.id));
+    }
+    edgeReconnectSuccessfulRef.current = true;
+  }, [nodes, edges, snapshot, setEdges]);
 
   return (
     <div className="dndflow">
@@ -744,6 +804,9 @@ const Flow = () => {
           onConnect={onConnect}
           onConnectStart={onConnectStart}
           onConnectEnd={onConnectEnd}
+          onReconnect={onReconnect}
+          onReconnectStart={onReconnectStart}
+          onReconnectEnd={onReconnectEnd}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onInit={setRfInstance}
@@ -757,6 +820,7 @@ const Flow = () => {
           selectionMode={SelectionMode.Partial}
           selectNodesOnDrag={false}
           elevateNodesOnSelect={false}
+          elevateEdgesOnSelect={true}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
