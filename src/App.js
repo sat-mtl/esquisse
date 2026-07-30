@@ -200,6 +200,40 @@ const Flow = () => {
     [nodes, edges, snapshot, setNodes, setEdges, setMenu],
   );
 
+  const cutNode = useCallback(() => {
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (!selectedNodes.length) return false;
+
+    copyNode(); // populates the clipboard with selected nodes + edges between them
+
+    const selectedEdges = edges.filter(e => e.selected);
+    snapshot(nodes, edges);
+    deleteElements({ nodes: selectedNodes, edges: selectedEdges });
+    return true;
+  }, [nodes, edges, copyNode, snapshot, deleteElements]);
+
+  const selectAll = useCallback(() => {
+    setNodes(nds => nds.map(n => n.selected ? n : { ...n, selected: true }));
+    setEdges(eds => eds.map(e => e.selected ? e : { ...e, selected: true }));
+  }, [setNodes, setEdges]);
+
+  const addComment = useCallback((flowPosition) => {
+    const textboxWidth = 200;
+    const textboxHeight = 100;
+    const newTextboxNode = {
+      id: "textbox_" + getId(),
+      type: "textbox",
+      position: {
+        x: flowPosition.x - textboxWidth / 2,
+        y: flowPosition.y - textboxHeight / 2,
+      },
+      data: { label: "" },
+      style: { width: textboxWidth, height: textboxHeight },
+    };
+    setNodes(nds => nds.concat(newTextboxNode));
+    setMenu({ type: null, data: null });
+  }, [setNodes, setMenu]);
+
   // Cmd/Ctrl +/- resizes selected comment(s)' text; returns false (and lets
   // the browser's native page-zoom happen instead) if no comment is selected.
   const resizeCommentFont = useCallback((delta) => {
@@ -290,6 +324,8 @@ const Flow = () => {
         if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(nodes, edges); return; }
         if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); redo(nodes, edges); return; }
         if (e.key === "c") { e.preventDefault(); copyNode(); return; }
+        if (e.key === "x") { if (cutNode()) e.preventDefault(); return; }
+        if (e.key === "a") { e.preventDefault(); selectAll(); return; }
         if (e.key === "v") {
           e.preventDefault();
           pasteNodes(screenToFlowPosition(lastMousePosRef.current));
@@ -306,6 +342,11 @@ const Flow = () => {
         deleteElements({ nodes: selectedNodes, edges: selectedEdges });
       }
 
+      if (e.key === "c" && !mod) {
+        e.preventDefault();
+        addComment(screenToFlowPosition(lastMousePosRef.current));
+      }
+
       // connectOnClick has no built-in way to cancel a started click-connection
       if (e.key === "Escape") {
         store.setState({ connectionClickStartHandle: null });
@@ -313,7 +354,7 @@ const Flow = () => {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store, resizeCommentFont]);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store, resizeCommentFont, addComment, cutNode, selectAll]);
 
   const onDrop = useCallback(
     (event) => {
@@ -975,23 +1016,7 @@ const Flow = () => {
                 }] : []),
                 {
                   label: t.addComment,
-                  onClick: (e) =>  {
-                    const clickPosition = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-                    const textboxWidth = 200;
-                    const textboxHeight = 100;
-                    const newTextboxNode = {
-                      id: "textbox_" + getId(),
-                      type: "textbox",
-                      position: {
-                        x: clickPosition.x - textboxWidth / 2,
-                        y: clickPosition.y - textboxHeight / 2,
-                      },
-                      data: { label: "" },
-                      style: { width: textboxWidth, height: textboxHeight },
-                    };
-                    setNodes(nds => nds.concat(newTextboxNode));
-                    setMenu({ type: null, data: null})
-                  },
+                  onClick: (e) => addComment(screenToFlowPosition({ x: e.clientX, y: e.clientY })),
                 },
               ]}
               onClose={onPaneclick}
