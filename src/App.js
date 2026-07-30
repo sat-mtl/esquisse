@@ -66,6 +66,10 @@ const addEndMarker = (edge) => ({
 
 const flowKey = 'saved-flow';
 
+// Comment box color palette — null = default (white). Derived from
+// --color-blue and the app's existing greys, not generic sticky-note pastels.
+const COMMENT_COLORS = [null, "#c7c7d1", "#a9c2f7", "#c7bdf7"];
+
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
@@ -184,6 +188,22 @@ const Flow = () => {
     },
     [nodes, edges, snapshot, setNodes, setEdges, setMenu],
   );
+
+  // Cmd/Ctrl +/- resizes selected comment(s)' text; returns false (and lets
+  // the browser's native page-zoom happen instead) if no comment is selected.
+  const resizeCommentFont = useCallback((delta) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected && n.type === "textbox").map(n => n.id));
+    if (!selectedIds.size) return false;
+
+    snapshot(nodes, edges);
+    setNodes(nds => nds.map(n => {
+      if (!selectedIds.has(n.id)) return n;
+      const current = n.data.fontSize ?? 12;
+      const next = Math.min(48, Math.max(6, current + delta));
+      return { ...n, data: { ...n.data, fontSize: next } };
+    }));
+    return true;
+  }, [nodes, edges, snapshot, setNodes]);
 
   /* Box-select only ever selects an edge as a side effect of its connected
    * NODES being touched by the drag rectangle (React Flow's own behavior) —
@@ -717,6 +737,12 @@ const Flow = () => {
     setMenu({ type: null, data: null });
   }, [nodes, edges, snapshot, setNodes, setMenu]);
 
+  const setNodeColor = useCallback((id, color) => {
+    snapshot(nodes, edges);
+    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, color } } : n));
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
+
   const deleteNode = useCallback((id) => {
         const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
         if (!selectedIds.has(id)) selectedIds.add(id); // always include right-clicked node
@@ -868,6 +894,13 @@ const Flow = () => {
                 { label: t.copyNode, onClick: () => copyNode(menu.data.id) },
                 ...(nodes.find(n => n.id === menu.data.id)?.type === "textbox"
                   ? [
+                    {
+                      swatches: COMMENT_COLORS.map(color => ({
+                        color,
+                        active: (nodes.find(n => n.id === menu.data.id)?.data.color || null) === color,
+                        onClick: () => setNodeColor(menu.data.id, color),
+                      })),
+                    },
                     { label: t.bringToFront, onClick: () => bringToFront(menu.data.id) },
                     { label: t.sendToBack, onClick: () => sendToBack(menu.data.id) },
                   ]
