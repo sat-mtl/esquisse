@@ -260,11 +260,16 @@ a {
 
 .react-flow__handle.source,
 .react-flow__handle.target {
-	width: 9px;
-	height: 9px;
+	width: 11px;
+	height: 11px;
+	z-index: 30;
 }
 .react-flow__handle.source { background-color: var(--color-handle-source); }
 .react-flow__handle.target { background-color: var(--color-handle-target); }
+
+.react-flow__nodesselection-rect {
+	pointer-events: none !important;
+}
 
 /* In-progress connection cable while dragging from a handle */
 .connection-line-path {

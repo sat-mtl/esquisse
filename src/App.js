@@ -4,11 +4,13 @@ import {
   ReactFlowProvider,
   MarkerType,
   useReactFlow,
+  useStoreApi,
   addEdge,
   Background,
   Controls,
   useNodesState,
   useEdgesState,
+  SelectionMode,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -64,7 +66,8 @@ const flowKey = 'saved-flow';
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition, deleteElements } = useReactFlow();
+  const { screenToFlowPosition, deleteElements, getNodes } = useReactFlow();
+  const store = useStoreApi();
   const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
   
@@ -108,6 +111,46 @@ const Flow = () => {
       document.removeEventListener("drop", blockDrop);
     };
   }, []);
+
+  /* Box-select only ever selects an edge as a side effect of its connected
+   * NODES being touched by the drag rectangle (React Flow's own behavior) —
+   * it never tests the cable's own path/label. This adds that: any edge
+   * whose midpoint falls inside the live selection rectangle also gets
+   * selected, on top of React Flow's node-based selection. */
+  useEffect(() => {
+    const unsubscribe = store.subscribe((state, prevState) => {
+      if (state.userSelectionRect === prevState.userSelectionRect) return;
+      const rect = state.userSelectionRect;
+      if (!rect) return;
+
+      const from = screenToFlowPosition({ x: rect.x, y: rect.y });
+      const to = screenToFlowPosition({ x: rect.x + rect.width, y: rect.y + rect.height });
+      const minX = Math.min(from.x, to.x), maxX = Math.max(from.x, to.x);
+      const minY = Math.min(from.y, to.y), maxY = Math.max(from.y, to.y);
+
+      const nodeById = new Map(getNodes().map(n => [n.id, n]));
+
+      setEdges((eds) => eds.map((edge) => {
+        const sourceNode = nodeById.get(edge.source);
+        const targetNode = nodeById.get(edge.target);
+        if (!sourceNode || !targetNode) return edge;
+
+        const sx = sourceNode.position.x + (sourceNode.measured?.width ?? 150);
+        const sy = sourceNode.position.y + (sourceNode.measured?.height ?? 40) / 2;
+        const tx = targetNode.position.x;
+        const ty = targetNode.position.y + (targetNode.measured?.height ?? 40) / 2;
+        const midX = (sx + tx) / 2;
+        const midY = (sy + ty) / 2;
+
+        const inBox = midX >= minX && midX <= maxX && midY >= minY && midY <= maxY;
+        const nodeBasedSelected = !!(sourceNode.selected || targetNode.selected);
+        const nextSelected = inBox || nodeBasedSelected;
+
+        return edge.selected === nextSelected ? edge : { ...edge, selected: nextSelected };
+      }));
+    });
+    return unsubscribe;
+  }, [store, screenToFlowPosition, getNodes, setEdges]);
 
   // Undo/redo + delete keyboard shortcuts
   useEffect(() => {
@@ -627,7 +670,9 @@ const Flow = () => {
           onPaneContextMenu={onPaneContextMenu}
           onPaneClick={onPaneclick}
           deleteKeyCode={null}
-          multiSelectionKeyCode={["Meta", "Control"]}
+          multiSelectionKeyCode={["Meta", "Control", "Shift"]}
+          selectionMode={SelectionMode.Partial}
+          selectNodesOnDrag={false}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
