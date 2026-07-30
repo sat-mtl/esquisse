@@ -12,8 +12,6 @@ import {
   useEdgesState,
   SelectionMode,
   reconnectEdge,
-  getBezierPath,
-  Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -73,7 +71,7 @@ const COMMENT_COLORS = [null, "#c7c7d1", "#a9c2f7", "#c7bdf7"];
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition, deleteElements, getNodes, getInternalNode } = useReactFlow();
+  const { screenToFlowPosition, deleteElements, getNodes } = useReactFlow();
   const store = useStoreApi();
   const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
@@ -127,6 +125,19 @@ const Flow = () => {
     document.addEventListener("mousemove", handler);
     return () => document.removeEventListener("mousemove", handler);
   }, []);
+
+  /* connectOnClick has no built-in way to cancel a started click-connection
+   * other than completing it or re-clicking the same handle — clicking
+   * anywhere else (empty canvas, another node's body) left it stuck "armed"
+   * (pulsing) indefinitely. Cancel it on any click that isn't on a handle. */
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.closest(".react-flow__handle")) return;
+      store.setState({ connectionClickStartHandle: null });
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [store]);
 
   const copyNode = useCallback(
     (id = null) => {
@@ -208,18 +219,25 @@ const Flow = () => {
   /* Box-select only ever selects an edge as a side effect of its connected
    * NODES being touched by the drag rectangle (React Flow's own behavior) —
    * it never tests the cable's own path/label. This adds that: any edge
-   * whose midpoint falls inside the live selection rectangle also gets
-   * selected, on top of React Flow's node-based selection. */
+   * whose label is touched by the live selection rectangle also gets
+   * selected, on top of React Flow's node-based selection.
+   *
+   * Queries the label's actual rendered position (getBoundingClientRect)
+   * instead of recomputing it from node internals + bezier math — that
+   * duplicate calculation could drift from what's really on screen (and did,
+   * causing inconsistent hits). This asks the browser directly, so it can't
+   * drift regardless of how the edge is actually rendered. */
   useEffect(() => {
     const unsubscribe = store.subscribe((state, prevState) => {
       if (state.userSelectionRect === prevState.userSelectionRect) return;
       const rect = state.userSelectionRect;
       if (!rect) return;
 
-      const from = screenToFlowPosition({ x: rect.x, y: rect.y });
-      const to = screenToFlowPosition({ x: rect.x + rect.width, y: rect.y + rect.height });
-      const minX = Math.min(from.x, to.x), maxX = Math.max(from.x, to.x);
-      const minY = Math.min(from.y, to.y), maxY = Math.max(from.y, to.y);
+      // userSelectionRect is relative to the pane container, not the
+      // viewport — convert to viewport coordinates to match getBoundingClientRect.
+      const pane = ref.current.getBoundingClientRect();
+      const minX = pane.left + rect.x, maxX = pane.left + rect.x + rect.width;
+      const minY = pane.top + rect.y, maxY = pane.top + rect.y + rect.height;
 
       const nodeById = new Map(getNodes().map(n => [n.id, n]));
 
@@ -228,43 +246,46 @@ const Flow = () => {
         const targetNode = nodeById.get(edge.target);
         if (!sourceNode || !targetNode) return edge;
 
-        const sourceInternal = getInternalNode(edge.source);
-        const targetInternal = getInternalNode(edge.target);
-        const sourceHandle = sourceInternal?.internals.handleBounds?.source?.[0];
-        const targetHandle = targetInternal?.internals.handleBounds?.target?.[0];
-
         const nodeBasedSelected = !!(sourceNode.selected || targetNode.selected);
-        if (!sourceHandle || !targetHandle) {
+
+        const labelEl = document.querySelector(`[data-edge-label-id="${edge.id}"]`);
+        if (!labelEl) {
           return edge.selected === nodeBasedSelected ? edge : { ...edge, selected: nodeBasedSelected };
         }
 
-        const sourceX = sourceInternal.internals.positionAbsolute.x + sourceHandle.x + sourceHandle.width / 2;
-        const sourceY = sourceInternal.internals.positionAbsolute.y + sourceHandle.y + sourceHandle.height / 2;
-        const targetX = targetInternal.internals.positionAbsolute.x + targetHandle.x + targetHandle.width / 2;
-        const targetY = targetInternal.internals.positionAbsolute.y + targetHandle.y + targetHandle.height / 2;
+        const labelRect = labelEl.getBoundingClientRect();
+        const labelCenterX = labelRect.left + labelRect.width / 2;
+        const labelCenterY = labelRect.top + labelRect.height / 2;
 
-        const [, labelX, labelY] = getBezierPath({
-          sourceX, sourceY, targetX, targetY,
-          sourcePosition: Position.Right,
-          targetPosition: Position.Left,
-        });
-
-        const inBox = labelX >= minX && labelX <= maxX && labelY >= minY && labelY <= maxY;
+        const inBox = labelCenterX >= minX && labelCenterX <= maxX && labelCenterY >= minY && labelCenterY <= maxY;
         const nextSelected = inBox || nodeBasedSelected;
 
         return edge.selected === nextSelected ? edge : { ...edge, selected: nextSelected };
       }));
     });
     return unsubscribe;
-  }, [store, screenToFlowPosition, getNodes, getInternalNode, setEdges]);
+  }, [store, getNodes, setEdges]);
 
   // Undo/redo + delete keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+
+      // Not a normal text-editing shortcut, so it's safe to intercept even
+      // while actively typing in a comment (unlike Ctrl+C/V, which must stay
+      // reserved for real copy/paste of the selected text).
+      if (mod && (e.key === "=" || e.key === "+")) {
+        if (resizeCommentFont(1)) e.preventDefault();
+        return;
+      }
+      if (mod && (e.key === "-" || e.key === "_")) {
+        if (resizeCommentFont(-1)) e.preventDefault();
+        return;
+      }
+
       // Skip if user is typing in an input/textarea
       if (e.target.closest("input, textarea, [contenteditable]")) return;
 
-      const mod = e.metaKey || e.ctrlKey;
       if (mod) {
         if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(nodes, edges); return; }
         if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); redo(nodes, edges); return; }
@@ -292,7 +313,7 @@ const Flow = () => {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store]);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store, resizeCommentFont]);
 
   const onDrop = useCallback(
     (event) => {
@@ -473,30 +494,45 @@ const Flow = () => {
   const onConnect = useCallback(
     (connection) => {
       connectCompletedRef.current = true;
-      const targetNode = nodes.find(n => n.id === connection.target);
-      if (!targetNode) return;
+      if (!nodes.some(n => n.id === connection.target)) return;
 
-      // Multi-connect: the actually-dragged source, plus any other selected
-      // nodes (Ctrl/Cmd-click to multi-select), all connect to the same target.
-      const sourceNodes = nodes.filter(
-        n => n.id !== targetNode.id && (n.id === connection.source || n.selected)
-      );
+      // Multi-connect: whichever side (source or target) is itself part of
+      // the current selection extends to the WHOLE selected group; the other
+      // side stays a single node. Never both sides extending at once — that
+      // would cross-product selected nodes against each other too (e.g. six
+      // selected Satellites all wiring to each other, not just receiving
+      // from the single dragged source).
+      const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+      const sourceIsGroup = selectedIds.has(connection.source);
+      const targetIsGroup = !sourceIsGroup && selectedIds.has(connection.target);
 
-      const newEdges = sourceNodes.reduce((eds, sourceNode) => {
-        const sharedInput = tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj);
-        if (!sharedInput) return eds;
-        return addEdge(
-          addEndMarker({
-            source: sourceNode.id,
-            sourceHandle: connection.sourceHandle,
-            target: targetNode.id,
-            targetHandle: connection.targetHandle,
-            type: "custom",
-            data: { sharedInput, protocol: "" },
-          }),
-          eds
-        );
-      }, edges);
+      const sourceNodes = sourceIsGroup
+        ? nodes.filter(n => selectedIds.has(n.id) && n.id !== connection.target)
+        : nodes.filter(n => n.id === connection.source);
+      const targetNodes = targetIsGroup
+        ? nodes.filter(n => selectedIds.has(n.id) && n.id !== connection.source)
+        : nodes.filter(n => n.id === connection.target);
+
+      const newEdges = sourceNodes.reduce((eds, sourceNode) => (
+        targetNodes.reduce((eds2, targetNode) => {
+          if (sourceNode.id === targetNode.id) return eds2;
+          const alreadyConnected = edges.some(e => e.source === sourceNode.id && e.target === targetNode.id);
+          if (alreadyConnected) return eds2;
+          const sharedInput = tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj);
+          if (!sharedInput) return eds2;
+          return addEdge(
+            addEndMarker({
+              source: sourceNode.id,
+              sourceHandle: connection.sourceHandle,
+              target: targetNode.id,
+              targetHandle: connection.targetHandle,
+              type: "custom",
+              data: { sharedInput, protocol: "" },
+            }),
+            eds2
+          );
+        }, eds)
+      ), edges);
 
       if (newEdges === edges) return;
 

@@ -191,6 +191,14 @@ a {
 	overflow: auto;
 	font-size: 8px;
 }
+.textbox-placeholder {
+	color: #999;
+}
+/* Translucent overlay instead of a fixed color, so selection blends with
+ * whatever comment background color is underneath (white/grey/blue/purple). */
+.textbox::selection {
+	background: rgba(0, 0, 0, 0.2);
+}
 
 /* Edge dropdown (protocol selector) */
 .edge-dropdown {
@@ -251,6 +259,34 @@ a {
 .context-menu-item--danger:hover {
 	background: #fff0f0;
 	color: #d00;
+}
+
+.context-menu-swatches {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 9px 16px;
+}
+.context-menu-swatch {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	cursor: pointer;
+	padding: 0;
+}
+.context-menu-swatch--default {
+	background: var(--color-white);
+	background-image: linear-gradient(45deg, transparent 45%, var(--color-border) 45%, var(--color-border) 55%, transparent 55%);
+}
+.context-menu-swatch--active {
+	box-shadow: 0 0 0 2px var(--color-blue);
+}
+
+/* Selected-edge default (a subtle grey-on-grey shift) was too easy to miss */
+.react-flow__edge.selected .react-flow__edge-path {
+	stroke: var(--color-blue) !important;
+	stroke-width: 2.5;
 }
 
 .react-flow__handle.source,

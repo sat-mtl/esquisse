@@ -2,8 +2,8 @@ import React from "react";
 import { useConnection, useNodes, useReactFlow } from "@xyflow/react";
 import { canConnect } from "../ToolObjects.js";
 
-function getOutputHandlePosition(internalNode) {
-  const bounds = internalNode?.internals.handleBounds?.source?.[0];
+function getHandlePosition(internalNode, handleType) {
+  const bounds = internalNode?.internals.handleBounds?.[handleType]?.[0];
   if (!bounds) return null;
   return {
     x: internalNode.internals.positionAbsolute.x + bounds.x + bounds.width / 2,
@@ -41,43 +41,66 @@ export default ({ fromX, fromY, toX, toY, fromNode, toNode, failReasonRef }) => 
     failReasonRef.current = !primaryValid && toNode ? (sameTypeHandles ? "direction" : "protocol") : null;
   }
 
-  /* Multi-connect preview: every other currently-selected node fans out
-   * alongside the actual drag, mirroring the sourceNodes logic in App.js's
-   * onConnect. These always connect as output->input, regardless of which
-   * handle the primary drag started from. */
+  /* Multi-connect preview, mirroring App.js's onConnect: whichever role
+   * (source or target) the literal dragged node belongs to, if THAT node is
+   * itself selected, the whole selected group shares that role — never both
+   * sides fanning out at once (that would suggest connections between the
+   * selected nodes themselves, which never actually happen). */
+  const outputNodeSelected = !!outputNode?.selected;
+  const inputNodeSelected = !outputNodeSelected && !!inputNode?.selected;
+
   const otherSelected = nodes.filter(
     (n) => n.selected && n.id !== fromNode.id && n.id !== toNode?.id
   );
 
-  const extraLines = otherSelected
-    .map((node) => {
-      const pos = getOutputHandlePosition(getInternalNode(node.id));
-      if (!pos) return null;
-      // Use the same direction-corrected target as the primary line — when
-      // the primary drag started from an input handle, the real eventual
-      // target is fromNode, not toNode.
-      const isValid = !toNode
-        ? true
-        : sameTypeHandles
-          ? false
-          : canConnect(node.data.toolObj, inputNode?.data.toolObj);
-      return { x: pos.x, y: pos.y, isValid };
-    })
-    .filter(Boolean);
+  let extraLines = [];
+  if (outputNodeSelected) {
+    // Other selected nodes are additional sources, fanning into the live cursor.
+    extraLines = otherSelected
+      .map((node) => {
+        const pos = getHandlePosition(getInternalNode(node.id), "source");
+        if (!pos) return null;
+        const isValid = !toNode
+          ? true
+          : sameTypeHandles
+            ? false
+            : canConnect(node.data.toolObj, inputNode?.data.toolObj);
+        return { fromPos: pos, toPos: { x: toX, y: toY }, isValid };
+      })
+      .filter(Boolean);
+  } else if (inputNodeSelected) {
+    // Other selected nodes are additional targets, fed from the live cursor
+    // (which represents the single external source in this scenario).
+    extraLines = otherSelected
+      .map((node) => {
+        const pos = getHandlePosition(getInternalNode(node.id), "target");
+        if (!pos) return null;
+        const isValid = !toNode
+          ? true
+          : sameTypeHandles
+            ? false
+            : canConnect(outputNode?.data.toolObj, node.data.toolObj);
+        return { fromPos: { x: toX, y: toY }, toPos: pos, isValid };
+      })
+      .filter(Boolean);
+  }
 
-  const lines = [{ x: fromX, y: fromY, isValid: primaryValid }, ...extraLines];
+  const lines = [
+    { fromPos: { x: fromX, y: fromY }, toPos: { x: toX, y: toY }, isValid: primaryValid },
+    ...extraLines,
+  ];
   const size = 4; // size of X arms
 
   return (
     <g>
-      {lines.map(({ x, y, isValid }, i) => (
+      {lines.map(({ fromPos, toPos, isValid }, i) => (
         <path
           key={i}
           fill="none"
           stroke={isValid ? "var(--xy-connectionline-stroke-default, #b1b1b7)" : "red"}
           strokeWidth={2}
           className="connection-line-path"
-          d={`M${x},${y} C ${x} ${toY} ${x} ${toY} ${toX},${toY}`}
+          d={`M${fromPos.x},${fromPos.y} C ${fromPos.x} ${toPos.y} ${fromPos.x} ${toPos.y} ${toPos.x},${toPos.y}`}
         />
       ))}
 
