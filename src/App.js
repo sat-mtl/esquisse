@@ -90,6 +90,8 @@ const Flow = () => {
   const connectCompletedRef = useRef(false);
   const toastTimerRef = useRef(null);
   const connectFailReasonRef = useRef(null);
+  const clipboardRef = useRef({ nodes: [], edges: [] });
+  const lastMousePosRef = useRef({ x: 0, y: 0 });
 
   const ConnectionLineWithReason = useCallback(
     (props) => <ConnectionLine {...props} failReasonRef={connectFailReasonRef} />,
@@ -111,6 +113,74 @@ const Flow = () => {
       document.removeEventListener("drop", blockDrop);
     };
   }, []);
+
+  // Tracks the cursor so Ctrl/Cmd+V has somewhere to paste
+  useEffect(() => {
+    const handler = (e) => { lastMousePosRef.current = { x: e.clientX, y: e.clientY }; };
+    document.addEventListener("mousemove", handler);
+    return () => document.removeEventListener("mousemove", handler);
+  }, []);
+
+  const copyNode = useCallback(
+    (id = null) => {
+      // Collect all selected nodes; fall back to the right-clicked node
+      const selected = nodes.filter(n => n.selected);
+      const toCopy = selected.length > 0 ? selected : (id ? nodes.filter(n => n.id === id) : []);
+      if (!toCopy.length) return;
+
+      // Also copy edges between two copied nodes, so a connected group pastes intact
+      const copiedIds = new Set(toCopy.map(n => n.id));
+      const copiedEdges = edges.filter(e => copiedIds.has(e.source) && copiedIds.has(e.target));
+
+      clipboardRef.current = {
+        nodes: toCopy.map(node => ({ ...node, data: { ...node.data } })),
+        edges: copiedEdges.map(edge => ({ ...edge, data: { ...edge.data } })),
+      };
+      setMenu({ type: null, data: null });
+    },
+    [nodes, edges, setMenu],
+  );
+
+  const pasteNodes = useCallback(
+    (flowPosition) => {
+      const { nodes: clipNodes, edges: clipEdges } = clipboardRef.current;
+      if (!clipNodes.length) return;
+
+      // Anchor the pasted group so its bounding-box center lands at flowPosition,
+      // preserving relative offsets between multiple copied nodes.
+      const centerX = clipNodes.reduce((sum, n) => sum + n.position.x, 0) / clipNodes.length;
+      const centerY = clipNodes.reduce((sum, n) => sum + n.position.y, 0) / clipNodes.length;
+
+      snapshot(nodes, edges);
+      const timestamp = Date.now();
+      const idMap = new Map();
+      const newNodes = clipNodes.map((node, i) => {
+        const newId = `paste_${timestamp}_${i}`;
+        idMap.set(node.id, newId);
+        return {
+          ...node,
+          id: newId,
+          position: {
+            x: node.position.x - centerX + flowPosition.x,
+            y: node.position.y - centerY + flowPosition.y,
+          },
+          selected: false,
+        };
+      });
+      const newEdges = clipEdges.map((edge, i) => ({
+        ...edge,
+        id: `paste_edge_${timestamp}_${i}`,
+        source: idMap.get(edge.source),
+        target: idMap.get(edge.target),
+        selected: false,
+      }));
+
+      setNodes(nds => nds.concat(newNodes));
+      if (newEdges.length) setEdges(eds => eds.concat(newEdges));
+      setMenu({ type: null, data: null });
+    },
+    [nodes, edges, snapshot, setNodes, setEdges, setMenu],
+  );
 
   /* Box-select only ever selects an edge as a side effect of its connected
    * NODES being touched by the drag rectangle (React Flow's own behavior) —
@@ -162,6 +232,12 @@ const Flow = () => {
       if (mod) {
         if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(nodes, edges); return; }
         if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); redo(nodes, edges); return; }
+        if (e.key === "c") { e.preventDefault(); copyNode(); return; }
+        if (e.key === "v") {
+          e.preventDefault();
+          pasteNodes(screenToFlowPosition(lastMousePosRef.current));
+          return;
+        }
       }
 
       if (e.key === "Backspace" || e.key === "Delete") {
@@ -175,7 +251,7 @@ const Flow = () => {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [undo, redo, nodes, edges, snapshot, deleteElements]);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition]);
 
   const onDrop = useCallback(
     (event) => {
@@ -525,18 +601,19 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "node",
         data: {
           id: node.id,
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
@@ -547,18 +624,19 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "edge",
         data: {
           id: edge.id,
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
@@ -569,17 +647,18 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "pane",
         data: {
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
@@ -592,26 +671,30 @@ const Flow = () => {
     setSelectedNode(null);
   }, [setSelectedNode]);
 
-  const duplicateNode = useCallback(
-    (id) => {
-      // Collect all selected duplicable nodes; fall back to the right-clicked node
-      const targets = nodes.filter(n => n.selected && n.data?.toolObj?.isIO);
-      const toClone = targets.length > 0 ? targets : nodes.filter(n => n.id === id && n.data?.toolObj?.isIO);
+  const bringToFront = useCallback((id) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+    if (!selectedIds.has(id)) selectedIds.add(id);
+    snapshot(nodes, edges);
+    // Edges/cables render with no explicit z-index of their own (default DOM
+    // paint order puts them below nodes) — a node needs an explicit zIndex to
+    // cross that layer boundary, not just array position among other nodes.
+    setNodes(nds => [
+      ...nds.filter(n => !selectedIds.has(n.id)),
+      ...nds.filter(n => selectedIds.has(n.id)).map(n => ({ ...n, zIndex: 1000 })),
+    ]);
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
 
-      if (!toClone.length) return;
-
-      snapshot(nodes, edges);
-      setNodes(nds => nds.concat(
-        toClone.map(node => ({
-          ...node,
-          id: "duplicate_" + getId(),
-          position: { x: node.position.x + 50, y: node.position.y + 50 },
-          selected: false,
-        }))
-      ));
-    },
-    [nodes, edges, snapshot],
-  );
+  const sendToBack = useCallback((id) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+    if (!selectedIds.has(id)) selectedIds.add(id);
+    snapshot(nodes, edges);
+    setNodes(nds => [
+      ...nds.filter(n => selectedIds.has(n.id)).map(n => ({ ...n, zIndex: -1 })),
+      ...nds.filter(n => !selectedIds.has(n.id)),
+    ]);
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
 
   const deleteNode = useCallback((id) => {
         const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
@@ -673,6 +756,7 @@ const Flow = () => {
           multiSelectionKeyCode={["Meta", "Control", "Shift"]}
           selectionMode={SelectionMode.Partial}
           selectNodesOnDrag={false}
+          elevateNodesOnSelect={false}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
@@ -713,8 +797,12 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                ...(nodes.find(n => n.id === menu.data.id)?.data?.toolObj?.isIO
-                  ? [{ label: t.duplicateNode, onClick: () => duplicateNode(menu.data.id) }]
+                { label: t.copyNode, onClick: () => copyNode(menu.data.id) },
+                ...(nodes.find(n => n.id === menu.data.id)?.type === "textbox"
+                  ? [
+                    { label: t.bringToFront, onClick: () => bringToFront(menu.data.id) },
+                    { label: t.sendToBack, onClick: () => sendToBack(menu.data.id) },
+                  ]
                   : []),
                 { label: t.deleteNode, onClick: () => deleteNode(menu.data.id), danger: true }
               ]}
@@ -744,16 +832,25 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
+                ...(clipboardRef.current.nodes.length > 0 ? [{
+                  label: t.pasteNode,
+                  onClick: (e) => pasteNodes(screenToFlowPosition({ x: e.clientX, y: e.clientY })),
+                }] : []),
                 {
                   label: t.addComment,
                   onClick: (e) =>  {
-                    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+                    const clickPosition = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+                    const textboxWidth = 200;
+                    const textboxHeight = 100;
                     const newTextboxNode = {
                       id: "textbox_" + getId(),
                       type: "textbox",
-                      position,
+                      position: {
+                        x: clickPosition.x - textboxWidth / 2,
+                        y: clickPosition.y - textboxHeight / 2,
+                      },
                       data: { label: "" },
-                      style: { width: 200, height: 100},
+                      style: { width: textboxWidth, height: textboxHeight },
                     };
                     setNodes(nds => nds.concat(newTextboxNode));
                     setMenu({ type: null, data: null})

@@ -185,11 +185,6 @@ a {
 }
 
 
-/* Keep textbox nodes behind other nodes on the canvas */
-.react-flow__node.react-flow__node-textbox {
-	z-index: 0;
-}
-
 .textbox {
 	width: 200px;
 	height: 12px;
