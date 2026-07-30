@@ -11,9 +11,21 @@ function getHandlePosition(internalNode, handleType) {
   };
 }
 
-export default ({ fromX, fromY, toX, toY, fromNode, toNode, failReasonRef }) => {
+// DOM-based lookup (mirrors the box-select-cable hit-test elsewhere in this
+// app): internals.handleBounds isn't reliably populated for every node during
+// a reconnect drag, but the rendered handle element always is.
+function getHandleFlowPosition(screenToFlowPosition, nodeId, handleId) {
+  const handleEl = document.querySelector(
+    `.react-flow__handle[data-nodeid="${nodeId}"][data-handleid="${handleId}"]`
+  );
+  if (!handleEl) return null;
+  const rect = handleEl.getBoundingClientRect();
+  return screenToFlowPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+}
+
+export default ({ fromX, fromY, toX, toY, fromNode, toNode, failReasonRef, reconnectPreviewRef }) => {
   const { fromHandle, toHandle } = useConnection();
-  const { getInternalNode } = useReactFlow();
+  const { getInternalNode, screenToFlowPosition } = useReactFlow();
   const nodes = useNodes();
 
   // Same-type pairing (inlet-to-inlet or outlet-to-outlet) is always invalid,
@@ -53,8 +65,33 @@ export default ({ fromX, fromY, toX, toY, fromNode, toNode, failReasonRef }) => 
     (n) => n.selected && n.id !== fromNode.id && n.id !== toNode?.id
   );
 
+  /* Multi-cable reconnect preview: onReconnectStart (App.js) hands us the
+   * exact set of other selected edges. Each one's line is anchored at its
+   * own current (pre-drag) endpoint — not its far-off fixed node — so the
+   * preview reads as "this cable is moving to the cursor" rather than a
+   * confusing line jumping across the whole canvas. */
+  const reconnectInfo = reconnectPreviewRef?.current;
+
   let extraLines = [];
-  if (outputNodeSelected) {
+  if (reconnectInfo) {
+    extraLines = reconnectInfo.edges
+      .map(({ fixedNodeId, oldMovingNodeId }) => {
+        const fixedNode = nodes.find((n) => n.id === fixedNodeId);
+        if (!fixedNode) return null;
+        const oldHandleId = reconnectInfo.movingSide === "target" ? "input" : "output";
+        const pos = getHandleFlowPosition(screenToFlowPosition, oldMovingNodeId, oldHandleId);
+        if (!pos) return null;
+        const isValid = !toNode
+          ? true
+          : sameTypeHandles
+            ? false
+            : reconnectInfo.fixedSide === "source"
+              ? canConnect(fixedNode.data.toolObj, toNode.data.toolObj)
+              : canConnect(toNode.data.toolObj, fixedNode.data.toolObj);
+        return { fromPos: pos, toPos: { x: toX, y: toY }, isValid };
+      })
+      .filter(Boolean);
+  } else if (outputNodeSelected) {
     // Other selected nodes are additional sources, fanning into the live cursor.
     extraLines = otherSelected
       .map((node) => {

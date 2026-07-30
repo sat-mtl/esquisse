@@ -71,7 +71,7 @@ const COMMENT_COLORS = [null, "#c7c7d1", "#a9c2f7", "#c7bdf7"];
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition, deleteElements, getNodes } = useReactFlow();
+  const { screenToFlowPosition, deleteElements, getNodes, getEdges } = useReactFlow();
   const store = useStoreApi();
   const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
@@ -99,7 +99,7 @@ const Flow = () => {
   const lastMousePosRef = useRef({ x: 0, y: 0 });
 
   const ConnectionLineWithReason = useCallback(
-    (props) => <ConnectionLine {...props} failReasonRef={connectFailReasonRef} />,
+    (props) => <ConnectionLine {...props} failReasonRef={connectFailReasonRef} reconnectPreviewRef={reconnectPreviewRef} />,
     [],
   );
 
@@ -838,45 +838,93 @@ const Flow = () => {
   // Drag an existing edge's endpoint onto empty canvas to delete it
   const edgeReconnectSuccessfulRef = useRef(true);
 
-  const onReconnectStart = useCallback(() => {
+  // Exact info (from React Flow itself, not inferred) about a multi-edge
+  // reconnect drag in progress, so ConnectionLine can preview every other
+  // selected edge's same-side endpoint following the cursor too.
+  const reconnectPreviewRef = useRef(null);
+
+  const onReconnectStart = useCallback((_, edge, handleType) => {
     edgeReconnectSuccessfulRef.current = false;
-  }, []);
+    const fixedSide = handleType === "source" ? "target" : "source";
+    // Read live state via getEdges() rather than the closed-over `edges`, in
+    // case React Flow's internal edge renderer holds on to a stale handler.
+    const otherEdges = getEdges().filter(e => e.id !== edge.id && e.selected);
+    reconnectPreviewRef.current = {
+      fixedSide,
+      movingSide: handleType,
+      // Anchor each preview line at the edge's own current (pre-drag)
+      // endpoint, not its far-off fixed node — a short "this is moving to
+      // the cursor" hint reads much clearer than a line crossing the canvas.
+      edges: otherEdges.map(e => ({ fixedNodeId: e[fixedSide], oldMovingNodeId: e[handleType] })),
+    };
+  }, [getEdges]);
 
   const onReconnect = useCallback((oldEdge, newConnection) => {
     edgeReconnectSuccessfulRef.current = true;
     snapshot(nodes, edges);
-    setEdges(eds => {
-      // Dragging onto a pair that's already connected would create a
-      // duplicate edge — just drop the old one instead.
-      const isDuplicate = eds.some(
-        e => e.id !== oldEdge.id && e.source === newConnection.source && e.target === newConnection.target
+
+    const sourceChanged = oldEdge.source !== newConnection.source;
+    const targetChanged = oldEdge.target !== newConnection.target;
+
+    // Reconnects one edge's same-side endpoint(s) to the new node(s),
+    // recomputing shared protocols. Drops the edge instead if the new pair
+    // would duplicate an existing one; leaves it untouched if incompatible.
+    const applyReconnect = (edge, currentEds) => {
+      const newSource = sourceChanged ? newConnection.source : edge.source;
+      const newTarget = targetChanged ? newConnection.target : edge.target;
+
+      const isDuplicate = currentEds.some(
+        e => e.id !== edge.id && e.source === newSource && e.target === newTarget
       );
       if (isDuplicate) {
-        return eds.filter(e => e.id !== oldEdge.id);
+        return currentEds.filter(e => e.id !== edge.id);
       }
 
-      // Recompute shared protocols for the new pair — reconnectEdge alone
-      // keeps the old edge's data, which would be stale for the new endpoint.
-      const sourceNode = nodes.find(n => n.id === newConnection.source);
-      const targetNode = nodes.find(n => n.id === newConnection.target);
+      const sourceNode = nodes.find(n => n.id === newSource);
+      const targetNode = nodes.find(n => n.id === newTarget);
       const sharedInput = sourceNode && targetNode
         ? tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj)
         : null;
+      if (!sharedInput) return currentEds; // incompatible pair — leave this edge as-is
 
       return reconnectEdge(
-        { ...oldEdge, data: { sharedInput, protocol: "" } },
-        newConnection,
-        eds
+        { ...edge, data: { sharedInput, protocol: "" } },
+        {
+          source: newSource,
+          sourceHandle: newConnection.sourceHandle,
+          target: newTarget,
+          targetHandle: newConnection.targetHandle,
+        },
+        currentEds
       );
+    };
+
+    setEdges(eds => {
+      // Every other currently-selected edge gets the same side moved to the
+      // same new node too, mirroring the primary reconnect.
+      const otherSelectedIds = eds.filter(e => e.id !== oldEdge.id && e.selected).map(e => e.id);
+
+      let nextEds = applyReconnect(oldEdge, eds);
+      for (const id of otherSelectedIds) {
+        const currentEdge = nextEds.find(e => e.id === id);
+        if (!currentEdge) continue; // already removed as a duplicate
+        nextEds = applyReconnect(currentEdge, nextEds);
+      }
+      return nextEds;
     });
   }, [nodes, edges, snapshot, setEdges]);
 
   const onReconnectEnd = useCallback((_, edge) => {
     if (!edgeReconnectSuccessfulRef.current) {
       snapshot(nodes, edges);
-      setEdges(eds => eds.filter(e => e.id !== edge.id));
+      setEdges(eds => {
+        // Dropping on empty canvas deletes every other selected edge too
+        const idsToDelete = new Set([edge.id, ...eds.filter(e => e.selected && e.id !== edge.id).map(e => e.id)]);
+        return eds.filter(e => !idsToDelete.has(e.id));
+      });
     }
     edgeReconnectSuccessfulRef.current = true;
+    reconnectPreviewRef.current = null;
   }, [nodes, edges, snapshot, setEdges]);
 
   return (
