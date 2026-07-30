@@ -262,6 +262,25 @@ a {
 .react-flow__handle.source { background-color: var(--color-handle-source); }
 .react-flow__handle.target { background-color: var(--color-handle-target); }
 
+/* Click-to-connect has no cursor-following cable, so these substitute as
+ * feedback: the handle you clicked pulses ("armed"), and whichever handle
+ * you're hovering next colors blue/red for valid/invalid. */
+.react-flow__handle.clickconnecting {
+	box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35);
+	animation: click-connecting-pulse 1s ease-in-out infinite;
+}
+@keyframes click-connecting-pulse {
+	0%, 100% { box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35); }
+	50% { box-shadow: 0 0 0 9px rgba(74, 70, 255, 0.12); }
+}
+.react-flow__handle.connectingto.valid {
+	background-color: var(--color-blue);
+	box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35);
+}
+.react-flow__handle.connectingto:not(.valid) {
+	background-color: red;
+}
+
 .react-flow__nodesselection-rect {
 	pointer-events: none !important;
 }

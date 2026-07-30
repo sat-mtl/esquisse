@@ -264,10 +264,15 @@ const Flow = () => {
         snapshot(nodes, edges);
         deleteElements({ nodes: selectedNodes, edges: selectedEdges });
       }
+
+      // connectOnClick has no built-in way to cancel a started click-connection
+      if (e.key === "Escape") {
+        store.setState({ connectionClickStartHandle: null });
+      }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition]);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store]);
 
   const onDrop = useCallback(
     (event) => {
