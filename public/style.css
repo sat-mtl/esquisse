@@ -185,16 +185,19 @@ a {
 }
 
 
-/* Keep textbox nodes behind other nodes on the canvas */
-.react-flow__node.react-flow__node-textbox {
-	z-index: 0;
-}
-
 .textbox {
 	width: 200px;
 	height: 12px;
 	overflow: auto;
 	font-size: 8px;
+}
+.textbox-placeholder {
+	color: #999;
+}
+/* Translucent overlay instead of a fixed color, so selection blends with
+ * whatever comment background color is underneath (white/grey/blue/purple). */
+.textbox::selection {
+	background: rgba(0, 0, 0, 0.2);
 }
 
 /* Edge dropdown (protocol selector) */
@@ -258,13 +261,76 @@ a {
 	color: #d00;
 }
 
+.context-menu-swatches {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 9px 16px;
+}
+.context-menu-swatch {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	cursor: pointer;
+	padding: 0;
+}
+.context-menu-swatch--default {
+	background: var(--color-white);
+	background-image: linear-gradient(45deg, transparent 45%, var(--color-border) 45%, var(--color-border) 55%, transparent 55%);
+}
+.context-menu-swatch--active {
+	box-shadow: 0 0 0 2px var(--color-blue);
+}
+
+/* Selected-edge default (a subtle grey-on-grey shift) was too easy to miss */
+.react-flow__edge.selected .react-flow__edge-path {
+	stroke: var(--color-blue) !important;
+	stroke-width: 2.5;
+}
+
 .react-flow__handle.source,
 .react-flow__handle.target {
-	width: 9px;
-	height: 9px;
+	width: 11px;
+	height: 11px;
+	z-index: 30;
 }
 .react-flow__handle.source { background-color: var(--color-handle-source); }
 .react-flow__handle.target { background-color: var(--color-handle-target); }
+
+/* Click-to-connect has no cursor-following cable, so these substitute as
+ * feedback: the handle you clicked pulses ("armed"), and whichever handle
+ * you're hovering next colors blue/red for valid/invalid. */
+.react-flow__handle.clickconnecting {
+	box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35);
+	animation: click-connecting-pulse 1s ease-in-out infinite;
+}
+@keyframes click-connecting-pulse {
+	0%, 100% { box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35); }
+	50% { box-shadow: 0 0 0 9px rgba(74, 70, 255, 0.12); }
+}
+.react-flow__handle.connectingto.valid {
+	background-color: var(--color-blue);
+	box-shadow: 0 0 0 4px rgba(74, 70, 255, 0.35);
+}
+.react-flow__handle.connectingto:not(.valid) {
+	background-color: red;
+}
+
+.react-flow__nodesselection-rect {
+	pointer-events: none !important;
+	background: transparent !important;
+	border: none !important;
+}
+
+/* In-progress connection cable while dragging from a handle */
+.connection-line-path {
+	stroke-dasharray: 5;
+	animation: connection-dash 0.4s linear infinite;
+}
+@keyframes connection-dash {
+	to { stroke-dashoffset: -10; }
+}
 
 .top-menu-bar {
 	display: flex;

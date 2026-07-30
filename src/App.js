@@ -4,11 +4,14 @@ import {
   ReactFlowProvider,
   MarkerType,
   useReactFlow,
+  useStoreApi,
   addEdge,
   Background,
   Controls,
   useNodesState,
   useEdgesState,
+  SelectionMode,
+  reconnectEdge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -61,10 +64,15 @@ const addEndMarker = (edge) => ({
 
 const flowKey = 'saved-flow';
 
+// Comment box color palette — null = default (white). Derived from
+// --color-blue and the app's existing greys, not generic sticky-note pastels.
+const COMMENT_COLORS = [null, "#c7c7d1", "#a9c2f7", "#c7bdf7"];
+
 const Flow = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { screenToFlowPosition, deleteElements } = useReactFlow();
+  const { screenToFlowPosition, deleteElements, getNodes, getEdges } = useReactFlow();
+  const store = useStoreApi();
   const [nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, snapshot, undo, redo, initHistory] = useFlowContext();
   const [menu, setMenu] = useState({ type: null, data: {} });
   
@@ -87,8 +95,13 @@ const Flow = () => {
   const connectCompletedRef = useRef(false);
   const toastTimerRef = useRef(null);
   const connectFailReasonRef = useRef(null);
+  const clipboardRef = useRef({ nodes: [], edges: [] });
+  const lastMousePosRef = useRef({ x: 0, y: 0 });
 
-  
+  const ConnectionLineWithReason = useCallback(
+    (props) => <ConnectionLine {...props} failReasonRef={connectFailReasonRef} reconnectPreviewRef={reconnectPreviewRef} />,
+    [],
+  );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -106,16 +119,218 @@ const Flow = () => {
     };
   }, []);
 
+  // Tracks the cursor so Ctrl/Cmd+V has somewhere to paste
+  useEffect(() => {
+    const handler = (e) => { lastMousePosRef.current = { x: e.clientX, y: e.clientY }; };
+    document.addEventListener("mousemove", handler);
+    return () => document.removeEventListener("mousemove", handler);
+  }, []);
+
+  /* connectOnClick has no built-in way to cancel a started click-connection
+   * other than completing it or re-clicking the same handle — clicking
+   * anywhere else (empty canvas, another node's body) left it stuck "armed"
+   * (pulsing) indefinitely. Cancel it on any click that isn't on a handle. */
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.closest(".react-flow__handle")) return;
+      store.setState({ connectionClickStartHandle: null });
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [store]);
+
+  const copyNode = useCallback(
+    (id = null) => {
+      // Collect all selected nodes; fall back to the right-clicked node
+      const selected = nodes.filter(n => n.selected);
+      const toCopy = selected.length > 0 ? selected : (id ? nodes.filter(n => n.id === id) : []);
+      if (!toCopy.length) return;
+
+      // Also copy edges between two copied nodes, so a connected group pastes intact
+      const copiedIds = new Set(toCopy.map(n => n.id));
+      const copiedEdges = edges.filter(e => copiedIds.has(e.source) && copiedIds.has(e.target));
+
+      clipboardRef.current = {
+        nodes: toCopy.map(node => ({ ...node, data: { ...node.data } })),
+        edges: copiedEdges.map(edge => ({ ...edge, data: { ...edge.data } })),
+      };
+      setMenu({ type: null, data: null });
+    },
+    [nodes, edges, setMenu],
+  );
+
+  const pasteNodes = useCallback(
+    (flowPosition) => {
+      const { nodes: clipNodes, edges: clipEdges } = clipboardRef.current;
+      if (!clipNodes.length) return;
+
+      // Anchor the pasted group so its bounding-box center lands at flowPosition,
+      // preserving relative offsets between multiple copied nodes.
+      const centerX = clipNodes.reduce((sum, n) => sum + n.position.x, 0) / clipNodes.length;
+      const centerY = clipNodes.reduce((sum, n) => sum + n.position.y, 0) / clipNodes.length;
+
+      snapshot(nodes, edges);
+      const timestamp = Date.now();
+      const idMap = new Map();
+      const newNodes = clipNodes.map((node, i) => {
+        const newId = `paste_${timestamp}_${i}`;
+        idMap.set(node.id, newId);
+        return {
+          ...node,
+          id: newId,
+          position: {
+            x: node.position.x - centerX + flowPosition.x,
+            y: node.position.y - centerY + flowPosition.y,
+          },
+          selected: false,
+        };
+      });
+      const newEdges = clipEdges.map((edge, i) => ({
+        ...edge,
+        id: `paste_edge_${timestamp}_${i}`,
+        source: idMap.get(edge.source),
+        target: idMap.get(edge.target),
+        selected: false,
+      }));
+
+      setNodes(nds => nds.concat(newNodes));
+      if (newEdges.length) setEdges(eds => eds.concat(newEdges));
+      setMenu({ type: null, data: null });
+    },
+    [nodes, edges, snapshot, setNodes, setEdges, setMenu],
+  );
+
+  const cutNode = useCallback(() => {
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (!selectedNodes.length) return false;
+
+    copyNode(); // populates the clipboard with selected nodes + edges between them
+
+    const selectedEdges = edges.filter(e => e.selected);
+    snapshot(nodes, edges);
+    deleteElements({ nodes: selectedNodes, edges: selectedEdges });
+    return true;
+  }, [nodes, edges, copyNode, snapshot, deleteElements]);
+
+  const selectAll = useCallback(() => {
+    setNodes(nds => nds.map(n => n.selected ? n : { ...n, selected: true }));
+    setEdges(eds => eds.map(e => e.selected ? e : { ...e, selected: true }));
+  }, [setNodes, setEdges]);
+
+  const addComment = useCallback((flowPosition) => {
+    const textboxWidth = 200;
+    const textboxHeight = 100;
+    const newTextboxNode = {
+      id: "textbox_" + getId(),
+      type: "textbox",
+      position: {
+        x: flowPosition.x - textboxWidth / 2,
+        y: flowPosition.y - textboxHeight / 2,
+      },
+      data: { label: "" },
+      style: { width: textboxWidth, height: textboxHeight },
+    };
+    setNodes(nds => nds.concat(newTextboxNode));
+    setMenu({ type: null, data: null });
+  }, [setNodes, setMenu]);
+
+  // Cmd/Ctrl +/- resizes selected comment(s)' text; returns false (and lets
+  // the browser's native page-zoom happen instead) if no comment is selected.
+  const resizeCommentFont = useCallback((delta) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected && n.type === "textbox").map(n => n.id));
+    if (!selectedIds.size) return false;
+
+    snapshot(nodes, edges);
+    setNodes(nds => nds.map(n => {
+      if (!selectedIds.has(n.id)) return n;
+      const current = n.data.fontSize ?? 12;
+      const next = Math.min(48, Math.max(6, current + delta));
+      return { ...n, data: { ...n.data, fontSize: next } };
+    }));
+    return true;
+  }, [nodes, edges, snapshot, setNodes]);
+
+  /* Box-select only ever selects an edge as a side effect of its connected
+   * NODES being touched by the drag rectangle (React Flow's own behavior) —
+   * it never tests the cable's own path/label. This adds that: any edge
+   * whose label is touched by the live selection rectangle also gets
+   * selected, on top of React Flow's node-based selection.
+   *
+   * Queries the label's actual rendered position (getBoundingClientRect)
+   * instead of recomputing it from node internals + bezier math — that
+   * duplicate calculation could drift from what's really on screen (and did,
+   * causing inconsistent hits). This asks the browser directly, so it can't
+   * drift regardless of how the edge is actually rendered. */
+  useEffect(() => {
+    const unsubscribe = store.subscribe((state, prevState) => {
+      if (state.userSelectionRect === prevState.userSelectionRect) return;
+      const rect = state.userSelectionRect;
+      if (!rect) return;
+
+      // userSelectionRect is relative to the pane container, not the
+      // viewport — convert to viewport coordinates to match getBoundingClientRect.
+      const pane = ref.current.getBoundingClientRect();
+      const minX = pane.left + rect.x, maxX = pane.left + rect.x + rect.width;
+      const minY = pane.top + rect.y, maxY = pane.top + rect.y + rect.height;
+
+      const nodeById = new Map(getNodes().map(n => [n.id, n]));
+
+      setEdges((eds) => eds.map((edge) => {
+        const sourceNode = nodeById.get(edge.source);
+        const targetNode = nodeById.get(edge.target);
+        if (!sourceNode || !targetNode) return edge;
+
+        const nodeBasedSelected = !!(sourceNode.selected || targetNode.selected);
+
+        const labelEl = document.querySelector(`[data-edge-label-id="${edge.id}"]`);
+        if (!labelEl) {
+          return edge.selected === nodeBasedSelected ? edge : { ...edge, selected: nodeBasedSelected };
+        }
+
+        const labelRect = labelEl.getBoundingClientRect();
+        const labelCenterX = labelRect.left + labelRect.width / 2;
+        const labelCenterY = labelRect.top + labelRect.height / 2;
+
+        const inBox = labelCenterX >= minX && labelCenterX <= maxX && labelCenterY >= minY && labelCenterY <= maxY;
+        const nextSelected = inBox || nodeBasedSelected;
+
+        return edge.selected === nextSelected ? edge : { ...edge, selected: nextSelected };
+      }));
+    });
+    return unsubscribe;
+  }, [store, getNodes, setEdges]);
+
   // Undo/redo + delete keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+
+      // Not a normal text-editing shortcut, so it's safe to intercept even
+      // while actively typing in a comment (unlike Ctrl+C/V, which must stay
+      // reserved for real copy/paste of the selected text).
+      if (mod && (e.key === "=" || e.key === "+")) {
+        if (resizeCommentFont(1)) e.preventDefault();
+        return;
+      }
+      if (mod && (e.key === "-" || e.key === "_")) {
+        if (resizeCommentFont(-1)) e.preventDefault();
+        return;
+      }
+
       // Skip if user is typing in an input/textarea
       if (e.target.closest("input, textarea, [contenteditable]")) return;
 
-      const mod = e.metaKey || e.ctrlKey;
       if (mod) {
         if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(nodes, edges); return; }
         if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); redo(nodes, edges); return; }
+        if (e.key === "c") { e.preventDefault(); copyNode(); return; }
+        if (e.key === "x") { if (cutNode()) e.preventDefault(); return; }
+        if (e.key === "a") { e.preventDefault(); selectAll(); return; }
+        if (e.key === "v") {
+          e.preventDefault();
+          pasteNodes(screenToFlowPosition(lastMousePosRef.current));
+          return;
+        }
       }
 
       if (e.key === "Backspace" || e.key === "Delete") {
@@ -126,10 +341,20 @@ const Flow = () => {
         snapshot(nodes, edges);
         deleteElements({ nodes: selectedNodes, edges: selectedEdges });
       }
+
+      if (e.key === "c" && !mod) {
+        e.preventDefault();
+        addComment(screenToFlowPosition(lastMousePosRef.current));
+      }
+
+      // connectOnClick has no built-in way to cancel a started click-connection
+      if (e.key === "Escape") {
+        store.setState({ connectionClickStartHandle: null });
+      }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [undo, redo, nodes, edges, snapshot, deleteElements]);
+  }, [undo, redo, nodes, edges, snapshot, deleteElements, copyNode, pasteNodes, screenToFlowPosition, store, resizeCommentFont, addComment, cutNode, selectAll]);
 
   const onDrop = useCallback(
     (event) => {
@@ -310,31 +535,50 @@ const Flow = () => {
   const onConnect = useCallback(
     (connection) => {
       connectCompletedRef.current = true;
-      const sourceNode = nodes.find(n => n.id === connection.source);
-      const targetNode = nodes.find(n => n.id === connection.target);
-      
-      if (!sourceNode || !targetNode) return;
-      
-      const sharedInput = tools.getMatchingIO(
-        sourceNode.data.toolObj,
-        targetNode.data.toolObj
-      );
-      
-      if (!sharedInput) return;
+      if (!nodes.some(n => n.id === connection.target)) return;
+
+      // Multi-connect: whichever side (source or target) is itself part of
+      // the current selection extends to the WHOLE selected group; the other
+      // side stays a single node. Never both sides extending at once — that
+      // would cross-product selected nodes against each other too (e.g. six
+      // selected Satellites all wiring to each other, not just receiving
+      // from the single dragged source).
+      const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+      const sourceIsGroup = selectedIds.has(connection.source);
+      const targetIsGroup = !sourceIsGroup && selectedIds.has(connection.target);
+
+      const sourceNodes = sourceIsGroup
+        ? nodes.filter(n => selectedIds.has(n.id) && n.id !== connection.target)
+        : nodes.filter(n => n.id === connection.source);
+      const targetNodes = targetIsGroup
+        ? nodes.filter(n => selectedIds.has(n.id) && n.id !== connection.source)
+        : nodes.filter(n => n.id === connection.target);
+
+      const newEdges = sourceNodes.reduce((eds, sourceNode) => (
+        targetNodes.reduce((eds2, targetNode) => {
+          if (sourceNode.id === targetNode.id) return eds2;
+          const alreadyConnected = edges.some(e => e.source === sourceNode.id && e.target === targetNode.id);
+          if (alreadyConnected) return eds2;
+          const sharedInput = tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj);
+          if (!sharedInput) return eds2;
+          return addEdge(
+            addEndMarker({
+              source: sourceNode.id,
+              sourceHandle: connection.sourceHandle,
+              target: targetNode.id,
+              targetHandle: connection.targetHandle,
+              type: "custom",
+              data: { sharedInput, protocol: "" },
+            }),
+            eds2
+          );
+        }, eds)
+      ), edges);
+
+      if (newEdges === edges) return;
 
       snapshot(nodes, edges);
-      setEdges((eds) =>
-        addEdge(
-          addEndMarker({
-            ...connection,
-            type: "custom",
-            data: { 
-              sharedInput,
-              protocol: "" },
-          }),
-          eds
-        )
-      );
+      setEdges(newEdges);
     },
     [nodes, edges, setEdges, snapshot],
   );
@@ -475,18 +719,19 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "node",
         data: {
           id: node.id,
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
@@ -497,18 +742,19 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "edge",
         data: {
           id: edge.id,
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
@@ -519,23 +765,22 @@ const Flow = () => {
       // Prevent native context menu from showing
       event.preventDefault();
 
-      // Calculate the position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen
+      // Calculate the position of the context menu, relative to the pane
+      // (not the viewport), making sure it doesn't get positioned off-screen
       const pane = ref.current.getBoundingClientRect();
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const x = event.clientX - pane.left;
+      const y = event.clientY - pane.top;
       setMenu({
         type: "pane",
         data: {
-          top: event.clientY < pane.height - 200 && event.clientY,
-          left: event.clientX < pane.width - 200 && event.clientX,
-          right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-          bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
-          position,
+          top: y < pane.height - 200 && y,
+          left: x < pane.width - 200 && x,
+          right: x >= pane.width - 200 && pane.width - x,
+          bottom: y >= pane.height - 200 && pane.height - y,
         }
       });
     },
-    [screenToFlowPosition],
+    [],
   )
 
   // Close context menu and deselect node when canvas is clicked
@@ -544,26 +789,36 @@ const Flow = () => {
     setSelectedNode(null);
   }, [setSelectedNode]);
 
-  const duplicateNode = useCallback(
-    (id) => {
-      // Collect all selected duplicable nodes; fall back to the right-clicked node
-      const targets = nodes.filter(n => n.selected && n.data?.toolObj?.isIO);
-      const toClone = targets.length > 0 ? targets : nodes.filter(n => n.id === id && n.data?.toolObj?.isIO);
+  const bringToFront = useCallback((id) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+    if (!selectedIds.has(id)) selectedIds.add(id);
+    snapshot(nodes, edges);
+    // Edges/cables render with no explicit z-index of their own (default DOM
+    // paint order puts them below nodes) — a node needs an explicit zIndex to
+    // cross that layer boundary, not just array position among other nodes.
+    setNodes(nds => [
+      ...nds.filter(n => !selectedIds.has(n.id)),
+      ...nds.filter(n => selectedIds.has(n.id)).map(n => ({ ...n, zIndex: 1000 })),
+    ]);
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
 
-      if (!toClone.length) return;
+  const sendToBack = useCallback((id) => {
+    const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
+    if (!selectedIds.has(id)) selectedIds.add(id);
+    snapshot(nodes, edges);
+    setNodes(nds => [
+      ...nds.filter(n => selectedIds.has(n.id)).map(n => ({ ...n, zIndex: -1 })),
+      ...nds.filter(n => !selectedIds.has(n.id)),
+    ]);
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
 
-      snapshot(nodes, edges);
-      setNodes(nds => nds.concat(
-        toClone.map(node => ({
-          ...node,
-          id: "duplicate_" + getId(),
-          position: { x: node.position.x + 50, y: node.position.y + 50 },
-          selected: false,
-        }))
-      ));
-    },
-    [nodes, edges, snapshot],
-  );
+  const setNodeColor = useCallback((id, color) => {
+    snapshot(nodes, edges);
+    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, color } } : n));
+    setMenu({ type: null, data: null });
+  }, [nodes, edges, snapshot, setNodes, setMenu]);
 
   const deleteNode = useCallback((id) => {
         const selectedIds = new Set(nodes.filter(n => n.selected).map(n => n.id));
@@ -578,7 +833,99 @@ const Flow = () => {
     snapshot(nodes, edges);
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
     setMenu({ type: null, data: null });
-  }, [nodes, edges, snapshot, setEdges]);    
+  }, [nodes, edges, snapshot, setEdges]);
+
+  // Drag an existing edge's endpoint onto empty canvas to delete it
+  const edgeReconnectSuccessfulRef = useRef(true);
+
+  // Exact info (from React Flow itself, not inferred) about a multi-edge
+  // reconnect drag in progress, so ConnectionLine can preview every other
+  // selected edge's same-side endpoint following the cursor too.
+  const reconnectPreviewRef = useRef(null);
+
+  const onReconnectStart = useCallback((_, edge, handleType) => {
+    edgeReconnectSuccessfulRef.current = false;
+    const fixedSide = handleType === "source" ? "target" : "source";
+    // Read live state via getEdges() rather than the closed-over `edges`, in
+    // case React Flow's internal edge renderer holds on to a stale handler.
+    const otherEdges = getEdges().filter(e => e.id !== edge.id && e.selected);
+    reconnectPreviewRef.current = {
+      fixedSide,
+      movingSide: handleType,
+      // Anchor each preview line at the edge's own current (pre-drag)
+      // endpoint, not its far-off fixed node — a short "this is moving to
+      // the cursor" hint reads much clearer than a line crossing the canvas.
+      edges: otherEdges.map(e => ({ fixedNodeId: e[fixedSide], oldMovingNodeId: e[handleType] })),
+    };
+  }, [getEdges]);
+
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessfulRef.current = true;
+    snapshot(nodes, edges);
+
+    const sourceChanged = oldEdge.source !== newConnection.source;
+    const targetChanged = oldEdge.target !== newConnection.target;
+
+    // Reconnects one edge's same-side endpoint(s) to the new node(s),
+    // recomputing shared protocols. Drops the edge instead if the new pair
+    // would duplicate an existing one; leaves it untouched if incompatible.
+    const applyReconnect = (edge, currentEds) => {
+      const newSource = sourceChanged ? newConnection.source : edge.source;
+      const newTarget = targetChanged ? newConnection.target : edge.target;
+
+      const isDuplicate = currentEds.some(
+        e => e.id !== edge.id && e.source === newSource && e.target === newTarget
+      );
+      if (isDuplicate) {
+        return currentEds.filter(e => e.id !== edge.id);
+      }
+
+      const sourceNode = nodes.find(n => n.id === newSource);
+      const targetNode = nodes.find(n => n.id === newTarget);
+      const sharedInput = sourceNode && targetNode
+        ? tools.getMatchingIO(sourceNode.data.toolObj, targetNode.data.toolObj)
+        : null;
+      if (!sharedInput) return currentEds; // incompatible pair — leave this edge as-is
+
+      return reconnectEdge(
+        { ...edge, data: { sharedInput, protocol: "" } },
+        {
+          source: newSource,
+          sourceHandle: newConnection.sourceHandle,
+          target: newTarget,
+          targetHandle: newConnection.targetHandle,
+        },
+        currentEds
+      );
+    };
+
+    setEdges(eds => {
+      // Every other currently-selected edge gets the same side moved to the
+      // same new node too, mirroring the primary reconnect.
+      const otherSelectedIds = eds.filter(e => e.id !== oldEdge.id && e.selected).map(e => e.id);
+
+      let nextEds = applyReconnect(oldEdge, eds);
+      for (const id of otherSelectedIds) {
+        const currentEdge = nextEds.find(e => e.id === id);
+        if (!currentEdge) continue; // already removed as a duplicate
+        nextEds = applyReconnect(currentEdge, nextEds);
+      }
+      return nextEds;
+    });
+  }, [nodes, edges, snapshot, setEdges]);
+
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessfulRef.current) {
+      snapshot(nodes, edges);
+      setEdges(eds => {
+        // Dropping on empty canvas deletes every other selected edge too
+        const idsToDelete = new Set([edge.id, ...eds.filter(e => e.selected && e.id !== edge.id).map(e => e.id)]);
+        return eds.filter(e => !idsToDelete.has(e.id));
+      });
+    }
+    edgeReconnectSuccessfulRef.current = true;
+    reconnectPreviewRef.current = null;
+  }, [nodes, edges, snapshot, setEdges]);
 
   return (
     <div className="dndflow">
@@ -613,15 +960,22 @@ const Flow = () => {
           onConnect={onConnect}
           onConnectStart={onConnectStart}
           onConnectEnd={onConnectEnd}
+          onReconnect={onReconnect}
+          onReconnectStart={onReconnectStart}
+          onReconnectEnd={onReconnectEnd}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onInit={setRfInstance}
-          connectionLineComponent={ConnectionLine}
+          connectionLineComponent={ConnectionLineWithReason}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
           onPaneContextMenu={onPaneContextMenu}
           onPaneClick={onPaneclick}
           deleteKeyCode={null}
+          multiSelectionKeyCode={["Meta", "Control", "Shift"]}
+          selectionMode={SelectionMode.Partial}
+          selectNodesOnDrag={false}
+          elevateNodesOnSelect={false}
           nodeTypes={nodeTypes}
           ariaLabelConfig={{
             "controls.ariaLabel": t.controlsPanel,
@@ -637,12 +991,6 @@ const Flow = () => {
 
               if (!sourceNode || !targetNode)
                 return false;
-
-              // Drop on an output handle = wrong direction (output→output or input→output)
-              if (connection.targetHandle === "output") {
-                connectFailReasonRef.current = "direction";
-                return false;
-              }
 
               const valid = tools.canConnect(
                 sourceNode.data.toolObj,
@@ -668,8 +1016,19 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
-                ...(nodes.find(n => n.id === menu.data.id)?.data?.toolObj?.isIO
-                  ? [{ label: t.duplicateNode, onClick: () => duplicateNode(menu.data.id) }]
+                { label: t.copyNode, onClick: () => copyNode(menu.data.id) },
+                ...(nodes.find(n => n.id === menu.data.id)?.type === "textbox"
+                  ? [
+                    {
+                      swatches: COMMENT_COLORS.map(color => ({
+                        color,
+                        active: (nodes.find(n => n.id === menu.data.id)?.data.color || null) === color,
+                        onClick: () => setNodeColor(menu.data.id, color),
+                      })),
+                    },
+                    { label: t.bringToFront, onClick: () => bringToFront(menu.data.id) },
+                    { label: t.sendToBack, onClick: () => sendToBack(menu.data.id) },
+                  ]
                   : []),
                 { label: t.deleteNode, onClick: () => deleteNode(menu.data.id), danger: true }
               ]}
@@ -699,20 +1058,13 @@ const Flow = () => {
               right={menu.data.right}
               bottom={menu.data.bottom}
               actions={[
+                ...(clipboardRef.current.nodes.length > 0 ? [{
+                  label: t.pasteNode,
+                  onClick: (e) => pasteNodes(screenToFlowPosition({ x: e.clientX, y: e.clientY })),
+                }] : []),
                 {
                   label: t.addComment,
-                  onClick: () =>  {
-                    const position = menu.data.position;
-                    const newTextboxNode = {
-                      id: "textbox_" + getId(),
-                      type: "textbox",
-                      position,
-                      data: { label: "" },
-                      style: { width: 200, height: 100},
-                    };
-                    setNodes(nds => nds.concat(newTextboxNode));
-                    setMenu({ type: null, data: null})
-                  },
+                  onClick: (e) => addComment(screenToFlowPosition({ x: e.clientX, y: e.clientY })),
                 },
               ]}
               onClose={onPaneclick}

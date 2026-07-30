@@ -64,6 +64,7 @@ export default function CustomEdge({
       
         <EdgeLabelRenderer>
           <div
+            data-edge-label-id={id}
             style={{
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
