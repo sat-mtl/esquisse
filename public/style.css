@@ -319,6 +319,8 @@ a {
 
 .react-flow__nodesselection-rect {
 	pointer-events: none !important;
+	background: transparent !important;
+	border: none !important;
 }
 
 /* In-progress connection cable while dragging from a handle */
