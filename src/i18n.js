@@ -56,7 +56,10 @@ export const strings = {
     customHardwareTooltip: "Ajoutez un appareil personnalisé. Glissez pour utiliser.",
 
     // Context menu
-    duplicateNode: "Dupliquer",
+    copyNode: "Copier",
+    pasteNode: "Coller",
+    bringToFront: "Amener au premier plan",
+    sendToBack: "Envoyer à l'arrière-plan",
     deleteNode: "Supprimer",
     deleteEdge: "Supprimer la connexion",
     addComment: "Ajouter un commentaire",
@@ -134,8 +137,11 @@ export const strings = {
     customSoftwareTooltip: "Add a custom software tool. Drag out to use.",
     customHardwareTooltip: "Add a custom hardware device. Drag out to use.",
 
-    duplicateNode: "Duplicate Node",
-    deleteNode: "Delete Node",
+    copyNode: "Copy",
+    pasteNode: "Paste",
+    bringToFront: "Bring to Front",
+    sendToBack: "Send to Back",
+    deleteNode: "Delete",
     deleteEdge: "Delete Edge",
     addComment: "Add comment",
 

@@ -33,10 +33,8 @@ export default memo(({ data, isConnectable, selected }) => {
     if (isTouchDevice()) {
       deleteElements({ nodes: [{ id: data.id }] });
       setSelectedNode(null);
-    } else if (data.toolObj.docLink && data.toolObj.docLink !== ".") {
-      window.open(data.toolObj.docLink, "_blank", "noopener,noreferrer");
     }
-  }, [data.id, data.toolObj, deleteElements, setSelectedNode]);
+  }, [data.id, deleteElements, setSelectedNode]);
 
   //update selected obj on click
   const handleClick = useCallback(() => {
